@@ -829,8 +829,26 @@ def index():
 
 # ===================== INITIALIZATION =====================
 if __name__ == "__main__":
+    import socket
+    
+    # Get Raspberry Pi's IP address
+    def get_local_ip():
+        try:
+            # Connect to a remote address to determine local IP
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.connect(("8.8.8.8", 80))
+            local_ip = s.getsockname()[0]
+            s.close()
+            return local_ip
+        except:
+            return "localhost"
+    
+    local_ip = get_local_ip()
+    
     print(f"[{datetime.datetime.now()}] 🚀 Starting SNMP Attack Demonstration System")
-    print(f"[{datetime.datetime.now()}] 📍 Web interface available at: http://0.0.0.0:{PORT}")
+    print(f"[{datetime.datetime.now()}] 📍 Web interface available at:")
+    print(f"    Local:  http://localhost:{PORT}")
+    print(f"    Network: http://{local_ip}:{PORT}")
     print(f"[{datetime.datetime.now()}] 🎯 Attack detection enabled: {ATTACK_THRESHOLD} requests in {ATTACK_WINDOW}s")
     print(f"[{datetime.datetime.now()}] 💡 Start normal operation animation...")
     
