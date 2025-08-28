@@ -3,46 +3,296 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Attack Demo — One-Glance View</title>
+<title>Network Demo — LED Visualization</title>
 <style>
-  :root { --bg:#0b0f14; --card:#121820; --muted:#a9b2c0; --accent:#00d3a7; --danger:#ff5d73; }
+  :root { 
+    --bg: #f8fafc; 
+    --card: #ffffff; 
+    --muted: #64748b; 
+    --accent: #0ea5e9; 
+    --danger: #ef4444;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --border: #e2e8f0;
+    --text: #1e293b;
+    --text-light: #64748b;
+  }
+  
   html,body { height:100%; margin:0; }
-  body { background:var(--bg); color:#e8eef5; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Helvetica,Arial,sans-serif; display:flex; flex-direction:column; }
-  header { padding:12px 16px; border-bottom:1px solid #18222f; background:#0c1218; display:flex; align-items:center; gap:16px; }
-  header h1 { margin:0; font-size:18px }
+  body { 
+    background: var(--bg); 
+    color: var(--text); 
+    font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Helvetica, Arial, sans-serif; 
+    display:flex; 
+    flex-direction:column;
+    line-height: 1.6;
+  }
+  
+  header { 
+    padding: 16px 20px; 
+    border-bottom: 1px solid var(--border); 
+    background: var(--card); 
+    display:flex; 
+    align-items:center; 
+    gap:16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  
+  header h1 { 
+    margin:0; 
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  
   .tabs { display:flex; gap:8px; margin-left:auto; }
-  .tab { background:#151d28; border:1px solid #263446; color:#cfe0f5; padding:8px 12px; border-radius:10px; cursor:pointer; font-weight:600 }
-  .tab.active { background:#0c2b25; border-color:#1c4c3f; color:#b6fff0 }
+  .tab { 
+    background: var(--bg); 
+    border: 1px solid var(--border); 
+    color: var(--text-light); 
+    padding: 10px 16px; 
+    border-radius: 12px; 
+    cursor:pointer; 
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+  .tab:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+  }
+  .tab.active { 
+    background: var(--accent); 
+    border-color: var(--accent); 
+    color: white;
+    box-shadow: 0 2px 8px rgba(14, 165, 233, 0.3);
+  }
 
   main { flex:1; min-height:0; display:flex; }
-  .card { flex:1; min-height:0; display:flex; flex-direction:column; gap:10px; padding:14px 16px; }
-  .panel { background:var(--card); border:1px solid #18222f; border-radius:14px; padding:12px; display:flex; flex-direction:column; min-height:0; }
+  .card { 
+    flex:1; 
+    min-height:0; 
+    display:flex; 
+    flex-direction:column; 
+    gap: 16px; 
+    padding: 20px; 
+  }
+  
+  .panel { 
+    background: var(--card); 
+    border: 1px solid var(--border); 
+    border-radius: 16px; 
+    padding: 20px; 
+    display: flex; 
+    flex-direction: column; 
+    min-height: 0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+  
   .stage-wrap { flex:1; min-height:0; display:flex; }
-  .stage { flex:1; width:100%; height:100%; background:#0c1218; border:1px solid #18222f; border-radius:12px; }
+  .stage { 
+    flex:1; 
+    width:100%; 
+    height:100%; 
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); 
+    border: 1px solid var(--border); 
+    border-radius: 16px;
+    padding: 20px;
+  }
 
-  .legend { display:flex; gap:12px; align-items:center; color:#a9b2c0; font-weight:600; }
-  .badge { display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; font-size:12px; border:1px solid #2a3a4b; background:#121b26 }
-  .req { color:#ffc5cd; border-color:#4c1c26; background:#2b1217 }
-  .res { color:#b6fff0; border-color:#1c4c3f; background:#0c2b25 }
-  .ping { color:#ffd0f0; border-color:#5c2d4a; background:#2a1523 }
+  .legend { 
+    display:flex; 
+    gap: 16px; 
+    align-items:center; 
+    color: var(--text-light); 
+    font-weight: 500;
+    margin-bottom: 12px;
+  }
+  
+  .badge { 
+    display:inline-flex; 
+    align-items:center; 
+    gap: 8px; 
+    padding: 8px 12px; 
+    border-radius: 20px; 
+    font-size: 13px; 
+    border: 1px solid var(--border); 
+    background: var(--card);
+    font-weight: 500;
+  }
+  
+  .req { 
+    color: #dc2626; 
+    border-color: #fecaca; 
+    background: #fef2f2;
+  }
+  
+  .res { 
+    color: var(--success); 
+    border-color: #bbf7d0; 
+    background: #f0fdf4;
+  }
+  
+  .ping { 
+    color: #ea580c; 
+    border-color: #fed7aa; 
+    background: #fff7ed;
+  }
 
-  .node { fill:#101825; stroke:#2b3a4a; stroke-width:2; }
-  .node-label { fill:#c7d4e5; font-weight:600; font-size:14px }
-  .controls { display:flex; gap:10px; flex-wrap:wrap; align-items:center }
-  .dotbar { display:flex; gap:8px; flex-wrap:wrap; }
-  .dot { width:16px; height:16px; border-radius:50%; background:#1a2430; border:1px solid #2a3a4b; box-shadow: inset 0 0 8px rgba(0,0,0,.6)}
-  .dot.on { background:#35f9c9; box-shadow: 0 0 12px #29ffd1, inset 0 0 6px rgba(0,0,0,.3); }
-  .dot.r.on { background:#ff556b; box-shadow: 0 0 12px #ff556b }
-  button { background:#1e2732; border:1px solid #2a3847; color:#e8eef5; padding:10px 14px; border-radius:10px; cursor:pointer; font-weight:600 }
-  button:hover { border-color:#3b4f64 }
-  button.accent { background:#0c2b25; border-color:#1c4c3f; color:#b6fff0 }
-  button.danger { background:#2b1217; border-color:#4c1c26; color:#ffc5cd }
-  input,select { background:#0f151d; color:#e8eef5; border:1px solid #2b3949; border-radius:10px; padding:10px 12px }
+  .node { 
+    fill: var(--card); 
+    stroke: var(--accent); 
+    stroke-width: 3;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+  }
+  
+  .node-label { 
+    fill: var(--text); 
+    font-weight: 600; 
+    font-size: 16px;
+  }
+  
+  .controls { 
+    display:flex; 
+    gap: 12px; 
+    flex-wrap:wrap; 
+    align-items:center;
+    margin-top: 16px;
+  }
+  
+  .dotbar { 
+    display:flex; 
+    gap: 10px; 
+    flex-wrap:wrap;
+    padding: 12px;
+    background: var(--bg);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+  }
+  
+  .dot { 
+    width: 20px; 
+    height: 20px; 
+    border-radius: 50%; 
+    background: var(--card); 
+    border: 2px solid var(--border); 
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    position: relative;
+  }
+  
+  .dot::after {
+    content: attr(title);
+    position: absolute;
+    bottom: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    color: var(--text-light);
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  
+  .dot:hover::after {
+    opacity: 1;
+  }
+  
+  .dot.on { 
+    background: var(--success); 
+    border-color: var(--success);
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.4), inset 0 2px 4px rgba(0,0,0,0.1);
+    transform: scale(1.1);
+  }
+  
+  .dot.r.on { 
+    background: var(--danger); 
+    border-color: var(--danger);
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+  }
+  
+  button { 
+    background: var(--card); 
+    border: 1px solid var(--border); 
+    color: var(--text); 
+    padding: 12px 18px; 
+    border-radius: 12px; 
+    cursor: pointer; 
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  button:hover { 
+    border-color: var(--accent);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
+  }
+  
+  button.accent { 
+    background: var(--accent); 
+    border-color: var(--accent); 
+    color: white;
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+  }
+  
+  button.accent:hover {
+    background: #0284c7;
+    box-shadow: 0 6px 16px rgba(14, 165, 233, 0.4);
+  }
+  
+  button.danger { 
+    background: var(--danger); 
+    border-color: var(--danger); 
+    color: white;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  }
+  
+  button.danger:hover {
+    background: #dc2626;
+    box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+  }
+  
+  input, select { 
+    background: var(--card); 
+    color: var(--text); 
+    border: 1px solid var(--border); 
+    border-radius: 12px; 
+    padding: 12px 16px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+  }
+  
+  input:focus, select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+  }
+  
+  .status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    background: var(--success);
+    color: white;
+    margin-left: auto;
+  }
+  
+  .status-indicator.offline {
+    background: var(--danger);
+  }
 </style>
 </head>
 <body>
 <header>
-  <h1>Attacker → Target (SNMP Demo)</h1>
+  <h1>🌐 Network Demo — LED Visualization</h1>
+  <div class="status-indicator" id="status">
+    <span>●</span> Online
+  </div>
   <div class="tabs">
     <div class="tab active" data-tab="demo" onclick="showTab('demo', this)">Demo</div>
     <div class="tab" data-tab="settings" onclick="showTab('settings', this)">Settings</div>
@@ -53,64 +303,83 @@
   <div class="card">
     <!-- VISUAL PANEL -->
     <div id="demo" class="panel section active">
-      <div class="legend" style="margin-bottom:6px">
-        <span class="badge req">➡ Request (pink)</span>
-        <span class="badge res">⬅ Response (teal, bottom)</span>
-        <span class="badge ping">• Ping</span>
+      <div class="legend">
+        <span class="badge req">➡ Request (Red)</span>
+        <span class="badge res">⬅ Response (Green)</span>
+        <span class="badge ping">• Ping (Orange)</span>
       </div>
 
       <div class="stage-wrap">
         <svg class="stage" viewBox="0 0 1100 560" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
           <defs>
-            <filter id="glow"><feGaussianBlur stdDeviation="3" result="g"/><feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            <filter id="glow">
+              <feGaussianBlur stdDeviation="4" result="g"/>
+              <feMerge>
+                <feMergeNode in="g"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+            <linearGradient id="nodeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#f1f5f9;stop-opacity:1" />
+            </linearGradient>
             <path id="p_req" d="M160,220 C420,40 680,40 940,220" fill="none" stroke="none"/>
             <path id="p_res" d="M940,340 C680,520 420,520 160,340" fill="none" stroke="none"/>
           </defs>
 
-          <rect x="100" y="230" rx="14" ry="14" width="160" height="100" class="node"/>
+          <!-- Background grid -->
+          <defs>
+            <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
+              <path d="M 50 0 L 0 0 0 50" fill="none" stroke="#e2e8f0" stroke-width="1" opacity="0.3"/>
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#grid)" />
+
+          <rect x="100" y="230" rx="16" ry="16" width="160" height="100" class="node" fill="url(#nodeGradient)"/>
           <text x="180" y="285" text-anchor="middle" class="node-label">Attacker</text>
-          <rect x="840" y="230" rx="14" ry="14" width="160" height="100" class="node"/>
+          <rect x="840" y="230" rx="16" ry="16" width="160" height="100" class="node" fill="url(#nodeGradient)"/>
           <text x="920" y="285" text-anchor="middle" class="node-label">Target</text>
 
-          <use href="#p_req" stroke="#3b536b" stroke-width="3" stroke-dasharray="6 6"/>
-          <use href="#p_res" stroke="#2b4a45" stroke-width="3" stroke-dasharray="6 6"/>
+          <use href="#p_req" stroke="#cbd5e1" stroke-width="4" stroke-dasharray="8 8"/>
+          <use href="#p_res" stroke="#cbd5e1" stroke-width="4" stroke-dasharray="8 8"/>
 
-          <circle id="pkt_req" r="9" class="packet" fill="#ff7a9a" style="opacity:0; filter:url(#glow)">
-            <animateMotion id="am_req" dur="0.9s" fill="freeze" path="M160,220 C420,40 680,40 940,220"/>
+          <circle id="pkt_req" r="12" class="packet" fill="#dc2626" style="opacity:0; filter:url(#glow)">
+            <animateMotion id="am_req" dur="1.2s" fill="freeze" path="M160,220 C420,40 680,40 940,220"/>
           </circle>
-          <circle id="pkt_res" r="9" class="packet" fill="#35f9c9" style="opacity:0; filter:url(#glow)">
-            <animateMotion id="am_res" dur="0.9s" fill="freeze" path="M940,340 C680,520 420,520 160,340"/>
+          <circle id="pkt_res" r="12" class="packet" fill="#10b981" style="opacity:0; filter:url(#glow)">
+            <animateMotion id="am_res" dur="1.2s" fill="freeze" path="M940,340 C680,520 420,520 160,340"/>
           </circle>
         </svg>
       </div>
 
-      <div class="controls" style="margin-top:8px">
+      <div class="controls">
         <div class="dotbar">
           <div id="d17" class="dot r" title="GPIO17"></div>
-          <div id="d27" class="dot"  title="GPIO27"></div>
-          <div id="d22" class="dot"  title="GPIO22"></div>
-          <div id="d10" class="dot"  title="GPIO10"></div>
-          <div id="d09" class="dot"  title="GPIO9"></div>
-          <div id="d5"  class="dot"  title="GPIO5"></div>
-          <div id="d6"  class="dot"  title="GPIO6"></div>
+          <div id="d27" class="dot" title="GPIO27"></div>
+          <div id="d22" class="dot" title="GPIO22"></div>
+          <div id="d10" class="dot" title="GPIO10"></div>
+          <div id="d09" class="dot" title="GPIO9"></div>
+          <div id="d5" class="dot" title="GPIO5"></div>
+          <div id="d6" class="dot" title="GPIO6"></div>
         </div>
         <button class="accent" onclick="sendReqResp()">Send Packet</button>
-        <button style="background:#2a1523; border-color:#5c2d4a; color:#ffd0f0" onclick="doPing()">Ping (Pink)</button>
+        <button style="background: #f59e0b; border-color: #f59e0b; color: white; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);" onclick="doPing()">Ping Target</button>
       </div>
 
-      <div class="controls" style="gap:8px; margin-top:4px">
-        <input id="target" placeholder="Target IP">
-        <input id="pub"    placeholder="RO community" value="public">
-        <input id="priv"   placeholder="RW community" value="private">
-        <input id="ifidx"  placeholder="ifIndex (e.g. 7)" style="width:140px">
-        <button onclick="snmpWalk()">SNMP Walk — <b>Interface Name</b></button>
-        <button class="danger" onclick="snmpDown()">SNMP Set ifAdminStatus=down</button>
+      <div class="controls">
+        <input id="target" placeholder="Target IP Address" style="min-width: 200px;">
+        <input id="pub" placeholder="RO Community" value="public" style="width: 140px;">
+        <input id="priv" placeholder="RW Community" value="private" style="width: 140px;">
+        <input id="ifidx" placeholder="ifIndex (e.g. 7)" style="width: 140px;">
+        <button onclick="snmpWalk()">SNMP Walk</button>
+        <button class="danger" onclick="snmpDown()">SNMP Port Down</button>
       </div>
     </div>
 
     <!-- SETTINGS PANEL -->
     <div id="settings" class="panel section" style="display:none">
-      <div class="controls" style="gap:8px">
+      <h3 style="margin-top: 0; color: var(--text);">LED Control Panel</h3>
+      <div class="controls">
         <button onclick="fetch('/on17')">ON 17</button>
         <button onclick="fetch('/on27')">ON 27</button>
         <button onclick="fetch('/on22')">ON 22</button>
@@ -120,8 +389,8 @@
         <button onclick="fetch('/on6')">ON 6</button>
         <button onclick="fetch('/off')">All OFF</button>
       </div>
-      <div class="controls" style="gap:8px">
-        <label>Wave speed</label>
+      <div class="controls">
+        <label style="font-weight: 500; color: var(--text);">Wave Speed:</label>
         <select id="hz">
           <option value="1">1 Hz</option>
           <option value="2">2 Hz</option>
@@ -131,90 +400,232 @@
         <button class="accent" onclick="startWave()">Start Wave</button>
         <button onclick="stopWave()">Stop</button>
       </div>
-      <div style="opacity:.75; font:12px ui-monospace; margin-top:6px">
-        Settings tab is for LED tests. Logs focus on attack actions only.
+      <div style="opacity: 0.7; font-size: 13px; margin-top: 12px; color: var(--text-light);">
+        💡 Settings tab is for LED testing. Demo tab focuses on network operations.
       </div>
     </div>
   </div>
 </main>
 
 <script>
-// Colors: default non-ping (req=pink, res=teal). Ping -> both pink.
+// Colors: updated for light mode
 function setPacketColors(reqColor, resColor){
   document.getElementById('pkt_req').setAttribute('fill', reqColor);
   document.getElementById('pkt_res').setAttribute('fill', resColor);
 }
+
 function showTab(id, btn){
   document.querySelectorAll('.section').forEach(s=>s.style.display='none');
   document.getElementById(id).style.display='flex';
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
 }
-function startWave(){ const hz=document.getElementById('hz').value; fetch('/start?hz='+hz); }
-function stopWave(){ fetch('/stop'); }
 
-// Simple demo: request then response (slight delay)
+function startWave(){ 
+  const hz=document.getElementById('hz').value; 
+  fetch('/start?hz='+hz); 
+}
+
+function stopWave(){ 
+  fetch('/stop'); 
+}
+
+// Fixed packet animation synchronization
 function sendReqResp(){
-  setPacketColors('#ff7a9a', '#35f9c9');
-  const req=document.getElementById('pkt_req');
-  const res=document.getElementById('pkt_res');
+  setPacketColors('#dc2626', '#10b981');
+  const req = document.getElementById('pkt_req');
+  const res = document.getElementById('pkt_res');
   const amReq = document.getElementById('am_req');
   const amRes = document.getElementById('am_res');
-  req.style.opacity=1; amReq.beginElement();
+  
+  // Reset animations
+  req.style.opacity = 0;
+  res.style.opacity = 0;
+  
+  // Start request packet
+  req.style.opacity = 1;
+  amReq.beginElement();
   fetch('/demo/packet', {method:'POST'});
-  setTimeout(()=>{ res.style.opacity=1; amRes.beginElement(); setTimeout(()=>{ res.style.opacity=0; }, 1000); }, 320);
-  setTimeout(()=>{ req.style.opacity=0; }, 1000);
+  
+  // Start response packet after request completes
+  setTimeout(() => {
+    res.style.opacity = 1;
+    amRes.beginElement();
+  }, 1200); // Match the animation duration
+  
+  // Hide packets after completion
+  setTimeout(() => {
+    req.style.opacity = 0;
+    res.style.opacity = 0;
+  }, 2400);
 }
 
 function doPing(){
-  const t=document.getElementById('target').value.trim();
-  if(!t){ alert('Enter target IP'); return; }
-  setPacketColors('#ff7a9a', '#ff7a9a'); // both pink for ping
-  const req=document.getElementById('pkt_req');
-  const res=document.getElementById('pkt_res');
+  const t = document.getElementById('target').value.trim();
+  if(!t){ 
+    alert('Please enter a target IP address'); 
+    return; 
+  }
+  
+  setPacketColors('#ea580c', '#ea580c'); // Both orange for ping
+  const req = document.getElementById('pkt_req');
+  const res = document.getElementById('pkt_res');
   const amReq = document.getElementById('am_req');
   const amRes = document.getElementById('am_res');
-  req.style.opacity=1; amReq.beginElement();
+  
+  // Reset animations
+  req.style.opacity = 0;
+  res.style.opacity = 0;
+  
+  // Start request packet
+  req.style.opacity = 1;
+  amReq.beginElement();
+  
   fetch('/ping?target='+encodeURIComponent(t))
     .then(r=>r.json())
-    .then(_=>{
-      setTimeout(()=>{ res.style.opacity=1; amRes.beginElement(); setTimeout(()=>{ res.style.opacity=0; }, 1000); }, 260);
+    .then(data => {
+      // Start response packet after ping completes
+      setTimeout(() => {
+        res.style.opacity = 1;
+        amRes.beginElement();
+      }, 1200);
     })
-    .finally(()=>{ setTimeout(()=>{ req.style.opacity=0; setPacketColors('#ff7a9a', '#35f9c9'); }, 1000); });
+    .catch(err => {
+      console.error('Ping failed:', err);
+      // Still show response animation for visual feedback
+      setTimeout(() => {
+        res.style.opacity = 1;
+        amRes.beginElement();
+      }, 1200);
+    })
+    .finally(() => {
+      // Reset colors and hide packets
+      setTimeout(() => {
+        req.style.opacity = 0;
+        res.style.opacity = 0;
+        setPacketColors('#dc2626', '#10b981');
+      }, 2400);
+    });
 }
 
 function snmpWalk(){
-  const t=document.getElementById('target').value.trim();
-  const c=document.getElementById('pub').value.trim();
-  if(!t){ alert('Enter target IP'); return; }
+  const t = document.getElementById('target').value.trim();
+  const c = document.getElementById('pub').value.trim();
+  if(!t){ 
+    alert('Please enter a target IP address'); 
+    return; 
+  }
   fetch('/snmp/walk?target='+encodeURIComponent(t)+'&community='+encodeURIComponent(c))
     .then(r=>r.json())
-    .then(data=>console.log('SNMP Walk:', data));
+    .then(data => {
+      console.log('SNMP Walk:', data);
+      if (data.ok) {
+        showNotification('SNMP Walk completed successfully', 'success');
+      } else {
+        showNotification('SNMP Walk failed: ' + (data.error || 'Unknown error'), 'error');
+      }
+    })
+    .catch(err => {
+      console.error('SNMP Walk error:', err);
+      showNotification('SNMP Walk failed', 'error');
+    });
 }
 
 function snmpDown(){
-  const t=document.getElementById('target').value.trim();
-  const c=document.getElementById('priv').value.trim();
-  const i=document.getElementById('ifidx').value.trim();
-  if(!t || !i){ alert('Enter target IP and ifIndex'); return; }
+  const t = document.getElementById('target').value.trim();
+  const c = document.getElementById('priv').value.trim();
+  const i = document.getElementById('ifidx').value.trim();
+  if(!t || !i){ 
+    alert('Please enter both target IP and ifIndex'); 
+    return; 
+  }
   fetch('/snmp/portdown?target='+encodeURIComponent(t)+'&community='+encodeURIComponent(c)+'&ifindex='+encodeURIComponent(i))
     .then(r=>r.json())
-    .then(data=>console.log('SNMP Port Down:', data));
+    .then(data => {
+      console.log('SNMP Port Down:', data);
+      if (data.ok) {
+        showNotification('Port successfully set to down', 'success');
+      } else {
+        showNotification('Port down failed: ' + (data.error || 'Unknown error'), 'error');
+      }
+    })
+    .catch(err => {
+      console.error('SNMP Port Down error:', err);
+      showNotification('Port down failed', 'error');
+    });
 }
 
-// SSE to update LED dots
-const evt = new EventSource('/events');
-evt.onmessage = (e)=>{
-  try{
-    const data = JSON.parse(e.data);
-    const pins = (data && data.pins) || {};
-    setDot('d17', pins["17"]); setDot('d27', pins["27"]);
-    setDot('d22', pins["22"]); setDot('d10', pins["10"]);
-    setDot('d09', pins["9"]);  setDot('d5', pins["5"]);
-    setDot('d6', pins["6"]);
-  }catch(_){}
-};
-function setDot(id, level){ const el=document.getElementById(id); if(!el) return; el.classList.toggle('on', level===1); }
+function showNotification(message, type) {
+  // Simple notification system
+  const notification = document.createElement('div');
+  notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 12px 20px;
+    border-radius: 8px;
+    color: white;
+    font-weight: 500;
+    z-index: 1000;
+    background: ${type === 'success' ? '#10b981' : '#ef4444'};
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+  `;
+  notification.textContent = message;
+  document.body.appendChild(notification);
+  
+  setTimeout(() => notification.style.transform = 'translateX(0)', 100);
+  setTimeout(() => {
+    notification.style.transform = 'translateX(100%)';
+    setTimeout(() => document.body.removeChild(notification), 300);
+  }, 3000);
+}
+
+// SSE to update LED dots with improved error handling
+let evt;
+function connectSSE() {
+  try {
+    evt = new EventSource('/events');
+    evt.onmessage = (e) => {
+      try {
+        const data = JSON.parse(e.data);
+        const pins = (data && data.pins) || {};
+        setDot('d17', pins["17"]); 
+        setDot('d27', pins["27"]);
+        setDot('d22', pins["22"]); 
+        setDot('d10', pins["10"]);
+        setDot('d09', pins["9"]);  
+        setDot('d5', pins["5"]);
+        setDot('d6', pins["6"]);
+        
+        // Update status indicator
+        document.getElementById('status').innerHTML = '<span>●</span> Online';
+        document.getElementById('status').classList.remove('offline');
+      } catch(err) {
+        console.error('SSE data parse error:', err);
+      }
+    };
+    
+    evt.onerror = () => {
+      document.getElementById('status').innerHTML = '<span>●</span> Offline';
+      document.getElementById('status').classList.add('offline');
+      setTimeout(connectSSE, 5000); // Reconnect after 5 seconds
+    };
+  } catch(err) {
+    console.error('SSE connection error:', err);
+    setTimeout(connectSSE, 5000);
+  }
+}
+
+function setDot(id, level){ 
+  const el = document.getElementById(id); 
+  if(!el) return; 
+  el.classList.toggle('on', level === 1); 
+}
+
+// Initialize SSE connection
+connectSSE();
 </script>
 </body>
 </html>
