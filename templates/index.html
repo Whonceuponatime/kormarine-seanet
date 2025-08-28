@@ -466,6 +466,7 @@
     </div>
   <div class="tabs">
     <div class="tab active" data-tab="demo" onclick="showTab('demo', this)">Demo</div>
+    <div class="tab" data-tab="diagram" onclick="showTab('diagram', this)">Network Diagram</div>
     <div class="tab" data-tab="settings" onclick="showTab('settings', this)">Settings</div>
   </div>
 </header>
@@ -550,7 +551,28 @@
        </div>
      </div>
 
-    
+    <!-- NETWORK DIAGRAM PANEL -->
+    <div id="diagram" class="panel section" style="display:none">
+      <div class="section-title">
+        🌐 Interactive Network Topology
+      </div>
+      <div class="stage-wrap">
+        <div style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); border: 1px solid var(--border); border-radius: 16px; padding: 40px; text-align: center; min-height: 400px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+          <h2 style="color: var(--text); margin-bottom: 20px;">🌐 Network Topology Diagram</h2>
+          <div style="background: var(--card); border: 2px solid var(--accent); border-radius: 12px; padding: 30px; margin: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+            <div style="font-size: 48px; margin-bottom: 15px;">👤💻 ➡️ 🔧📡 ➡️ 🖥️🖥️🖥️🖥️</div>
+            <div style="color: var(--text-light); font-size: 14px; line-height: 1.6;">
+              <strong>Hacker</strong> → <strong>MOXA Router (192.168.10.1)</strong> → <strong>VLAN 10 Devices</strong>
+            </div>
+          </div>
+          <div style="display: flex; gap: 15px; margin-top: 20px;">
+            <button class="accent" onclick="simulateAttack()">🚀 Simulate Attack</button>
+            <button onclick="selectRouterTarget()">🎯 Select Router Target</button>
+            <button onclick="showNetworkInfo()">📊 Network Info</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- SETTINGS PANEL -->
     <div id="settings" class="panel section" style="display:none">
@@ -1120,6 +1142,43 @@ function highlightPorts() {
   showNotification('💡 All ports highlighted', 'success');
 }
 
+// Network Diagram Functions
+function simulateAttack() {
+  showNotification('🚀 Simulating network attack...', 'success');
+  showOutput('🚀 Network attack simulation initiated\nTarget: 192.168.10.1\nMethod: SNMP exploitation\nStatus: Vulnerable ports detected\n');
+}
+
+function selectRouterTarget() {
+  document.getElementById('snmp_target').value = '192.168.10.1';
+  showNotification('🎯 Router target selected: 192.168.10.1', 'success');
+  showTab('demo', document.querySelector('[data-tab="demo"]'));
+}
+
+function showNetworkInfo() {
+  const info = `📊 Network Topology Information:
+
+🔧 Central Router: MOXA EDR-G9010-VPN-2MGSFP
+   IP Address: 192.168.10.1
+   Ports: 8 x RJ45 Ethernet
+   Management: MG1/MG2 ports
+   
+🖥️ VLAN 10 Devices: 4 connected devices
+   All devices online and operational
+   
+🔒 Security Status: ⚠️ VULNERABLE
+   SNMP community strings may be default
+   Ports can be controlled remotely
+   
+💡 Use the Demo tab to interact with the network`;
+
+  showOutput(info);
+}
+
+function initializeDiagram() {
+  // Placeholder for diagram initialization
+  console.log('Diagram initialized');
+}
+
 // Initialize diagram when page loads
 document.addEventListener('DOMContentLoaded', () => {
   // Set default values for SNMP inputs
@@ -1151,6 +1210,13 @@ function showTab(tabName, clickedElement) {
   // Add active class to clicked tab
   if (clickedElement) {
     clickedElement.classList.add('active');
+  }
+  
+  // Initialize diagram when switching to it
+  if (tabName === 'diagram') {
+    setTimeout(() => {
+      showNotification('🌐 Network diagram loaded', 'success');
+    }, 300);
   }
 }
 </script>
