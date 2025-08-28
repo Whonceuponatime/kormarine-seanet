@@ -99,14 +99,7 @@
     padding: 20px;
   }
 
-  .legend { 
-    display:flex; 
-    gap: 16px; 
-    align-items:center; 
-    color: var(--text-light); 
-    font-weight: 500;
-    margin-bottom: 12px;
-  }
+  
   
   .badge { 
     display:inline-flex; 
@@ -467,7 +460,7 @@
 </head>
 <body>
   <header>
-    <h1>🌐 Network Demo — LED Visualization</h1>
+    <h1>🔧 SNMP Network Management — LED Visualization</h1>
     <div class="status-indicator" id="status">
       <span>●</span> Online
     </div>
@@ -481,12 +474,7 @@
   <div class="card">
     <!-- VISUAL PANEL -->
     <div id="demo" class="panel section active">
-      <div class="legend">
-        <span class="badge req">➡ Request (Red)</span>
-        <span class="badge res">⬅ Response (Green)</span>
-        <span class="badge ping">• Ping (Orange)</span>
-      </div>
-
+             
       <div class="stage-wrap">
         <svg class="stage" viewBox="0 0 1100 560" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
           <defs>
@@ -530,11 +518,7 @@
         </svg>
       </div>
 
-             <div class="controls">
-         <input id="target" placeholder="Target IP Address" style="min-width: 200px;">
-         <button onclick="doPing()">Ping</button>
-         <button class="accent" onclick="sendReqResp()">Send Packet</button>
-       </div>
+      
 
        <!-- SNMP Section -->
        <div class="section-title" style="margin-top: 24px; border-top: 1px solid var(--border); padding-top: 16px;">
@@ -551,8 +535,8 @@
 
        <div class="controls" style="margin-top: 12px;">
          <input id="manual_ifindex" placeholder="Interface Index (e.g. 7)" style="width: 160px;">
-         <button class="danger" onclick="snmpPortDown()">🔴 Port Down (LED: 1→2→3→4→5→6→7)</button>
-         <button class="success" onclick="snmpPortUp()">🟢 Port Up (LED: 7→6→5→4→3→2→1)</button>
+         <button class="danger" onclick="snmpPortDown()">🔴 Port Down</button>
+         <button class="success" onclick="snmpPortUp()">🟢 Port Up</button>
        </div>
 
 
@@ -637,94 +621,9 @@ function stopWave(){
   fetch('/stop'); 
 }
 
-// Fixed packet animation synchronization
-function sendReqResp(){
-  setPacketColors('#dc2626', '#10b981');
-  const req = document.getElementById('pkt_req');
-  const res = document.getElementById('pkt_res');
-  const amReq = document.getElementById('am_req');
-  const amRes = document.getElementById('am_res');
-  
-  // Reset animations
-  req.style.opacity = 0;
-  res.style.opacity = 0;
-  
-  // Start request packet
-  req.style.opacity = 1;
-  amReq.beginElement();
-  fetch('/demo/packet', {method:'POST'});
-  
-  // Start response packet after request completes
-  setTimeout(() => {
-    res.style.opacity = 1;
-    amRes.beginElement();
-  }, 1200); // Match the animation duration
-  
-  // Hide packets after completion
-  setTimeout(() => {
-    req.style.opacity = 0;
-    res.style.opacity = 0;
-  }, 2400);
-}
 
- function doPing(){
-   const t = document.getElementById('target').value.trim();
-   if(!t){ 
-     alert('Please enter a target IP address'); 
-     return; 
-   }
-   
-   setPacketColors('#ea580c', '#ea580c'); // Both orange for ping
-   const req = document.getElementById('pkt_req');
-   const res = document.getElementById('pkt_res');
-   const amReq = document.getElementById('am_req');
-   const amRes = document.getElementById('am_res');
-   
-   // Reset animations
-   req.style.opacity = 0;
-   res.style.opacity = 0;
-   
-   // Start request packet
-   req.style.opacity = 1;
-   amReq.beginElement();
-   
-   // Show output area
-   showOutput(`Pinging ${t}...\n`);
-   
-   fetch('/ping?target='+encodeURIComponent(t))
-     .then(r=>r.json())
-     .then(data => {
-       // Display ping results
-       if(data.ok) {
-         showOutput(`✅ Ping successful!\nResponse: ${data.output}\n`);
-       } else {
-         showOutput(`❌ Ping failed: ${data.error}\n`);
-       }
-       
-       // Start response packet after ping completes
-       setTimeout(() => {
-         res.style.opacity = 1;
-         amRes.beginElement();
-       }, 1200);
-     })
-     .catch(err => {
-       console.error('Ping failed:', err);
-       showOutput(`❌ Ping error: ${err.message}\n`);
-       // Still show response animation for visual feedback
-       setTimeout(() => {
-         res.style.opacity = 1;
-         amRes.beginElement();
-       }, 1200);
-     })
-     .finally(() => {
-       // Reset colors and hide packets
-       setTimeout(() => {
-         req.style.opacity = 0;
-         res.style.opacity = 0;
-         setPacketColors('#dc2626', '#10b981');
-       }, 2400);
-     });
- }
+
+
 
 // SNMP Functions
  function discoverInterfaces() {
@@ -794,8 +693,8 @@ function displayInterfaces(interfaces, target, community) {
             </div>
           </div>
                      <div class="interface-actions">
-             <button class="danger" style="padding: 6px 12px; font-size: 12px;" onclick="snmpPortDown('${target}', '${community}', '${i}')" title="LED Pattern: 1→2→3→4→5→6→7">Down</button>
-             <button class="success" style="padding: 6px 12px; font-size: 12px;" onclick="snmpPortUp('${target}', '${community}', '${i}')" title="LED Pattern: 7→6→5→4→3→2→1">Up</button>
+             <button class="danger" style="padding: 6px 12px; font-size: 12px;" onclick="snmpPortDown('${target}', '${community}', '${i}')">Down</button>
+             <button class="success" style="padding: 6px 12px; font-size: 12px;" onclick="snmpPortUp('${target}', '${community}', '${i}')">Up</button>
            </div>
         </div>
       `;
@@ -850,7 +749,7 @@ function parseSnmpOutput(output) {
      .then(r => r.json())
      .then(data => {
        if(data.ok) {
-         showOutput(`✅ Port ${i} successfully set to DOWN (LED Pattern: 1→2→3→4→5→6→7)\n`);
+         showOutput(`✅ Port ${i} successfully set to DOWN\n`);
          showNotification('Port successfully set to down', 'success');
          // Refresh interface list if we're in discovery mode
          if(target) {
@@ -884,7 +783,7 @@ function parseSnmpOutput(output) {
      .then(r => r.json())
      .then(data => {
        if(data.ok) {
-         showOutput(`✅ Port ${i} successfully set to UP (LED Pattern: 7→6→5→4→3→2→1)\n`);
+         showOutput(`✅ Port ${i} successfully set to UP\n`);
          showNotification('Port successfully set to up', 'success');
          // Refresh interface list if we're in discovery mode
          if(target) {

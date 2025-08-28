@@ -106,17 +106,7 @@ class Routes:
             ).start()
             return jsonify(ok=True)
         
-        # Ping route
-        @self.app.get("/ping")
-        def ping():
-            target = request.args.get("target", "").strip()
-            if not target:
-                return jsonify(ok=False, error="target required"), 400
-            
-            result = self.cmd.ping_target(target)
-            if not result["ok"] and "error" in result:
-                return jsonify(**result), 400
-            return jsonify(**result)
+
         
         # SNMP routes
         @self.app.get("/snmp/walk")

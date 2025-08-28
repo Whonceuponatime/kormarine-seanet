@@ -16,7 +16,6 @@ class CommandExecutor:
     def __init__(self, gpio_controller):
         """Initialize command executor with GPIO controller reference"""
         self.gpio = gpio_controller
-        self.ping_lock = threading.Lock()
     
     def _run(self, cmd: str, timeout=DEFAULT_TIMEOUT):
         """Execute a shell command with timeout"""
@@ -26,32 +25,7 @@ class CommandExecutor:
         except subprocess.TimeoutExpired:
             return 124, "", f"timeout after {timeout}s"
     
-    def ping_target(self, target: str):
-        """Ping a target with LED visualization"""
-        if not target.strip():
-            return {"ok": False, "error": "target required"}
-        
-        if not self.ping_lock.acquire(blocking=False):
-            return {"ok": False, "error": "busy"}
-        
-        def _do_ping():
-            try:
-                self.gpio.roundtrip_wave(step_period=0.14)
-            finally:
-                self.ping_lock.release()
-        
-        # Start LED animation in background
-        threading.Thread(target=_do_ping, daemon=True).start()
-        
-        # Execute ping command
-        code, out, err = self._run(f"ping -c 1 -W 1 {target}", timeout=PING_TIMEOUT)
-        
-        return {
-            "ok": (code == 0),
-            "code": code,
-            "stdout": out,
-            "stderr": err
-        }
+    
     
     def snmp_walk(self, target: str, community: str = "public"):
         """Execute SNMP walk with LED visualization"""
