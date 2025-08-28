@@ -466,7 +466,6 @@
     </div>
   <div class="tabs">
     <div class="tab active" data-tab="demo" onclick="showTab('demo', this)">Demo</div>
-    <div class="tab" data-tab="diagram" onclick="showTab('diagram', this)">Network Diagram</div>
     <div class="tab" data-tab="settings" onclick="showTab('settings', this)">Settings</div>
   </div>
 </header>
@@ -477,46 +476,30 @@
     <div id="demo" class="panel section active">
              
       <div class="stage-wrap">
-        <svg class="stage" viewBox="0 0 1100 560" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <filter id="glow">
-              <feGaussianBlur stdDeviation="4" result="g"/>
-              <feMerge>
-                <feMergeNode in="g"/>
-                <feMergeNode in="SourceGraphic"/>
-              </feMerge>
-            </filter>
-            <linearGradient id="nodeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
-              <stop offset="100%" style="stop-color:#f1f5f9;stop-opacity:1" />
-            </linearGradient>
-            <path id="p_req" d="M160,220 C420,40 680,40 940,220" fill="none" stroke="none"/>
-            <path id="p_res" d="M940,340 C680,520 420,520 160,340" fill="none" stroke="none"/>
-          </defs>
-
-          <!-- Background grid -->
-          <defs>
-            <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
-              <path d="M 50 0 L 0 0 0 50" fill="none" stroke="#e2e8f0" stroke-width="1" opacity="0.3"/>
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#grid)" />
-
-          <rect x="100" y="230" rx="16" ry="16" width="160" height="100" class="node" fill="url(#nodeGradient)"/>
-          <text x="180" y="285" text-anchor="middle" class="node-label">Attacker</text>
-          <rect x="840" y="230" rx="16" ry="16" width="160" height="100" class="node" fill="url(#nodeGradient)"/>
-          <text x="920" y="285" text-anchor="middle" class="node-label">Target</text>
-
-          <use href="#p_req" stroke="#cbd5e1" stroke-width="4" stroke-dasharray="8 8"/>
-          <use href="#p_res" stroke="#cbd5e1" stroke-width="4" stroke-dasharray="8 8"/>
-
-          <circle id="pkt_req" r="12" class="packet" fill="#dc2626" style="opacity:0; filter:url(#glow)">
-            <animateMotion id="am_req" dur="1.2s" fill="freeze" path="M160,220 C420,40 680,40 940,220"/>
-          </circle>
-          <circle id="pkt_res" r="12" class="packet" fill="#10b981" style="opacity:0; filter:url(#glow)">
-            <animateMotion id="am_res" dur="1.2s" fill="freeze" path="M940,340 C680,520 420,520 160,340"/>
-          </circle>
-        </svg>
+        <div style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); border: 1px solid var(--border); border-radius: 16px; padding: 20px; min-height: 400px; position: relative; overflow: hidden;">
+          <div style="position: absolute; top: 10px; left: 20px; z-index: 10;">
+            <h3 style="color: var(--text); margin: 0 0 10px 0; font-size: 18px;">🌐 Interactive Network Topology</h3>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <button class="accent" style="padding: 6px 12px; font-size: 11px;" onclick="simulateAttack()">🚀 Attack</button>
+              <button style="padding: 6px 12px; font-size: 11px;" onclick="showNetworkInfo()">📊 Info</button>
+              <button style="padding: 6px 12px; font-size: 11px;" onclick="selectRouterTarget()">🎯 Select Router</button>
+              <button style="padding: 6px 12px; font-size: 11px;" onclick="startPacketAnimation()">📦 Animate</button>
+            </div>
+          </div>
+          
+          <!-- Network Diagram Container -->
+          <div id="network-diagram" style="width: 100%; height: 350px; margin-top: 60px; overflow: hidden; border-radius: 12px; background: white; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); position: relative;">
+            <!-- Embedded SVG from Draw.io -->
+            <div style="width: 100%; height: 100%; transform: scale(0.25); transform-origin: top left; position: absolute; top: 0; left: 0;">
+              <!-- SVG will be embedded here via JavaScript -->
+            </div>
+          </div>
+          
+          <!-- Clickable Hotspots Overlay -->
+          <div id="diagram-hotspots" style="position: absolute; top: 60px; left: 20px; right: 20px; bottom: 20px; pointer-events: none;">
+            <!-- Hotspots will be added by JavaScript -->
+          </div>
+        </div>
       </div>
 
       
@@ -551,28 +534,6 @@
        </div>
      </div>
 
-    <!-- NETWORK DIAGRAM PANEL -->
-    <div id="diagram" class="panel section" style="display:none">
-      <div class="section-title">
-        🌐 Interactive Network Topology
-      </div>
-      <div class="stage-wrap">
-        <div style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); border: 1px solid var(--border); border-radius: 16px; padding: 40px; text-align: center; min-height: 400px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-          <h2 style="color: var(--text); margin-bottom: 20px;">🌐 Network Topology Diagram</h2>
-          <div style="background: var(--card); border: 2px solid var(--accent); border-radius: 12px; padding: 30px; margin: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-            <div style="font-size: 48px; margin-bottom: 15px;">👤💻 ➡️ 🔧📡 ➡️ 🖥️🖥️🖥️🖥️</div>
-            <div style="color: var(--text-light); font-size: 14px; line-height: 1.6;">
-              <strong>Hacker</strong> → <strong>MOXA Router (192.168.10.1)</strong> → <strong>VLAN 10 Devices</strong>
-            </div>
-          </div>
-          <div style="display: flex; gap: 15px; margin-top: 20px;">
-            <button class="accent" onclick="simulateAttack()">🚀 Simulate Attack</button>
-            <button onclick="selectRouterTarget()">🎯 Select Router Target</button>
-            <button onclick="showNetworkInfo()">📊 Network Info</button>
-          </div>
-        </div>
-      </div>
-    </div>
 
     <!-- SETTINGS PANEL -->
     <div id="settings" class="panel section" style="display:none">
@@ -1175,8 +1136,81 @@ function showNetworkInfo() {
 }
 
 function initializeDiagram() {
-  // Placeholder for diagram initialization
-  console.log('Diagram initialized');
+  // Load the network diagram SVG
+  const diagramContainer = document.querySelector('#network-diagram > div');
+  if (diagramContainer) {
+    // Use fetch to load the SVG file
+    fetch('rpi background.drawio.svg')
+      .then(response => response.text())
+      .then(svgContent => {
+        diagramContainer.innerHTML = svgContent;
+        setupInteractiveHotspots();
+      })
+      .catch(error => {
+        console.log('Could not load diagram, using fallback');
+        // Fallback to a simplified diagram
+        diagramContainer.innerHTML = `
+          <div style="display: flex; justify-content: center; align-items: center; height: 100%; font-size: 48px; background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%);">
+            <div style="text-align: center; transform: scale(4);">
+              <div style="margin: 20px;">👤💻</div>
+              <div style="margin: 20px;">⬇️</div>
+              <div style="margin: 20px; padding: 10px; border: 2px solid #007acc; border-radius: 8px; background: white;">🔧📡</div>
+              <div style="margin: 20px;">⬇️</div>
+              <div style="margin: 20px;">🖥️🖥️🖥️🖥️</div>
+            </div>
+          </div>
+        `;
+        setupInteractiveHotspots();
+      });
+  }
+}
+
+function setupInteractiveHotspots() {
+  // Add clickable overlay hotspots for interaction
+  const hotspotsContainer = document.getElementById('diagram-hotspots');
+  if (!hotspotsContainer) return;
+  
+  // Clear existing hotspots
+  hotspotsContainer.innerHTML = '';
+  
+  // Add router hotspot (center of diagram)
+  const routerHotspot = document.createElement('div');
+  routerHotspot.style.cssText = `
+    position: absolute;
+    top: 40%;
+    left: 45%;
+    width: 10%;
+    height: 20%;
+    background: rgba(0, 122, 204, 0.2);
+    border: 2px dashed #007acc;
+    border-radius: 8px;
+    cursor: pointer;
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+  `;
+  routerHotspot.innerHTML = '<span style="font-size: 12px; color: #007acc; font-weight: bold;">Router</span>';
+  routerHotspot.onclick = selectRouterTarget;
+  routerHotspot.onmouseover = () => {
+    routerHotspot.style.background = 'rgba(0, 122, 204, 0.3)';
+  };
+  routerHotspot.onmouseout = () => {
+    routerHotspot.style.background = 'rgba(0, 122, 204, 0.2)';
+  };
+  
+  hotspotsContainer.appendChild(routerHotspot);
+}
+
+function startPacketAnimation() {
+  showNotification('📦 Starting packet animation...', 'success');
+  // Simulate LED pattern for packet flow
+  fetch('/start?hz=2');
+  setTimeout(() => {
+    fetch('/stop');
+    showNotification('📦 Packet animation complete', 'success');
+  }, 3000);
 }
 
 // Initialize diagram when page loads
@@ -1187,7 +1221,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (ro && !ro.value) ro.value = 'community';
   if (rw && !rw.value) rw.value = 'private';
   
-  // Initialize diagram
+  // Initialize the network diagram
   initializeDiagram();
 });
 
