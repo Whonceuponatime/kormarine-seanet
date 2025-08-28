@@ -379,13 +379,12 @@
 </head>
 <body>
   <header>
-    <h1>🌐 Network Demo — LED Visualization (TEST v2.0)</h1>
+    <h1>🌐 Network Demo — LED Visualization</h1>
     <div class="status-indicator" id="status">
-      <span>●</span> Online - Updated!
+      <span>●</span> Online
     </div>
   <div class="tabs">
     <div class="tab active" data-tab="demo" onclick="showTab('demo', this)">Demo</div>
-    <div class="tab" data-tab="snmp" onclick="showTab('snmp', this)">SNMP</div>
     <div class="tab" data-tab="settings" onclick="showTab('settings', this)">Settings</div>
   </div>
 </header>
@@ -457,39 +456,61 @@
         <button style="background: #f59e0b; border-color: #f59e0b; color: white; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);" onclick="doPing()">Ping Target</button>
       </div>
 
-      <div class="controls">
-        <input id="target" placeholder="Target IP Address" style="min-width: 200px;">
-        <button onclick="doPing()">Ping</button>
-      </div>
-    </div>
+             <div class="controls">
+         <input id="target" placeholder="Target IP Address" style="min-width: 200px;">
+         <button onclick="doPing()">Ping</button>
+       </div>
 
-    <!-- SNMP PANEL -->
-    <div id="snmp" class="panel section" style="display:none">
-      <div class="section-title">
-        🔧 SNMP Interface Management
-      </div>
-      
-      <div class="controls">
-        <input id="snmp_target" placeholder="Target IP Address" style="min-width: 200px;">
-        <input id="snmp_ro" placeholder="RO Community" value="public" style="width: 140px;">
-        <input id="snmp_rw" placeholder="RW Community" value="private" style="width: 140px;">
-        <button class="accent" onclick="discoverInterfaces()">🔍 Discover Interfaces</button>
-      </div>
+       <!-- SNMP Section -->
+       <div class="section-title" style="margin-top: 24px; border-top: 1px solid var(--border); padding-top: 16px;">
+         🔧 SNMP Network Management
+       </div>
+       
+       <div class="controls">
+         <input id="snmp_target" placeholder="SNMP Target IP" style="min-width: 180px;">
+         <input id="snmp_ro" placeholder="RO Community" value="public" style="width: 120px;">
+         <input id="snmp_rw" placeholder="RW Community" value="private" style="width: 120px;">
+         <button class="accent" onclick="discoverInterfaces()">🔍 Discover Interfaces</button>
+         <button onclick="snmpWalk()">📋 SNMP Walk</button>
+       </div>
 
-      <div id="interface_container" style="display: none;">
-        <div class="interface-list" id="interface_list">
-          <!-- Interfaces will be populated here -->
-        </div>
-      </div>
+       <div class="controls" style="margin-top: 12px;">
+         <input id="manual_ifindex" placeholder="Interface Index (e.g. 7)" style="width: 160px;">
+         <button class="danger" onclick="snmpPortDown()">🔴 Port Down (LED: 1→2→3→4→5)</button>
+         <button class="success" onclick="snmpPortUp()">🟢 Port Up (LED: 5→4→3→2→1)</button>
+       </div>
 
-      <div class="controls" style="margin-top: 16px;">
-        <div class="section-title">Manual SNMP Operations</div>
-        <input id="manual_ifindex" placeholder="Interface Index (e.g. 7)" style="width: 160px;">
-        <button class="danger" onclick="snmpPortDown()">🔴 Port Down</button>
-        <button class="success" onclick="snmpPortUp()">🟢 Port Up</button>
-        <button onclick="snmpWalk()">📋 SNMP Walk</button>
-      </div>
-    </div>
+       <!-- Output Display Area -->
+       <div id="output_container" style="margin-top: 16px; display: none;">
+         <div class="section-title" style="display: flex; justify-content: space-between; align-items: center;">
+           📊 Output Data
+           <button onclick="clearOutput()" style="padding: 6px 12px; font-size: 12px; background: var(--muted); border-color: var(--muted); color: white;">Clear</button>
+         </div>
+         <div id="output_area" style="
+           background: var(--bg); 
+           border: 1px solid var(--border); 
+           border-radius: 12px; 
+           padding: 16px; 
+           max-height: 300px; 
+           overflow-y: auto; 
+           font-family: 'Courier New', monospace; 
+           font-size: 13px; 
+           line-height: 1.4;
+           white-space: pre-wrap;
+           color: var(--text);
+         "></div>
+       </div>
+
+       <!-- Interface List -->
+       <div id="interface_container" style="margin-top: 16px; display: none;">
+         <div class="section-title">🌐 Discovered Interfaces</div>
+         <div class="interface-list" id="interface_list">
+           <!-- Interfaces will be populated here -->
+         </div>
+       </div>
+     </div>
+
+    
 
     <!-- SETTINGS PANEL -->
     <div id="settings" class="panel section" style="display:none">
@@ -577,85 +598,100 @@ function sendReqResp(){
   }, 2400);
 }
 
-function doPing(){
-  const t = document.getElementById('target').value.trim();
-  if(!t){ 
-    alert('Please enter a target IP address'); 
-    return; 
-  }
-  
-  setPacketColors('#ea580c', '#ea580c'); // Both orange for ping
-  const req = document.getElementById('pkt_req');
-  const res = document.getElementById('pkt_res');
-  const amReq = document.getElementById('am_req');
-  const amRes = document.getElementById('am_res');
-  
-  // Reset animations
-  req.style.opacity = 0;
-  res.style.opacity = 0;
-  
-  // Start request packet
-  req.style.opacity = 1;
-  amReq.beginElement();
-  
-  fetch('/ping?target='+encodeURIComponent(t))
-    .then(r=>r.json())
-    .then(data => {
-      // Start response packet after ping completes
-      setTimeout(() => {
-        res.style.opacity = 1;
-        amRes.beginElement();
-      }, 1200);
-    })
-    .catch(err => {
-      console.error('Ping failed:', err);
-      // Still show response animation for visual feedback
-      setTimeout(() => {
-        res.style.opacity = 1;
-        amRes.beginElement();
-      }, 1200);
-    })
-    .finally(() => {
-      // Reset colors and hide packets
-      setTimeout(() => {
-        req.style.opacity = 0;
-        res.style.opacity = 0;
-        setPacketColors('#dc2626', '#10b981');
-      }, 2400);
-    });
-}
+ function doPing(){
+   const t = document.getElementById('target').value.trim();
+   if(!t){ 
+     alert('Please enter a target IP address'); 
+     return; 
+   }
+   
+   setPacketColors('#ea580c', '#ea580c'); // Both orange for ping
+   const req = document.getElementById('pkt_req');
+   const res = document.getElementById('pkt_res');
+   const amReq = document.getElementById('am_req');
+   const amRes = document.getElementById('am_res');
+   
+   // Reset animations
+   req.style.opacity = 0;
+   res.style.opacity = 0;
+   
+   // Start request packet
+   req.style.opacity = 1;
+   amReq.beginElement();
+   
+   // Show output area
+   showOutput(`Pinging ${t}...\n`);
+   
+   fetch('/ping?target='+encodeURIComponent(t))
+     .then(r=>r.json())
+     .then(data => {
+       // Display ping results
+       if(data.ok) {
+         showOutput(`✅ Ping successful!\nResponse: ${data.output}\n`);
+       } else {
+         showOutput(`❌ Ping failed: ${data.error}\n`);
+       }
+       
+       // Start response packet after ping completes
+       setTimeout(() => {
+         res.style.opacity = 1;
+         amRes.beginElement();
+       }, 1200);
+     })
+     .catch(err => {
+       console.error('Ping failed:', err);
+       showOutput(`❌ Ping error: ${err.message}\n`);
+       // Still show response animation for visual feedback
+       setTimeout(() => {
+         res.style.opacity = 1;
+         amRes.beginElement();
+       }, 1200);
+     })
+     .finally(() => {
+       // Reset colors and hide packets
+       setTimeout(() => {
+         req.style.opacity = 0;
+         res.style.opacity = 0;
+         setPacketColors('#dc2626', '#10b981');
+       }, 2400);
+     });
+ }
 
 // SNMP Functions
-function discoverInterfaces() {
-  const target = document.getElementById('snmp_target').value.trim();
-  const community = document.getElementById('snmp_ro').value.trim();
-  
-  if(!target) {
-    alert('Please enter a target IP address');
-    return;
-  }
-  
-  const container = document.getElementById('interface_container');
-  const list = document.getElementById('interface_list');
-  
-  // Show loading
-  container.style.display = 'block';
-  list.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-light);"><div class="loading"></div> Discovering interfaces...</div>';
-  
-  fetch('/snmp/interfaces?target='+encodeURIComponent(target)+'&community='+encodeURIComponent(community))
-    .then(r => r.json())
-    .then(data => {
-      if(data.ok) {
-        displayInterfaces(data.interfaces, target, community);
-      } else {
-        list.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--danger);">❌ Failed to discover interfaces: ' + (data.error || 'Unknown error') + '</div>';
-      }
-    })
-    .catch(err => {
-      console.error('Interface discovery failed:', err);
-      list.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--danger);">❌ Interface discovery failed</div>';
-    });
-}
+ function discoverInterfaces() {
+   const target = document.getElementById('snmp_target').value.trim();
+   const community = document.getElementById('snmp_ro').value.trim();
+   
+   if(!target) {
+     alert('Please enter a target IP address');
+     return;
+   }
+   
+   const container = document.getElementById('interface_container');
+   const list = document.getElementById('interface_list');
+   
+   // Show loading and output
+   container.style.display = 'block';
+   showOutput(`🔍 Discovering interfaces on ${target}...\n`);
+   list.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-light);"><div class="loading"></div> Discovering interfaces...</div>';
+   
+   fetch('/snmp/interfaces?target='+encodeURIComponent(target)+'&community='+encodeURIComponent(community))
+     .then(r => r.json())
+     .then(data => {
+       if(data.ok) {
+         showOutput(`✅ Interface discovery successful!\nFound ${Object.keys(data.interfaces.names || {}).length} interfaces\n`);
+         displayInterfaces(data.interfaces, target, community);
+       } else {
+         showOutput(`❌ Interface discovery failed: ${data.error || 'Unknown error'}\n`);
+         list.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--danger);">❌ Failed to discover interfaces: ' + (data.error || 'Unknown error') + '</div>';
+       }
+     })
+     .catch(err => {
+       console.error('Interface discovery failed:', err);
+       showOutput(`❌ Interface discovery error: ${err.message}\n`);
+       list.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--danger);">❌ Interface discovery failed</div>';
+     });
+ }
 
 function displayInterfaces(interfaces, target, community) {
   const list = document.getElementById('interface_list');
@@ -688,10 +724,10 @@ function displayInterfaces(interfaces, target, community) {
               Oper: <span class="${operClass}">${operText}</span>
             </div>
           </div>
-          <div class="interface-actions">
-            <button class="danger" style="padding: 6px 12px; font-size: 12px;" onclick="snmpPortDown('${target}', '${community}', '${i}')">Down</button>
-            <button class="success" style="padding: 6px 12px; font-size: 12px;" onclick="snmpPortUp('${target}', '${community}', '${i}')">Up</button>
-          </div>
+                     <div class="interface-actions">
+             <button class="danger" style="padding: 6px 12px; font-size: 12px;" onclick="snmpPortDown('${target}', '${community}', '${i}')" title="LED Pattern: 1→2→3→4→5">Down</button>
+             <button class="success" style="padding: 6px 12px; font-size: 12px;" onclick="snmpPortUp('${target}', '${community}', '${i}')" title="LED Pattern: 5→4→3→2→1">Up</button>
+           </div>
         </div>
       `;
     }
@@ -729,112 +765,152 @@ function parseSnmpOutput(output) {
   return result;
 }
 
-function snmpPortDown(target = null, community = null, ifindex = null) {
-  const t = target || document.getElementById('snmp_target').value.trim();
-  const c = community || document.getElementById('snmp_rw').value.trim();
-  const i = ifindex || document.getElementById('manual_ifindex').value.trim();
-  
-  if(!t || !i) {
-    alert('Please enter both target IP and interface index');
-    return;
-  }
-  
-  fetch('/snmp/portdown?target='+encodeURIComponent(t)+'&community='+encodeURIComponent(c)+'&ifindex='+encodeURIComponent(i))
-    .then(r => r.json())
-    .then(data => {
-      if(data.ok) {
-        showNotification('Port successfully set to down', 'success');
-        // Refresh interface list if we're in discovery mode
-        if(target) {
-          setTimeout(() => discoverInterfaces(), 1000);
-        }
-      } else {
-        showNotification('Port down failed: ' + (data.error || 'Unknown error'), 'error');
-      }
-    })
-    .catch(err => {
-      console.error('SNMP Port Down error:', err);
-      showNotification('Port down failed', 'error');
-    });
-}
+ function snmpPortDown(target = null, community = null, ifindex = null) {
+   const t = target || document.getElementById('snmp_target').value.trim();
+   const c = community || document.getElementById('snmp_rw').value.trim();
+   const i = ifindex || document.getElementById('manual_ifindex').value.trim();
+   
+   if(!t || !i) {
+     alert('Please enter both target IP and interface index');
+     return;
+   }
+   
+   showOutput(`🔴 Setting port ${i} DOWN on ${t}...\n`);
+   
+   fetch('/snmp/portdown?target='+encodeURIComponent(t)+'&community='+encodeURIComponent(c)+'&ifindex='+encodeURIComponent(i))
+     .then(r => r.json())
+     .then(data => {
+       if(data.ok) {
+         showOutput(`✅ Port ${i} successfully set to DOWN (LED Pattern: 1→2→3→4→5)\n`);
+         showNotification('Port successfully set to down', 'success');
+         // Refresh interface list if we're in discovery mode
+         if(target) {
+           setTimeout(() => discoverInterfaces(), 1000);
+         }
+       } else {
+         showOutput(`❌ Port down failed: ${data.error || 'Unknown error'}\n`);
+         showNotification('Port down failed: ' + (data.error || 'Unknown error'), 'error');
+       }
+     })
+     .catch(err => {
+       console.error('SNMP Port Down error:', err);
+       showOutput(`❌ Port down error: ${err.message}\n`);
+       showNotification('Port down failed', 'error');
+     });
+ }
 
-function snmpPortUp(target = null, community = null, ifindex = null) {
-  const t = target || document.getElementById('snmp_target').value.trim();
-  const c = community || document.getElementById('snmp_rw').value.trim();
-  const i = ifindex || document.getElementById('manual_ifindex').value.trim();
-  
-  if(!t || !i) {
-    alert('Please enter both target IP and interface index');
-    return;
-  }
-  
-  fetch('/snmp/portup?target='+encodeURIComponent(t)+'&community='+encodeURIComponent(c)+'&ifindex='+encodeURIComponent(i))
-    .then(r => r.json())
-    .then(data => {
-      if(data.ok) {
-        showNotification('Port successfully set to up', 'success');
-        // Refresh interface list if we're in discovery mode
-        if(target) {
-          setTimeout(() => discoverInterfaces(), 1000);
-        }
-      } else {
-        showNotification('Port up failed: ' + (data.error || 'Unknown error'), 'error');
-      }
-    })
-    .catch(err => {
-      console.error('SNMP Port Up error:', err);
-      showNotification('Port up failed', 'error');
-    });
-}
+ function snmpPortUp(target = null, community = null, ifindex = null) {
+   const t = target || document.getElementById('snmp_target').value.trim();
+   const c = community || document.getElementById('snmp_rw').value.trim();
+   const i = ifindex || document.getElementById('manual_ifindex').value.trim();
+   
+   if(!t || !i) {
+     alert('Please enter both target IP and interface index');
+     return;
+   }
+   
+   showOutput(`🟢 Setting port ${i} UP on ${t}...\n`);
+   
+   fetch('/snmp/portup?target='+encodeURIComponent(t)+'&community='+encodeURIComponent(c)+'&ifindex='+encodeURIComponent(i))
+     .then(r => r.json())
+     .then(data => {
+       if(data.ok) {
+         showOutput(`✅ Port ${i} successfully set to UP (LED Pattern: 5→4→3→2→1)\n`);
+         showNotification('Port successfully set to up', 'success');
+         // Refresh interface list if we're in discovery mode
+         if(target) {
+           setTimeout(() => discoverInterfaces(), 1000);
+         }
+       } else {
+         showOutput(`❌ Port up failed: ${data.error || 'Unknown error'}\n`);
+         showNotification('Port up failed: ' + (data.error || 'Unknown error'), 'error');
+       }
+     })
+     .catch(err => {
+       console.error('SNMP Port Up error:', err);
+       showOutput(`❌ Port up error: ${err.message}\n`);
+       showNotification('Port up failed', 'error');
+     });
+ }
 
-function snmpWalk(){
-  const t = document.getElementById('snmp_target').value.trim();
-  const c = document.getElementById('snmp_ro').value.trim();
-  if(!t){ 
-    alert('Please enter a target IP address'); 
-    return; 
-  }
-  fetch('/snmp/walk?target='+encodeURIComponent(t)+'&community='+encodeURIComponent(c))
-    .then(r=>r.json())
-    .then(data => {
-      if (data.ok) {
-        showNotification('SNMP Walk completed successfully', 'success');
-      } else {
-        showNotification('SNMP Walk failed: ' + (data.error || 'Unknown error'), 'error');
-      }
-    })
-    .catch(err => {
-      console.error('SNMP Walk error:', err);
-      showNotification('SNMP Walk failed', 'error');
-    });
-}
+ function snmpWalk(){
+   const t = document.getElementById('snmp_target').value.trim();
+   const c = document.getElementById('snmp_ro').value.trim();
+   if(!t){ 
+     alert('Please enter a target IP address'); 
+     return; 
+   }
+   
+   showOutput(`📋 Running SNMP Walk on ${t}...\n`);
+   
+   fetch('/snmp/walk?target='+encodeURIComponent(t)+'&community='+encodeURIComponent(c))
+     .then(r=>r.json())
+     .then(data => {
+       if (data.ok) {
+         showOutput(`✅ SNMP Walk completed successfully!\nOutput:\n${data.output}\n`);
+         showNotification('SNMP Walk completed successfully', 'success');
+       } else {
+         showOutput(`❌ SNMP Walk failed: ${data.error || 'Unknown error'}\n`);
+         showNotification('SNMP Walk failed: ' + (data.error || 'Unknown error'), 'error');
+       }
+     })
+     .catch(err => {
+       console.error('SNMP Walk error:', err);
+       showOutput(`❌ SNMP Walk error: ${err.message}\n`);
+       showNotification('SNMP Walk failed', 'error');
+     });
+ }
 
-function showNotification(message, type) {
-  // Simple notification system
-  const notification = document.createElement('div');
-  notification.style.cssText = `
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    padding: 12px 20px;
-    border-radius: 8px;
-    color: white;
-    font-weight: 500;
-    z-index: 1000;
-    background: ${type === 'success' ? '#10b981' : '#ef4444'};
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    transform: translateX(100%);
-    transition: transform 0.3s ease;
-  `;
-  notification.textContent = message;
-  document.body.appendChild(notification);
-  
-  setTimeout(() => notification.style.transform = 'translateX(0)', 100);
-  setTimeout(() => {
-    notification.style.transform = 'translateX(100%)';
-    setTimeout(() => document.body.removeChild(notification), 300);
-  }, 3000);
-}
+ function showOutput(message) {
+   const container = document.getElementById('output_container');
+   const area = document.getElementById('output_area');
+   
+   // Show container if hidden
+   container.style.display = 'block';
+   
+   // Add timestamp
+   const timestamp = new Date().toLocaleTimeString();
+   const formattedMessage = `[${timestamp}] ${message}`;
+   
+   // Append to existing content
+   area.textContent += formattedMessage;
+   
+   // Auto-scroll to bottom
+   area.scrollTop = area.scrollHeight;
+ }
+ 
+ function clearOutput() {
+   const area = document.getElementById('output_area');
+   area.textContent = '';
+   document.getElementById('output_container').style.display = 'none';
+ }
+ 
+ function showNotification(message, type) {
+   // Simple notification system
+   const notification = document.createElement('div');
+   notification.style.cssText = `
+     position: fixed;
+     top: 20px;
+     right: 20px;
+     padding: 12px 20px;
+     border-radius: 8px;
+     color: white;
+     font-weight: 500;
+     z-index: 1000;
+     background: ${type === 'success' ? '#10b981' : '#ef4444'};
+     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+     transform: translateX(100%);
+     transition: transform 0.3s ease;
+   `;
+   notification.textContent = message;
+   document.body.appendChild(notification);
+   
+   setTimeout(() => notification.style.transform = 'translateX(0)', 100);
+   setTimeout(() => {
+     notification.style.transform = 'translateX(100%)';
+     setTimeout(() => document.body.removeChild(notification), 300);
+   }, 3000);
+ }
 
 // SSE to update LED dots with improved error handling
 let evt;
