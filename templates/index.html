@@ -366,15 +366,103 @@
     to { transform: rotate(360deg); }
   }
   
-  .section-title {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
+     .section-title {
+     font-size: 16px;
+     font-weight: 600;
+     color: var(--text);
+     margin-bottom: 12px;
+     display: flex;
+     align-items: center;
+     gap: 8px;
+   }
+   
+   /* Modal Styles */
+   .modal {
+     display: none;
+     position: fixed;
+     z-index: 1000;
+     left: 0;
+     top: 0;
+     width: 100%;
+     height: 100%;
+     background-color: rgba(0, 0, 0, 0.5);
+     backdrop-filter: blur(4px);
+   }
+   
+   .modal-content {
+     background-color: var(--card);
+     margin: 5% auto;
+     padding: 0;
+     border: 1px solid var(--border);
+     border-radius: 16px;
+     width: 80%;
+     max-width: 800px;
+     max-height: 80vh;
+     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+     animation: modalSlideIn 0.3s ease-out;
+   }
+   
+   @keyframes modalSlideIn {
+     from {
+       opacity: 0;
+       transform: translateY(-20px);
+     }
+     to {
+       opacity: 1;
+       transform: translateY(0);
+     }
+   }
+   
+   .modal-header {
+     padding: 20px 24px 16px;
+     border-bottom: 1px solid var(--border);
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+   }
+   
+   .modal-title {
+     font-size: 18px;
+     font-weight: 600;
+     color: var(--text);
+     margin: 0;
+   }
+   
+   .modal-close {
+     background: none;
+     border: none;
+     font-size: 24px;
+     cursor: pointer;
+     color: var(--text-light);
+     padding: 4px;
+     border-radius: 8px;
+     transition: all 0.2s ease;
+   }
+   
+   .modal-close:hover {
+     background: var(--bg);
+     color: var(--text);
+   }
+   
+   .modal-body {
+     padding: 20px 24px;
+     max-height: 60vh;
+     overflow-y: auto;
+   }
+   
+   .modal-output {
+     background: var(--bg);
+     border: 1px solid var(--border);
+     border-radius: 12px;
+     padding: 16px;
+     font-family: 'Courier New', monospace;
+     font-size: 13px;
+     line-height: 1.4;
+     white-space: pre-wrap;
+     color: var(--text);
+     max-height: 400px;
+     overflow-y: auto;
+   }
 </style>
 </head>
 <body>
@@ -442,23 +530,10 @@
         </svg>
       </div>
 
-      <div class="controls">
-        <div class="dotbar">
-          <div id="d17" class="dot r" title="GPIO17"></div>
-          <div id="d27" class="dot" title="GPIO27"></div>
-          <div id="d22" class="dot" title="GPIO22"></div>
-          <div id="d10" class="dot" title="GPIO10"></div>
-          <div id="d09" class="dot" title="GPIO9"></div>
-          <div id="d5" class="dot" title="GPIO5"></div>
-          <div id="d6" class="dot" title="GPIO6"></div>
-        </div>
-        <button class="accent" onclick="sendReqResp()">Send Packet</button>
-        <button style="background: #f59e0b; border-color: #f59e0b; color: white; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);" onclick="doPing()">Ping Target</button>
-      </div>
-
              <div class="controls">
          <input id="target" placeholder="Target IP Address" style="min-width: 200px;">
          <button onclick="doPing()">Ping</button>
+         <button class="accent" onclick="sendReqResp()">Send Packet</button>
        </div>
 
        <!-- SNMP Section -->
@@ -476,30 +551,11 @@
 
        <div class="controls" style="margin-top: 12px;">
          <input id="manual_ifindex" placeholder="Interface Index (e.g. 7)" style="width: 160px;">
-         <button class="danger" onclick="snmpPortDown()">🔴 Port Down (LED: 1→2→3→4→5)</button>
-         <button class="success" onclick="snmpPortUp()">🟢 Port Up (LED: 5→4→3→2→1)</button>
+         <button class="danger" onclick="snmpPortDown()">🔴 Port Down (LED: 1→2→3→4→5→6→7)</button>
+         <button class="success" onclick="snmpPortUp()">🟢 Port Up (LED: 7→6→5→4→3→2→1)</button>
        </div>
 
-       <!-- Output Display Area -->
-       <div id="output_container" style="margin-top: 16px; display: none;">
-         <div class="section-title" style="display: flex; justify-content: space-between; align-items: center;">
-           📊 Output Data
-           <button onclick="clearOutput()" style="padding: 6px 12px; font-size: 12px; background: var(--muted); border-color: var(--muted); color: white;">Clear</button>
-         </div>
-         <div id="output_area" style="
-           background: var(--bg); 
-           border: 1px solid var(--border); 
-           border-radius: 12px; 
-           padding: 16px; 
-           max-height: 300px; 
-           overflow-y: auto; 
-           font-family: 'Courier New', monospace; 
-           font-size: 13px; 
-           line-height: 1.4;
-           white-space: pre-wrap;
-           color: var(--text);
-         "></div>
-       </div>
+
 
        <!-- Interface List -->
        <div id="interface_container" style="margin-top: 16px; display: none;">
@@ -542,10 +598,23 @@
         💡 Settings tab is for LED testing. Demo tab focuses on network operations.
       </div>
     </div>
-  </div>
-</main>
+     </div>
+ </main>
 
-<script>
+ <!-- Output Modal -->
+ <div id="outputModal" class="modal">
+   <div class="modal-content">
+     <div class="modal-header">
+       <h3 class="modal-title">📊 Command Output</h3>
+       <button class="modal-close" onclick="closeModal()">&times;</button>
+     </div>
+     <div class="modal-body">
+       <div id="modalOutput" class="modal-output"></div>
+     </div>
+   </div>
+ </div>
+
+ <script>
 // Colors: updated for light mode
 function setPacketColors(reqColor, resColor){
   document.getElementById('pkt_req').setAttribute('fill', reqColor);
@@ -725,8 +794,8 @@ function displayInterfaces(interfaces, target, community) {
             </div>
           </div>
                      <div class="interface-actions">
-             <button class="danger" style="padding: 6px 12px; font-size: 12px;" onclick="snmpPortDown('${target}', '${community}', '${i}')" title="LED Pattern: 1→2→3→4→5">Down</button>
-             <button class="success" style="padding: 6px 12px; font-size: 12px;" onclick="snmpPortUp('${target}', '${community}', '${i}')" title="LED Pattern: 5→4→3→2→1">Up</button>
+             <button class="danger" style="padding: 6px 12px; font-size: 12px;" onclick="snmpPortDown('${target}', '${community}', '${i}')" title="LED Pattern: 1→2→3→4→5→6→7">Down</button>
+             <button class="success" style="padding: 6px 12px; font-size: 12px;" onclick="snmpPortUp('${target}', '${community}', '${i}')" title="LED Pattern: 7→6→5→4→3→2→1">Up</button>
            </div>
         </div>
       `;
@@ -781,7 +850,7 @@ function parseSnmpOutput(output) {
      .then(r => r.json())
      .then(data => {
        if(data.ok) {
-         showOutput(`✅ Port ${i} successfully set to DOWN (LED Pattern: 1→2→3→4→5)\n`);
+         showOutput(`✅ Port ${i} successfully set to DOWN (LED Pattern: 1→2→3→4→5→6→7)\n`);
          showNotification('Port successfully set to down', 'success');
          // Refresh interface list if we're in discovery mode
          if(target) {
@@ -815,7 +884,7 @@ function parseSnmpOutput(output) {
      .then(r => r.json())
      .then(data => {
        if(data.ok) {
-         showOutput(`✅ Port ${i} successfully set to UP (LED Pattern: 5→4→3→2→1)\n`);
+         showOutput(`✅ Port ${i} successfully set to UP (LED Pattern: 7→6→5→4→3→2→1)\n`);
          showNotification('Port successfully set to up', 'success');
          // Refresh interface list if we're in discovery mode
          if(target) {
@@ -862,27 +931,30 @@ function parseSnmpOutput(output) {
  }
 
  function showOutput(message) {
-   const container = document.getElementById('output_container');
-   const area = document.getElementById('output_area');
-   
-   // Show container if hidden
-   container.style.display = 'block';
+   const modal = document.getElementById('outputModal');
+   const modalOutput = document.getElementById('modalOutput');
    
    // Add timestamp
    const timestamp = new Date().toLocaleTimeString();
    const formattedMessage = `[${timestamp}] ${message}`;
    
    // Append to existing content
-   area.textContent += formattedMessage;
+   modalOutput.textContent += formattedMessage;
    
    // Auto-scroll to bottom
-   area.scrollTop = area.scrollHeight;
+   modalOutput.scrollTop = modalOutput.scrollHeight;
+   
+   // Show modal
+   modal.style.display = 'block';
+ }
+ 
+ function closeModal() {
+   document.getElementById('outputModal').style.display = 'none';
  }
  
  function clearOutput() {
-   const area = document.getElementById('output_area');
-   area.textContent = '';
-   document.getElementById('output_container').style.display = 'none';
+   document.getElementById('modalOutput').textContent = '';
+   closeModal();
  }
  
  function showNotification(message, type) {

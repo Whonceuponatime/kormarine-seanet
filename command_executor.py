@@ -98,20 +98,22 @@ class CommandExecutor:
         ok = (code == 0)
         
         if ok:
-            # Success animation - 12345 pattern for port down
-            def port_down_animation():
-                # Pattern: 1-2-3-4-5 (GPIO 17, 27, 22, 10, 9)
-                seq = [
-                    (True,  False, False, False, False, False, False),  # 17 (1)
-                    (False, True,  False, False, False, False, False),  # 27 (2)
-                    (False, False, True,  False, False, False, False),  # 22 (3)
-                    (False, False, False, True,  False, False, False),  # 10 (4)
-                    (False, False, False, False, True,  False, False),  # 9  (5)
-                ]
-                for st in seq:
-                    self.gpio._apply_states(*st)
-                    time.sleep(0.2)
-                self.gpio._off_all()
+                                      # Success animation - 1234567 pattern for port down
+             def port_down_animation():
+                 # Pattern: 1-2-3-4-5-6-7 (GPIO 17, 27, 22, 10, 9, 5, 6)
+                 seq = [
+                     (True,  False, False, False, False, False, False),  # 17 (1)
+                     (False, True,  False, False, False, False, False),  # 27 (2)
+                     (False, False, True,  False, False, False, False),  # 22 (3)
+                     (False, False, False, True,  False, False, False),  # 10 (4)
+                     (False, False, False, False, True,  False, False),  # 9  (5)
+                     (False, False, False, False, False, True,  False),  # 5  (6)
+                     (False, False, False, False, False, False, True),   # 6  (7)
+                 ]
+                 for st in seq:
+                     self.gpio._apply_states(*st)
+                     time.sleep(0.15)
+                 self.gpio._off_all()
             
             threading.Thread(target=port_down_animation, daemon=True).start()
         else:
@@ -150,10 +152,12 @@ class CommandExecutor:
         ok = (code == 0)
         
         if ok:
-            # Success animation - 54321 pattern for port up
+            # Success animation - 7654321 pattern for port up
             def port_up_animation():
-                # Pattern: 5-4-3-2-1 (GPIO 9, 10, 22, 27, 17)
+                # Pattern: 7-6-5-4-3-2-1 (GPIO 6, 5, 9, 10, 22, 27, 17)
                 seq = [
+                    (False, False, False, False, False, False, True),   # 6  (7)
+                    (False, False, False, False, False, True,  False),  # 5  (6)
                     (False, False, False, False, True,  False, False),  # 9  (5)
                     (False, False, False, True,  False, False, False),  # 10 (4)
                     (False, False, True,  False, False, False, False),  # 22 (3)
@@ -162,7 +166,7 @@ class CommandExecutor:
                 ]
                 for st in seq:
                     self.gpio._apply_states(*st)
-                    time.sleep(0.2)
+                    time.sleep(0.15)
                 self.gpio._off_all()
             
             threading.Thread(target=port_up_animation, daemon=True).start()
