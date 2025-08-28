@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Attack Demo — One-Glance View</title>
+<style>
+  :root { --bg:#0b0f14; --card:#121820; --muted:#a9b2c0; --accent:#00d3a7; --danger:#ff5d73; }
+  html,body { height:100%; margin:0; }
+  body { background:var(--bg); color:#e8eef5; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Helvetica,Arial,sans-serif; display:flex; flex-direction:column; }
+  header { padding:12px 16px; border-bottom:1px solid #18222f; background:#0c1218; display:flex; align-items:center; gap:16px; }
+  header h1 { margin:0; font-size:18px }
+  .tabs { display:flex; gap:8px; margin-left:auto; }
+  .tab { background:#151d28; border:1px solid #263446; color:#cfe0f5; padding:8px 12px; border-radius:10px; cursor:pointer; font-weight:600 }
+  .tab.active { background:#0c2b25; border-color:#1c4c3f; color:#b6fff0 }
+
+  main { flex:1; min-height:0; display:flex; }
+  .card { flex:1; min-height:0; display:flex; flex-direction:column; gap:10px; padding:14px 16px; }
+  .panel { background:var(--card); border:1px solid #18222f; border-radius:14px; padding:12px; display:flex; flex-direction:column; min-height:0; }
+  .stage-wrap { flex:1; min-height:0; display:flex; }
+  .stage { flex:1; width:100%; height:100%; background:#0c1218; border:1px solid #18222f; border-radius:12px; }
+
+  .legend { display:flex; gap:12px; align-items:center; color:#a9b2c0; font-weight:600; }
+  .badge { display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; font-size:12px; border:1px solid #2a3a4b; background:#121b26 }
+  .req { color:#ffc5cd; border-color:#4c1c26; background:#2b1217 }
+  .res { color:#b6fff0; border-color:#1c4c3f; background:#0c2b25 }
+  .ping { color:#ffd0f0; border-color:#5c2d4a; background:#2a1523 }
+
+  .node { fill:#101825; stroke:#2b3a4a; stroke-width:2; }
+  .node-label { fill:#c7d4e5; font-weight:600; font-size:14px }
+  .controls { display:flex; gap:10px; flex-wrap:wrap; align-items:center }
+  .dotbar { display:flex; gap:8px; flex-wrap:wrap; }
+  .dot { width:16px; height:16px; border-radius:50%; background:#1a2430; border:1px solid #2a3a4b; box-shadow: inset 0 0 8px rgba(0,0,0,.6)}
+  .dot.on { background:#35f9c9; box-shadow: 0 0 12px #29ffd1, inset 0 0 6px rgba(0,0,0,.3); }
+  .dot.r.on { background:#ff556b; box-shadow: 0 0 12px #ff556b }
+  button { background:#1e2732; border:1px solid #2a3847; color:#e8eef5; padding:10px 14px; border-radius:10px; cursor:pointer; font-weight:600 }
+  button:hover { border-color:#3b4f64 }
+  button.accent { background:#0c2b25; border-color:#1c4c3f; color:#b6fff0 }
+  button.danger { background:#2b1217; border-color:#4c1c26; color:#ffc5cd }
+  input,select { background:#0f151d; color:#e8eef5; border:1px solid #2b3949; border-radius:10px; padding:10px 12px }
+</style>
+</head>
+<body>
+<header>
+  <h1>Attacker → Target (SNMP Demo)</h1>
+  <div class="tabs">
+    <div class="tab active" data-tab="demo" onclick="showTab('demo', this)">Demo</div>
+    <div class="tab" data-tab="settings" onclick="showTab('settings', this)">Settings</div>
+  </div>
+</header>
+
+<main>
+  <div class="card">
+    <!-- VISUAL PANEL -->
+    <div id="demo" class="panel section active">
+      <div class="legend" style="margin-bottom:6px">
+        <span class="badge req">➡ Request (pink)</span>
+        <span class="badge res">⬅ Response (teal, bottom)</span>
+        <span class="badge ping">• Ping</span>
+      </div>
+
+      <div class="stage-wrap">
+        <svg class="stage" viewBox="0 0 1100 560" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <filter id="glow"><feGaussianBlur stdDeviation="3" result="g"/><feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            <path id="p_req" d="M160,220 C420,40 680,40 940,220" fill="none" stroke="none"/>
+            <path id="p_res" d="M940,340 C680,520 420,520 160,340" fill="none" stroke="none"/>
+          </defs>
+
+          <rect x="100" y="230" rx="14" ry="14" width="160" height="100" class="node"/>
+          <text x="180" y="285" text-anchor="middle" class="node-label">Attacker</text>
+          <rect x="840" y="230" rx="14" ry="14" width="160" height="100" class="node"/>
+          <text x="920" y="285" text-anchor="middle" class="node-label">Target</text>
+
+          <use href="#p_req" stroke="#3b536b" stroke-width="3" stroke-dasharray="6 6"/>
+          <use href="#p_res" stroke="#2b4a45" stroke-width="3" stroke-dasharray="6 6"/>
+
+          <circle id="pkt_req" r="9" class="packet" fill="#ff7a9a" style="opacity:0; filter:url(#glow)">
+            <animateMotion id="am_req" dur="0.9s" fill="freeze" path="M160,220 C420,40 680,40 940,220"/>
+          </circle>
+          <circle id="pkt_res" r="9" class="packet" fill="#35f9c9" style="opacity:0; filter:url(#glow)">
+            <animateMotion id="am_res" dur="0.9s" fill="freeze" path="M940,340 C680,520 420,520 160,340"/>
+          </circle>
+        </svg>
+      </div>
+
+      <div class="controls" style="margin-top:8px">
+        <div class="dotbar">
+          <div id="d17" class="dot r" title="GPIO17"></div>
+          <div id="d27" class="dot"  title="GPIO27"></div>
+          <div id="d22" class="dot"  title="GPIO22"></div>
+          <div id="d10" class="dot"  title="GPIO10"></div>
+          <div id="d09" class="dot"  title="GPIO9"></div>
+          <div id="d5"  class="dot"  title="GPIO5"></div>
+          <div id="d6"  class="dot"  title="GPIO6"></div>
+        </div>
+        <button class="accent" onclick="sendReqResp()">Send Packet</button>
+        <button style="background:#2a1523; border-color:#5c2d4a; color:#ffd0f0" onclick="doPing()">Ping (Pink)</button>
+      </div>
+
+      <div class="controls" style="gap:8px; margin-top:4px">
+        <input id="target" placeholder="Target IP">
+        <input id="pub"    placeholder="RO community" value="public">
+        <input id="priv"   placeholder="RW community" value="private">
+        <input id="ifidx"  placeholder="ifIndex (e.g. 7)" style="width:140px">
+        <button onclick="snmpWalk()">SNMP Walk — <b>Interface Name</b></button>
+        <button class="danger" onclick="snmpDown()">SNMP Set ifAdminStatus=down</button>
+      </div>
+    </div>
+
+    <!-- SETTINGS PANEL -->
+    <div id="settings" class="panel section" style="display:none">
+      <div class="controls" style="gap:8px">
+        <button onclick="fetch('/on17')">ON 17</button>
+        <button onclick="fetch('/on27')">ON 27</button>
+        <button onclick="fetch('/on22')">ON 22</button>
+        <button onclick="fetch('/on10')">ON 10</button>
+        <button onclick="fetch('/on9')">ON 9</button>
+        <button onclick="fetch('/on5')">ON 5</button>
+        <button onclick="fetch('/on6')">ON 6</button>
+        <button onclick="fetch('/off')">All OFF</button>
+      </div>
+      <div class="controls" style="gap:8px">
+        <label>Wave speed</label>
+        <select id="hz">
+          <option value="1">1 Hz</option>
+          <option value="2">2 Hz</option>
+          <option value="3">3 Hz</option>
+          <option value="5">5 Hz</option>
+        </select>
+        <button class="accent" onclick="startWave()">Start Wave</button>
+        <button onclick="stopWave()">Stop</button>
+      </div>
+      <div style="opacity:.75; font:12px ui-monospace; margin-top:6px">
+        Settings tab is for LED tests. Logs focus on attack actions only.
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+// Colors: default non-ping (req=pink, res=teal). Ping -> both pink.
+function setPacketColors(reqColor, resColor){
+  document.getElementById('pkt_req').setAttribute('fill', reqColor);
+  document.getElementById('pkt_res').setAttribute('fill', resColor);
+}
+function showTab(id, btn){
+  document.querySelectorAll('.section').forEach(s=>s.style.display='none');
+  document.getElementById(id).style.display='flex';
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+}
+function startWave(){ const hz=document.getElementById('hz').value; fetch('/start?hz='+hz); }
+function stopWave(){ fetch('/stop'); }
+
+// Simple demo: request then response (slight delay)
+function sendReqResp(){
+  setPacketColors('#ff7a9a', '#35f9c9');
+  const req=document.getElementById('pkt_req');
+  const res=document.getElementById('pkt_res');
+  const amReq = document.getElementById('am_req');
+  const amRes = document.getElementById('am_res');
+  req.style.opacity=1; amReq.beginElement();
+  fetch('/demo/packet', {method:'POST'});
+  setTimeout(()=>{ res.style.opacity=1; amRes.beginElement(); setTimeout(()=>{ res.style.opacity=0; }, 1000); }, 320);
+  setTimeout(()=>{ req.style.opacity=0; }, 1000);
+}
+
+function doPing(){
+  const t=document.getElementById('target').value.trim();
+  if(!t){ alert('Enter target IP'); return; }
+  setPacketColors('#ff7a9a', '#ff7a9a'); // both pink for ping
+  const req=document.getElementById('pkt_req');
+  const res=document.getElementById('pkt_res');
+  const amReq = document.getElementById('am_req');
+  const amRes = document.getElementById('am_res');
+  req.style.opacity=1; amReq.beginElement();
+  fetch('/ping?target='+encodeURIComponent(t))
+    .then(r=>r.json())
+    .then(_=>{
+      setTimeout(()=>{ res.style.opacity=1; amRes.beginElement(); setTimeout(()=>{ res.style.opacity=0; }, 1000); }, 260);
+    })
+    .finally(()=>{ setTimeout(()=>{ req.style.opacity=0; setPacketColors('#ff7a9a', '#35f9c9'); }, 1000); });
+}
+
+function snmpWalk(){
+  const t=document.getElementById('target').value.trim();
+  const c=document.getElementById('pub').value.trim();
+  if(!t){ alert('Enter target IP'); return; }
+  fetch('/snmp/walk?target='+encodeURIComponent(t)+'&community='+encodeURIComponent(c))
+    .then(r=>r.json())
+    .then(data=>console.log('SNMP Walk:', data));
+}
+
+function snmpDown(){
+  const t=document.getElementById('target').value.trim();
+  const c=document.getElementById('priv').value.trim();
+  const i=document.getElementById('ifidx').value.trim();
+  if(!t || !i){ alert('Enter target IP and ifIndex'); return; }
+  fetch('/snmp/portdown?target='+encodeURIComponent(t)+'&community='+encodeURIComponent(c)+'&ifindex='+encodeURIComponent(i))
+    .then(r=>r.json())
+    .then(data=>console.log('SNMP Port Down:', data));
+}
+
+// SSE to update LED dots
+const evt = new EventSource('/events');
+evt.onmessage = (e)=>{
+  try{
+    const data = JSON.parse(e.data);
+    const pins = (data && data.pins) || {};
+    setDot('d17', pins["17"]); setDot('d27', pins["27"]);
+    setDot('d22', pins["22"]); setDot('d10', pins["10"]);
+    setDot('d09', pins["9"]);  setDot('d5', pins["5"]);
+    setDot('d6', pins["6"]);
+  }catch(_){}
+};
+function setDot(id, level){ const el=document.getElementById(id); if(!el) return; el.classList.toggle('on', level===1); }
+</script>
+</body>
+</html>
