@@ -927,6 +927,232 @@ function setDot(id, level){
 
 // Initialize SSE connection
 connectSSE();
+
+// Interactive Network Diagram Functions
+function initializeDiagram() {
+  createPortHotspots();
+  setupHackerInteraction();
+  setupRouterInteraction();
+}
+
+function createPortHotspots() {
+  const routerGroup = document.getElementById('router-group');
+  if (!routerGroup) return;
+  
+  const baseX = 250, baseY = 100;
+  const portPositions = [
+    // Left column ports (8, 6, 4, 2)
+    { port: 8, x: baseX + 20, y: baseY + 200 },
+    { port: 6, x: baseX + 20, y: baseY + 220 },
+    { port: 4, x: baseX + 20, y: baseY + 240 },
+    { port: 2, x: baseX + 20, y: baseY + 260 },
+    // Right column ports (7, 5, 3, 1)
+    { port: 7, x: baseX + 65, y: baseY + 200 },
+    { port: 5, x: baseX + 65, y: baseY + 220 },
+    { port: 3, x: baseX + 65, y: baseY + 240 },
+    { port: 1, x: baseX + 65, y: baseY + 260 }
+  ];
+  
+  const routerIP = routerGroup.dataset.ip || '192.168.10.1';
+  
+  portPositions.forEach(pos => {
+    const hotspot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    hotspot.setAttribute('cx', pos.x + 17);
+    hotspot.setAttribute('cy', pos.y + 6);
+    hotspot.setAttribute('r', '8');
+    hotspot.setAttribute('class', 'port-hotspot');
+    hotspot.setAttribute('data-port', pos.port);
+    hotspot.setAttribute('data-ip', routerIP);
+    hotspot.style.cssText = 'fill: transparent; stroke: transparent; cursor: pointer; transition: all 0.2s ease;';
+    
+    hotspot.addEventListener('mouseenter', () => {
+      hotspot.style.stroke = '#0ea5e9';
+      hotspot.style.strokeWidth = '2';
+      hotspot.style.fill = 'rgba(14, 165, 233, 0.1)';
+    });
+    
+    hotspot.addEventListener('mouseleave', () => {
+      hotspot.style.stroke = 'transparent';
+      hotspot.style.fill = 'transparent';
+    });
+    
+    hotspot.addEventListener('click', () => {
+      selectPort(routerIP, pos.port);
+    });
+    
+    routerGroup.appendChild(hotspot);
+  });
+}
+
+function setupHackerInteraction() {
+  const hackerClick = document.getElementById('hacker-click');
+  if (!hackerClick) return;
+  
+  hackerClick.addEventListener('click', () => {
+    simulateAttack();
+  });
+  
+  // Add hover effect to hacker group
+  const hackerGroup = document.getElementById('hacker-group');
+  if (hackerGroup) {
+    hackerGroup.style.cursor = 'pointer';
+    hackerGroup.addEventListener('mouseenter', () => {
+      hackerGroup.style.filter = 'drop-shadow(0 0 10px rgba(239, 68, 68, 0.5))';
+    });
+    hackerGroup.addEventListener('mouseleave', () => {
+      hackerGroup.style.filter = 'none';
+    });
+  }
+}
+
+function setupRouterInteraction() {
+  const routerGroup = document.getElementById('router-group');
+  if (!routerGroup) return;
+  
+  // Add hover effect to router
+  routerGroup.addEventListener('mouseenter', () => {
+    routerGroup.style.filter = 'drop-shadow(0 0 15px rgba(16, 185, 129, 0.3))';
+  });
+  routerGroup.addEventListener('mouseleave', () => {
+    routerGroup.style.filter = 'none';
+  });
+}
+
+function selectPort(ip, port) {
+  // Update form fields
+  document.getElementById('snmp_target').value = ip;
+  document.getElementById('manual_ifindex').value = port;
+  
+  // Show notification
+  showNotification(`Selected ${ip} port ${port}`, 'success');
+  
+  // Visual feedback
+  const hotspot = document.querySelector(`[data-port="${port}"]`);
+  if (hotspot) {
+    hotspot.style.stroke = '#10b981';
+    hotspot.style.strokeWidth = '3';
+    hotspot.style.fill = 'rgba(16, 185, 129, 0.2)';
+    setTimeout(() => {
+      hotspot.style.stroke = 'transparent';
+      hotspot.style.fill = 'transparent';
+    }, 1000);
+  }
+  
+  // Switch to demo tab to show the selected values
+  showTab('demo', document.querySelector('[data-tab="demo"]'));
+}
+
+function simulateAttack() {
+  showNotification('🚀 Simulating network attack...', 'success');
+  
+  // Visual attack animation
+  const hackerGroup = document.getElementById('hacker-group');
+  const routerGroup = document.getElementById('router-group');
+  
+  if (hackerGroup && routerGroup) {
+    // Flash hacker
+    hackerGroup.style.filter = 'drop-shadow(0 0 20px rgba(239, 68, 68, 0.8))';
+    
+    // Create attack line
+    const attackLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    attackLine.setAttribute('x1', '200');
+    attackLine.setAttribute('y1', '260');
+    attackLine.setAttribute('x2', '250');
+    attackLine.setAttribute('y2', '300');
+    attackLine.setAttribute('stroke', '#ef4444');
+    attackLine.setAttribute('stroke-width', '4');
+    attackLine.setAttribute('stroke-dasharray', '10,5');
+    attackLine.style.opacity = '0';
+    attackLine.style.transition = 'opacity 0.5s ease';
+    
+    const svg = document.querySelector('#diagram svg');
+    svg.appendChild(attackLine);
+    
+    // Animate attack
+    setTimeout(() => {
+      attackLine.style.opacity = '1';
+      routerGroup.style.filter = 'drop-shadow(0 0 20px rgba(239, 68, 68, 0.8))';
+    }, 100);
+    
+    setTimeout(() => {
+      attackLine.style.opacity = '0';
+      hackerGroup.style.filter = 'none';
+      routerGroup.style.filter = 'none';
+      setTimeout(() => svg.removeChild(attackLine), 500);
+    }, 2000);
+  }
+  
+  // Show output
+  showOutput('🚀 Network attack simulation initiated\nTarget: 192.168.10.1\nMethod: SNMP exploitation\nStatus: Vulnerable ports detected\n');
+}
+
+function resetDiagram() {
+  // Reset all visual effects
+  const elements = document.querySelectorAll('#diagram *');
+  elements.forEach(el => {
+    el.style.filter = 'none';
+    el.style.stroke = '';
+    el.style.fill = '';
+  });
+  
+  // Clear form fields
+  document.getElementById('snmp_target').value = '';
+  document.getElementById('manual_ifindex').value = '';
+  
+  showNotification('🔄 Diagram reset', 'success');
+}
+
+function highlightPorts() {
+  const hotspots = document.querySelectorAll('.port-hotspot');
+  hotspots.forEach((hotspot, index) => {
+    setTimeout(() => {
+      hotspot.style.stroke = '#f59e0b';
+      hotspot.style.strokeWidth = '3';
+      hotspot.style.fill = 'rgba(245, 158, 11, 0.2)';
+      
+      setTimeout(() => {
+        hotspot.style.stroke = 'transparent';
+        hotspot.style.fill = 'transparent';
+      }, 500);
+    }, index * 100);
+  });
+  
+  showNotification('💡 All ports highlighted', 'success');
+}
+
+// Initialize diagram when page loads
+document.addEventListener('DOMContentLoaded', () => {
+  // Set default values for SNMP inputs
+  const ro = document.getElementById('snmp_ro');
+  const rw = document.getElementById('snmp_rw');
+  if (ro && !ro.value) ro.value = 'community';
+  if (rw && !rw.value) rw.value = 'private';
+  
+  // Initialize diagram
+  initializeDiagram();
+});
+
+// Enhanced tab switching to handle diagram
+function showTab(tabName, clickedElement) {
+  // Hide all panels
+  const panels = document.querySelectorAll('.panel');
+  panels.forEach(panel => panel.style.display = 'none');
+  
+  // Remove active class from all tabs
+  const tabs = document.querySelectorAll('.tab');
+  tabs.forEach(tab => tab.classList.remove('active'));
+  
+  // Show selected panel
+  const selectedPanel = document.getElementById(tabName);
+  if (selectedPanel) {
+    selectedPanel.style.display = 'flex';
+  }
+  
+  // Add active class to clicked tab
+  if (clickedElement) {
+    clickedElement.classList.add('active');
+  }
+}
 </script>
 </body>
 </html>
