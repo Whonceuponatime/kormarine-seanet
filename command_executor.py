@@ -64,13 +64,16 @@ class CommandExecutor:
         cmd = f"snmpwalk -v2c -c {community} {target} 1.3.6.1.2.1.31.1.1.1.1"
         code, out, err = self._run(cmd, timeout=SNMP_TIMEOUT)
         
-        # Visual feedback
-        self.gpio._set(PIN_X, X_ACTIVE_LOW, True)
-        time.sleep(0.12)
-        self.gpio._set(PIN_X, X_ACTIVE_LOW, False)
-        
-        # Start wave animation
-        threading.Thread(target=self.gpio.wave_once, kwargs={"step_period": 0.16}, daemon=True).start()
+        # Visual feedback - flash green LED for success
+        if code == 0:
+            self.gpio._set(PIN_Y, Y_ACTIVE_LOW, True)
+            time.sleep(0.2)
+            self.gpio._set(PIN_Y, Y_ACTIVE_LOW, False)
+            # Start wave animation
+            threading.Thread(target=self.gpio.wave_once, kwargs={"step_period": 0.16}, daemon=True).start()
+        else:
+            # Flash red LED for error
+            self.gpio.strobe_error()
         
         return {
             "ok": (code == 0),
@@ -95,7 +98,7 @@ class CommandExecutor:
         ok = (code == 0)
         
         if ok:
-            # Success animation
+            # Success animation - red wave for port down
             threading.Thread(target=self.gpio.wave_once, kwargs={"step_period": 0.16}, daemon=True).start()
         else:
             # Error animation
@@ -116,4 +119,103 @@ class CommandExecutor:
             "confirm_code": gcode,
             "confirm_stdout": gout,
             "confirm_stderr": gerr
+        }
+    
+    def snmp_portup(self, target: str, ifindex: str, community: str = "private"):
+        """Set SNMP port to up with LED visualization"""
+        if not (target.strip() and ifindex.strip().isdigit()):
+            return {"ok": False, "error": "target and numeric ifindex required"}
+        
+        self.gpio.stop_anim()
+        self.gpio._off_all()
+        
+        set_oid = f"1.3.6.1.2.1.2.2.1.7.{ifindex}"
+        set_cmd = f"snmpset -v2c -c {community} {target} {set_oid} i 1"
+        code, out, err = self._run(set_cmd, timeout=6)
+        
+        ok = (code == 0)
+        
+        if ok:
+            # Success animation - green wave for port up
+            def green_wave():
+                # Custom green wave animation
+                seq = [
+                    (False, False, True,  False, False, False, False),  # 22 (green)
+                    (False, False, False, True,  False, False, False),  # 10
+                    (False, False, False, False, True,  False, False),  # 9
+                    (False, False, False, False, False, True,  False),  # 5
+                    (False, False, False, False, False, False, True),   # 6
+                ]
+                for st in seq:
+                    self.gpio._apply_states(*st)
+                    time.sleep(0.16)
+                self.gpio._off_all()
+            
+            threading.Thread(target=green_wave, daemon=True).start()
+        else:
+            # Error animation
+            self.gpio.strobe_error()
+        
+        # Confirm the change
+        get_oid = f"1.3.6.1.2.1.2.2.1.8.{ifindex}"
+        get_cmd = f"snmpget -v2c -c public {target} {get_oid}"
+        gcode, gout, gerr = self._run(get_cmd, timeout=5)
+        
+        return {
+            "ok": ok,
+            "set_cmd": set_cmd,
+            "set_code": code,
+            "set_stdout": out,
+            "set_stderr": err,
+            "confirm_cmd": get_cmd,
+            "confirm_code": gcode,
+            "confirm_stdout": gout,
+            "confirm_stderr": gerr
+        }
+    
+    def snmp_get_interfaces(self, target: str, community: str = "public"):
+        """Get list of network interfaces with their status"""
+        if not target.strip():
+            return {"ok": False, "error": "target required"}
+        
+        self.gpio.stop_anim()
+        self.gpio._off_all()
+        
+        # Get interface names
+        name_cmd = f"snmpwalk -v2c -c {community} {target} 1.3.6.1.2.1.31.1.1.1.1"
+        name_code, name_out, name_err = self._run(name_cmd, timeout=SNMP_TIMEOUT)
+        
+        # Get interface admin status
+        admin_cmd = f"snmpwalk -v2c -c {community} {target} 1.3.6.1.2.1.2.2.1.7"
+        admin_code, admin_out, admin_err = self._run(admin_cmd, timeout=SNMP_TIMEOUT)
+        
+        # Get interface operational status
+        oper_cmd = f"snmpwalk -v2c -c {community} {target} 1.3.6.1.2.1.2.2.1.8"
+        oper_code, oper_out, oper_err = self._run(oper_cmd, timeout=SNMP_TIMEOUT)
+        
+        ok = (name_code == 0 and admin_code == 0 and oper_code == 0)
+        
+        if ok:
+            # Visual feedback - flash blue LED
+            self.gpio._set(PIN_A, A_ACTIVE_LOW, True)
+            time.sleep(0.2)
+            self.gpio._set(PIN_A, A_ACTIVE_LOW, False)
+        
+        return {
+            "ok": ok,
+            "interfaces": {
+                "names": name_out,
+                "admin_status": admin_out,
+                "oper_status": oper_out
+            },
+            "commands": {
+                "names": name_cmd,
+                "admin": admin_cmd,
+                "oper": oper_cmd
+            },
+            "errors": {
+                "names": name_err,
+                "admin": admin_err,
+                "oper": oper_err
+            }
         }
