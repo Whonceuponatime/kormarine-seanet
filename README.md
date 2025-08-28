@@ -78,11 +78,17 @@ The server will start on `http://0.0.0.0:5050`
 
 ## Usage
 
-### Interactive Web Interface
+### Web Interfaces
 
-Access the web interface at `http://<raspberry-pi-ip>:5050`
+Access the web interfaces at `http://<raspberry-pi-ip>:5050`
 
-The interface provides a comprehensive SNMP attack demonstration platform:
+#### 1. Control Interface (`/`)
+The main control interface provides a comprehensive SNMP attack demonstration platform:
+
+#### 2. Interactive Network Diagram (`/diagram`)
+A visual, interactive network topology diagram with real-time animations and click-to-attack functionality.
+
+### Control Interface Features
 
 #### Target Configuration
 - **Target IP**: Set the IP address of the vulnerable switch
@@ -107,6 +113,33 @@ The interface provides a comprehensive SNMP attack demonstration platform:
 - **Live LED Status**: Real-time LED state updates via Server-Sent Events
 - **Command Output**: Live console showing executed commands and results
 - **Visual Feedback**: Color-coded success/error indicators
+
+### Interactive Network Diagram Features
+
+#### 🎯 **Visual Network Topology**
+- **Animated SVG Diagram**: Professional network topology visualization
+- **Real-time LED Sync**: Diagram LEDs mirror physical GPIO status
+- **Device Representations**: Raspberry Pi (attacker), switch (target), connected devices
+- **Connection Visualization**: Dynamic network links with status indicators
+
+#### 🔍 **Interactive Discovery**
+- **Click-to-Discover**: Single button network scanning
+- **Animated Packets**: Visual SNMP packet flow from attacker to target
+- **Port Discovery**: Real-time interface detection and display
+- **Status Visualization**: Live port status (up/down) with color coding
+
+#### ⚔️ **Visual Attack Demonstration**
+- **Click-to-Attack**: Select any discovered port for demonstration
+- **Packet Animation**: Attack packets flow from Pi → Switch → Target Device
+- **LED Choreography**: Physical LEDs show attack progression (1→2→3→4→5→6→7)
+- **Restore Functionality**: Reverse LED sequence for service restoration (7→6→5→4→3→2→1)
+- **Live Updates**: Real-time status changes on diagram and physical hardware
+
+#### 📊 **Enhanced Feedback**
+- **Attack Log Console**: Real-time command execution and results
+- **Visual Status Indicators**: Device health, connection status, attack progress
+- **Synchronized Hardware**: Physical LEDs match diagram animations
+- **Professional Presentation**: Clean, modern interface suitable for demonstrations
 
 ### API Endpoints
 

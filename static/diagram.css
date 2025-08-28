@@ -1,0 +1,600 @@
+/* Interactive Network Diagram Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    color: #ecf0f1;
+    min-height: 100vh;
+    overflow-x: auto;
+}
+
+.diagram-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Header Styles */
+.diagram-header {
+    background: rgba(52, 73, 93, 0.9);
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-content h1 {
+    color: #ecf0f1;
+    font-size: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.header-content h1 i {
+    color: #3498db;
+}
+
+.nav-links {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.nav-link {
+    padding: 8px 16px;
+    background: rgba(52, 152, 219, 0.1);
+    color: #3498db;
+    text-decoration: none;
+    border-radius: 20px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.nav-link:hover {
+    background: rgba(52, 152, 219, 0.2);
+    transform: translateY(-2px);
+}
+
+.nav-link.active {
+    background: #3498db;
+    color: white;
+    border-color: #2980b9;
+}
+
+.led-status-mini {
+    text-align: center;
+}
+
+.led-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.led-mini {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #34495e;
+    border: 2px solid #2c3e50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: bold;
+    color: #bdc3c7;
+    transition: all 0.3s ease;
+}
+
+.led-mini.on {
+    background: #e74c3c;
+    box-shadow: 0 0 15px #e74c3c;
+    color: white;
+}
+
+/* Control Panel */
+.control-panel {
+    background: rgba(52, 73, 93, 0.9);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.target-config {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.target-config label {
+    color: #bdc3c7;
+    font-weight: 600;
+}
+
+.target-config input {
+    padding: 10px 15px;
+    border: 2px solid #34495e;
+    border-radius: 8px;
+    background: #2c3e50;
+    color: #ecf0f1;
+    font-size: 1rem;
+    width: 200px;
+}
+
+.target-config input:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+.action-btn {
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.action-btn:hover {
+    background: linear-gradient(135deg, #2980b9, #21618c);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.attack-status {
+    color: #27ae60;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+/* Network Diagram */
+.network-diagram {
+    background: rgba(236, 240, 241, 0.95);
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+#network-svg {
+    width: 100%;
+    height: 500px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #ecf0f1 0%, #bdc3c7 100%);
+}
+
+/* SVG Styles */
+.device {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.device:hover {
+    filter: brightness(1.1);
+    transform: scale(1.05);
+}
+
+.device.clickable:hover {
+    filter: brightness(1.2) drop-shadow(0 5px 15px rgba(0, 0, 0, 0.3));
+}
+
+.device-text {
+    fill: white;
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.device-subtext {
+    fill: rgba(255, 255, 255, 0.8);
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 11px;
+}
+
+.device-text-small {
+    fill: white;
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.device-subtext-small {
+    fill: rgba(255, 255, 255, 0.7);
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 8px;
+}
+
+.cloud-text {
+    fill: #7f8c8d;
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.icon-text {
+    font-size: 12px;
+}
+
+.status-text {
+    fill: white;
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 8px;
+    font-weight: bold;
+}
+
+.attack-text {
+    fill: #e74c3c;
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* LED Indicators */
+.led-indicator {
+    transition: all 0.3s ease;
+}
+
+.led-indicator.on {
+    fill: #e74c3c !important;
+    filter: drop-shadow(0 0 8px #e74c3c);
+}
+
+/* Connection States */
+.device-connection {
+    transition: all 0.3s ease;
+}
+
+.device-connection.down {
+    stroke: #e74c3c;
+    stroke-dasharray: 10,5;
+    opacity: 0.5;
+}
+
+.device-connection.attacking {
+    stroke: #f39c12;
+    stroke-width: 5;
+    opacity: 1;
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.connection-status.down {
+    fill: #e74c3c;
+}
+
+.connection-status.up {
+    fill: #27ae60;
+}
+
+/* Interaction Panel */
+.interaction-panel {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.discovered-ports, .attack-log {
+    background: rgba(52, 73, 93, 0.9);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.discovered-ports h3, .attack-log h3 {
+    color: #ecf0f1;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 2px solid #34495e;
+    padding-bottom: 8px;
+}
+
+.discovered-ports h3 i, .attack-log h3 i {
+    color: #3498db;
+}
+
+/* Ports Grid */
+.ports-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.port-placeholder {
+    color: #7f8c8d;
+    font-style: italic;
+    text-align: center;
+    padding: 20px;
+    border: 2px dashed #34495e;
+    border-radius: 8px;
+}
+
+.port-item {
+    background: #34495e;
+    border: 2px solid #2c3e50;
+    border-radius: 8px;
+    padding: 15px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.port-item:hover {
+    border-color: #3498db;
+    background: #3f5671;
+}
+
+.port-item.attacking {
+    border-color: #f39c12;
+    background: #6b4f1a;
+    animation: portPulse 1s infinite;
+}
+
+@keyframes portPulse {
+    0%, 100% { background: #6b4f1a; }
+    50% { background: #8e6324; }
+}
+
+.port-name {
+    color: #ecf0f1;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.port-status {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+}
+
+.status-up {
+    color: #27ae60;
+}
+
+.status-down {
+    color: #e74c3c;
+}
+
+.port-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.port-btn {
+    flex: 1;
+    padding: 6px 10px;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.port-btn.attack {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+}
+
+.port-btn.restore {
+    background: linear-gradient(135deg, #27ae60, #229954);
+    color: white;
+}
+
+.port-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+}
+
+.port-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Attack Log */
+.log-container {
+    max-height: 300px;
+    overflow-y: auto;
+    background: #2c3e50;
+    border-radius: 8px;
+    padding: 15px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    border: 2px solid #34495e;
+}
+
+.log-entry {
+    margin-bottom: 8px;
+    padding: 5px;
+    border-radius: 4px;
+}
+
+.log-entry.info {
+    color: #3498db;
+}
+
+.log-entry.success {
+    color: #27ae60;
+    background: rgba(39, 174, 96, 0.1);
+}
+
+.log-entry.error {
+    color: #e74c3c;
+    background: rgba(231, 76, 60, 0.1);
+}
+
+.log-entry.warning {
+    color: #f39c12;
+    background: rgba(243, 156, 18, 0.1);
+}
+
+.log-entry.attack {
+    color: #e74c3c;
+    background: rgba(231, 76, 60, 0.2);
+    font-weight: bold;
+}
+
+.timestamp {
+    color: #7f8c8d;
+    margin-right: 10px;
+}
+
+.clear-btn {
+    margin-top: 10px;
+    padding: 8px 15px;
+    background: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+}
+
+.clear-btn:hover {
+    background: #c0392b;
+}
+
+/* Packet Animation */
+.packet {
+    fill: #f39c12;
+    stroke: #e67e22;
+    stroke-width: 2;
+    filter: drop-shadow(0 0 8px #f39c12);
+}
+
+.packet-snmp {
+    fill: #9b59b6;
+    stroke: #8e44ad;
+    filter: drop-shadow(0 0 8px #9b59b6);
+}
+
+.packet-attack {
+    fill: #e74c3c;
+    stroke: #c0392b;
+    filter: drop-shadow(0 0 8px #e74c3c);
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .interaction-panel {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .diagram-header {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+    }
+    
+    .control-panel {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .target-config {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .target-config input {
+        width: 100%;
+    }
+    
+    #network-svg {
+        height: 400px;
+    }
+    
+    .ports-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Loading States */
+.loading {
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+.loading::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    border: 2px solid #bdc3c7;
+    border-top: 2px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Attack Animation Effects */
+.attack-active #attack-indicators {
+    opacity: 1 !important;
+}
+
+.switch-compromised {
+    filter: drop-shadow(0 0 20px #e74c3c);
+}
+
+.device-compromised {
+    filter: drop-shadow(0 0 15px #f39c12);
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #34495e;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #7f8c8d;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #95a5a6;
+}

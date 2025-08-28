@@ -51,6 +51,34 @@ body {
     font-weight: 300;
 }
 
+.nav-links {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.nav-link {
+    padding: 8px 16px;
+    background: rgba(52, 152, 219, 0.1);
+    color: #3498db;
+    text-decoration: none;
+    border-radius: 20px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.nav-link:hover {
+    background: rgba(52, 152, 219, 0.2);
+    transform: translateY(-2px);
+}
+
+.nav-link.active {
+    background: #3498db;
+    color: white;
+    border-color: #2980b9;
+}
+
 /* LED Status Grid */
 .led-status {
     text-align: center;

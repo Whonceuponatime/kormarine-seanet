@@ -160,6 +160,11 @@ class Routes:
         def index():
             return render_template('index.html')
         
+        # Interactive network diagram route
+        @self.app.get("/diagram")
+        def network_diagram():
+            return render_template('network_diagram.html')
+        
         # Additional CORS headers for development
         @self.app.after_request
         def after_request(response):
