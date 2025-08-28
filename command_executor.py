@@ -98,22 +98,22 @@ class CommandExecutor:
         ok = (code == 0)
         
         if ok:
-                                      # Success animation - 1234567 pattern for port down
-             def port_down_animation():
-                 # Pattern: 1-2-3-4-5-6-7 (GPIO 17, 27, 22, 10, 9, 5, 6)
-                 seq = [
-                     (True,  False, False, False, False, False, False),  # 17 (1)
-                     (False, True,  False, False, False, False, False),  # 27 (2)
-                     (False, False, True,  False, False, False, False),  # 22 (3)
-                     (False, False, False, True,  False, False, False),  # 10 (4)
-                     (False, False, False, False, True,  False, False),  # 9  (5)
-                     (False, False, False, False, False, True,  False),  # 5  (6)
-                     (False, False, False, False, False, False, True),   # 6  (7)
-                 ]
-                 for st in seq:
-                     self.gpio._apply_states(*st)
-                     time.sleep(0.15)
-                 self.gpio._off_all()
+            # Success animation - 1234567 pattern for port down
+            def port_down_animation():
+                # Pattern: 1-2-3-4-5-6-7 (GPIO 17, 27, 22, 10, 9, 5, 6)
+                seq = [
+                    (True,  False, False, False, False, False, False),  # 17 (1)
+                    (False, True,  False, False, False, False, False),  # 27 (2)
+                    (False, False, True,  False, False, False, False),  # 22 (3)
+                    (False, False, False, True,  False, False, False),  # 10 (4)
+                    (False, False, False, False, True,  False, False),  # 9  (5)
+                    (False, False, False, False, False, True,  False),  # 5  (6)
+                    (False, False, False, False, False, False, True),   # 6  (7)
+                ]
+                for st in seq:
+                    self.gpio._apply_states(*st)
+                    time.sleep(0.15)
+                self.gpio._off_all()
             
             threading.Thread(target=port_down_animation, daemon=True).start()
         else:
