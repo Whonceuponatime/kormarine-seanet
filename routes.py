@@ -8,7 +8,8 @@ Handles all Flask routes and API endpoints
 import json
 import time
 import threading
-from flask import Flask, jsonify, request, Response, render_template
+import os
+from flask import Flask, jsonify, request, Response, render_template, send_from_directory
 from config import *
 
 
@@ -17,7 +18,10 @@ class Routes:
         """Initialize routes with GPIO controller and command executor"""
         self.gpio = gpio_controller
         self.cmd = command_executor
-        self.app = Flask(__name__)
+        # Create Flask app with proper template and static folder paths
+        template_dir = os.path.join(os.path.dirname(__file__), 'templates')
+        static_dir = os.path.join(os.path.dirname(__file__), 'static')
+        self.app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
         self._register_routes()
     
     def _register_routes(self):
@@ -155,6 +159,14 @@ class Routes:
         @self.app.get("/")
         def index():
             return render_template('index.html')
+        
+        # Additional CORS headers for development
+        @self.app.after_request
+        def after_request(response):
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+            response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+            return response
     
     def get_app(self):
         """Get the Flask app instance"""

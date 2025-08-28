@@ -5,8 +5,10 @@ A modular HTTP server for Raspberry Pi that controls GPIO LEDs and provides netw
 ## Features
 
 - **GPIO LED Control**: Control 7 LEDs connected to GPIO pins with various animations
-- **Network Testing**: Ping targets and execute SNMP commands with LED visualization
-- **Web Interface**: Modern, responsive web UI for controlling LEDs and network operations
+- **SNMP Attack Demonstration**: Execute SNMP walks and port manipulation attacks with LED visualization
+- **Interactive Web Interface**: Modern, responsive web UI for demonstrating network security concepts
+- **Real-time LED Feedback**: Visual representation of SNMP operations through LED sequences
+- **Educational Security Tool**: Designed for authorized network security demonstrations
 - **Real-time Status**: Server-Sent Events (SSE) for live LED status updates
 - **Modular Architecture**: Clean separation of concerns with dedicated modules
 
@@ -19,7 +21,10 @@ A modular HTTP server for Raspberry Pi that controls GPIO LEDs and provides netw
 ├── command_executor.py    # Shell command execution (ping, SNMP)
 ├── routes.py              # Flask routes and API endpoints
 ├── templates/
-│   └── index.html         # Web interface template
+│   └── index.html         # Interactive web interface
+├── static/
+│   ├── style.css          # Modern CSS styling
+│   └── script.js          # Interactive JavaScript functionality
 ├── requirements.txt       # Python dependencies
 └── README.md             # This file
 ```
@@ -73,22 +78,35 @@ The server will start on `http://0.0.0.0:5050`
 
 ## Usage
 
-### Web Interface
+### Interactive Web Interface
 
 Access the web interface at `http://<raspberry-pi-ip>:5050`
 
-The interface has two tabs:
+The interface provides a comprehensive SNMP attack demonstration platform:
 
-#### Demo Tab
-- **Send Packet**: Triggers a wave animation
-- **Ping**: Ping a target with roundtrip LED animation
-- **SNMP Walk**: Execute SNMP walk with LED feedback
-- **SNMP Port Down**: Set SNMP port to down status
+#### Target Configuration
+- **Target IP**: Set the IP address of the vulnerable switch
+- **Community String**: Choose between 'public' (read) and 'private' (write) access
 
-#### Settings Tab
-- **Individual LED Control**: Turn on specific LEDs
-- **Wave Animation**: Start/stop continuous wave animation
-- **Speed Control**: Adjust animation speed (1-5 Hz)
+#### Discovery & Reconnaissance
+- **SNMP Walk**: Discover available network interfaces with LED animation
+- **Get Interfaces**: List all interfaces with their current status (up/down)
+
+#### SNMP Attack Demonstration
+- **Port Selection**: Choose specific network ports from discovered interfaces
+- **Set Port Down**: Demonstrate SNMP-based port shutdown attacks
+- **Set Port Up**: Restore port functionality
+- **Visual Feedback**: LED sequence animations show attack progress
+
+#### LED Control Panel
+- **Demo Packet**: Trigger packet transmission animation
+- **LED Chaser**: Start continuous LED sequence animation
+- **Manual Control**: Individual LED control and animation management
+
+#### Real-time Features
+- **Live LED Status**: Real-time LED state updates via Server-Sent Events
+- **Command Output**: Live console showing executed commands and results
+- **Visual Feedback**: Color-coded success/error indicators
 
 ### API Endpoints
 
@@ -110,10 +128,11 @@ The interface has two tabs:
 - `GET /status` - Get current LED states
 - `GET /events` - Server-Sent Events stream for real-time updates
 
-#### Network Operations
-- `GET /ping?target=<ip>` - Ping target with LED animation
-- `GET /snmp/walk?target=<ip>&community=<string>` - SNMP walk
-- `GET /snmp/portdown?target=<ip>&ifindex=<number>&community=<string>` - SNMP port down
+#### SNMP Operations
+- `GET /snmp/walk?target=<ip>&community=<string>` - SNMP walk with LED feedback
+- `GET /snmp/interfaces?target=<ip>&community=<string>` - Get interface list and status
+- `GET /snmp/portdown?target=<ip>&ifindex=<number>&community=<string>` - Set port to down
+- `GET /snmp/portup?target=<ip>&ifindex=<number>&community=<string>` - Set port to up
 
 #### Demo
 - `POST /demo/packet` - Trigger demo packet animation
@@ -171,10 +190,19 @@ The server outputs status messages to console. Check for:
 
 ## Security Considerations
 
-- The server runs on all interfaces (`0.0.0.0`) by default
-- Consider firewall rules for production use
-- SNMP community strings are transmitted in plain text
-- No authentication is implemented
+⚠️ **IMPORTANT: This tool is designed for educational purposes only**
+
+- **Authorized Use Only**: Only use on networks you own or have explicit permission to test
+- **Vulnerable Target Required**: Designed to work with switches configured for SNMP v1/v2c with default community strings
+- **No Authentication**: The web interface has no authentication - secure your network accordingly
+- **SNMP Plaintext**: Community strings are transmitted in plain text
+- **Network Exposure**: Server runs on all interfaces (`0.0.0.0`) by default
+
+### Recommended Lab Setup
+- Isolated network environment
+- Manageable switch with SNMP v1/v2c enabled
+- Default community strings: 'public' (read) and 'private' (write)
+- Firewall rules to restrict access to demonstration network only
 
 ## License
 
