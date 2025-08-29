@@ -925,19 +925,14 @@ class NetworkDiagram {
             }
         } else if (deviceType === 'switch') {
             const nameText = deviceGroup.querySelector('#switch-device-name');
-            const ipText = deviceGroup.querySelector('#switch-ip');
             const descText = deviceGroup.querySelector('#switch-device-desc');
             if (nameText) {
                 nameText.setAttribute('x', centerX);
                 nameText.setAttribute('y', textY);
             }
-            if (ipText) {
-                ipText.setAttribute('x', centerX);
-                ipText.setAttribute('y', textY + 13);
-            }
             if (descText) {
                 descText.setAttribute('x', centerX);
-                descText.setAttribute('y', textY + 26);
+                descText.setAttribute('y', textY + 13);
             }
         } else {
             // Target devices
