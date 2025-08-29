@@ -803,16 +803,29 @@ class NetworkDiagram {
             if (image) {
                 image.setAttribute('href', imageUrl);
                 
-                // Adjust image size and position for better coverage
-                const imageSize = Math.min(width * 0.8, height * 0.8);
-                const x = (width - imageSize) / 2;
-                const y = (height - imageSize) / 2;
+                // Position images in upper area to avoid text overlap
+                if (patternId === 'rpi-pattern') {
+                    // Raspberry Pi - position in upper left area
+                    image.setAttribute('x', '5');
+                    image.setAttribute('y', '5');
+                    image.setAttribute('width', '50');
+                    image.setAttribute('height', '35');
+                } else if (patternId === 'switch-pattern') {
+                    // Switch - position in upper left area
+                    image.setAttribute('x', '10');
+                    image.setAttribute('y', '5');
+                    image.setAttribute('width', '60');
+                    image.setAttribute('height', '40');
+                } else {
+                    // Target devices - position in upper area
+                    image.setAttribute('x', '5');
+                    image.setAttribute('y', '5');
+                    image.setAttribute('width', '40');
+                    image.setAttribute('height', '25');
+                }
                 
-                image.setAttribute('x', x);
-                image.setAttribute('y', y);
-                image.setAttribute('width', imageSize);
-                image.setAttribute('height', imageSize);
-                image.setAttribute('opacity', '0.9');
+                image.setAttribute('opacity', '0.8');
+                image.setAttribute('preserveAspectRatio', 'xMidYMid meet');
             }
         }
     }
