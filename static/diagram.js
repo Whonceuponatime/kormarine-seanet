@@ -934,18 +934,22 @@ class NetworkDiagram {
                 descText.setAttribute('x', centerX);
                 descText.setAttribute('y', textY + 13);
             }
+            
+            // Update port labels on the switch
+            for (let i = 1; i <= 4; i++) {
+                const portLabel = deviceGroup.querySelector(`#switch-port-${i}`);
+                if (portLabel) {
+                    portLabel.setAttribute('x', width - 10);
+                    portLabel.setAttribute('y', 25 + (i * 15));
+                }
+            }
         } else {
-            // Target devices
+            // Target devices - only device name now
             const deviceNum = deviceType.replace('device', '');
             const nameText = deviceGroup.querySelector(`#device${deviceNum}-device-name`);
-            const portText = deviceGroup.querySelector(`#device${deviceNum}-port-label`);
             if (nameText) {
                 nameText.setAttribute('x', centerX);
                 nameText.setAttribute('y', textY);
-            }
-            if (portText) {
-                portText.setAttribute('x', centerX);
-                portText.setAttribute('y', subtextY);
             }
             
             // Update connection status indicator position
