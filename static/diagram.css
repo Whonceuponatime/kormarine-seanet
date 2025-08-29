@@ -24,13 +24,13 @@ body {
     overflow: hidden;
 }
 
-/* Header Styles - Compact for viewport fit */
+/* Header Styles - More space for logo and title */
 .diagram-header {
     background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
     border: 2px solid #dc3545;
     border-radius: 8px;
-    padding: 12px 20px;
-    margin-bottom: 8px;
+    padding: 15px 25px;
+    margin-bottom: 10px;
     box-shadow: 0 4px 12px rgba(220, 53, 69, 0.15);
     position: relative;
     flex-shrink: 0;
@@ -49,13 +49,13 @@ body {
 }
 
 .header-logo {
-    height: 80px;
+    height: 100px;
     width: auto;
 }
 
 .header-content h1 {
     color: #dc3545;
-    font-size: 1.8rem;
+    font-size: 2.2rem;
     margin: 0;
     font-weight: 700;
 }
@@ -178,13 +178,13 @@ body {
     color: white;
 }
 
-/* Control Panel - Compact for viewport fit */
+/* Control Panel - More space for diagram */
 .control-panel {
     background: linear-gradient(135deg, rgba(52, 73, 93, 0.95) 0%, rgba(44, 62, 80, 0.95) 100%);
     border: 2px solid rgba(52, 152, 219, 0.3);
     border-radius: 12px;
-    padding: 15px;
-    margin-bottom: 8px;
+    padding: 18px;
+    margin-bottom: 10px;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
     flex-shrink: 0;
@@ -197,17 +197,17 @@ body {
     align-items: start;
 }
 
-/* Control Group - Compact for viewport fit */
+/* Control Group - Better proportions */
 .control-group {
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 10px;
-    padding: 12px;
+    padding: 14px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
     transition: all 0.3s ease;
-    min-height: 90px;
+    min-height: 100px;
     backdrop-filter: blur(5px);
 }
 
@@ -649,26 +649,29 @@ body {
     fill: #27ae60;
 }
 
-/* Professional Interaction Panel - Compact for viewport fit */
+/* Professional Interaction Panel - Minimal size for more diagram space */
 .interaction-panel {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 15px;
+    gap: 12px;
     flex-shrink: 0;
     min-height: 0;
+    height: 180px;
 }
 
-/* Unified Panel Styling - Compact for viewport fit */
+/* Unified Panel Styling - Minimal size for more diagram space */
 .discovered-ports, .attack-log {
     background: linear-gradient(135deg, rgba(52, 73, 93, 0.95) 0%, rgba(44, 62, 80, 0.95) 100%);
     border: 2px solid rgba(52, 152, 219, 0.3);
-    border-radius: 12px;
-    padding: 15px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
     transition: all 0.3s ease;
     min-height: 0;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 .discovered-ports:hover, .attack-log:hover {
@@ -679,65 +682,69 @@ body {
 
 /* Manual LED control styles removed */
 
-/* Panel Headers - Compact for viewport fit */
+/* Panel Headers - Minimal size */
 .discovered-ports h3, .attack-log h3 {
     color: #ecf0f1;
-    font-size: 1.1rem;
+    font-size: 0.9rem;
     font-weight: 700;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
     display: flex;
     align-items: center;
-    gap: 8px;
-    border-bottom: 2px solid rgba(52, 152, 219, 0.3);
-    padding-bottom: 8px;
+    gap: 6px;
+    border-bottom: 1px solid rgba(52, 152, 219, 0.3);
+    padding-bottom: 6px;
     position: relative;
+    flex-shrink: 0;
 }
 
 .discovered-ports h3::after, .attack-log h3::after {
     content: '';
     position: absolute;
-    bottom: -2px;
+    bottom: -1px;
     left: 0;
-    width: 60px;
-    height: 2px;
+    width: 40px;
+    height: 1px;
     background: linear-gradient(90deg, #3498db, #2980b9);
-    border-radius: 2px;
+    border-radius: 1px;
 }
 
 .discovered-ports h3 i, .attack-log h3 i {
     color: #3498db;
-    font-size: 1.2rem;
-    padding: 6px;
+    font-size: 1rem;
+    padding: 4px;
     background: rgba(52, 152, 219, 0.15);
-    border-radius: 6px;
+    border-radius: 4px;
     border: 1px solid rgba(52, 152, 219, 0.3);
 }
 
-/* Ports Grid - Compact for viewport fit */
+/* Ports Grid - Minimal size for more diagram space */
 .ports-grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 8px;
-    height: 150px;
+    gap: 6px;
+    flex: 1;
     overflow-y: auto;
+    min-height: 0;
 }
 
 .port-placeholder {
     color: #7f8c8d;
     font-style: italic;
     text-align: center;
-    padding: 20px;
-    border: 2px dashed #34495e;
-    border-radius: 8px;
+    padding: 12px;
+    border: 1px dashed #34495e;
+    border-radius: 6px;
+    font-size: 0.8rem;
 }
 
 .port-item {
     background: #34495e;
-    border: 2px solid #2c3e50;
-    border-radius: 8px;
-    padding: 15px;
+    border: 1px solid #2c3e50;
+    border-radius: 6px;
+    padding: 8px;
     transition: all 0.3s ease;
     cursor: pointer;
+    font-size: 0.8rem;
 }
 
 .port-item:hover {
@@ -814,22 +821,23 @@ body {
     transform: none;
 }
 
-/* Attack Log - Compact for viewport fit */
+/* Attack Log - Minimal size for more diagram space */
 .log-container {
-    height: 150px;
+    flex: 1;
     overflow-y: auto;
     background: #2c3e50;
-    border-radius: 8px;
-    padding: 12px;
+    border-radius: 6px;
+    padding: 8px;
     font-family: 'Courier New', monospace;
-    font-size: 0.8rem;
-    border: 2px solid #34495e;
+    font-size: 0.7rem;
+    border: 1px solid #34495e;
+    min-height: 0;
 }
 
 .log-entry {
-    margin-bottom: 8px;
-    padding: 5px;
-    border-radius: 4px;
+    margin-bottom: 4px;
+    padding: 3px;
+    border-radius: 3px;
 }
 
 .log-entry.info {
@@ -863,15 +871,16 @@ body {
 }
 
 .clear-btn {
-    margin-top: 10px;
-    padding: 8px 15px;
+    margin-top: 6px;
+    padding: 4px 8px;
     background: #e74c3c;
     color: white;
     border: none;
-    border-radius: 6px;
+    border-radius: 4px;
     cursor: pointer;
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     transition: all 0.3s ease;
+    flex-shrink: 0;
 }
 
 .clear-btn:hover {
