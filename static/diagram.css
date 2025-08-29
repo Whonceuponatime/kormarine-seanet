@@ -185,22 +185,22 @@ body {
 
 .control-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 15px;
     align-items: start;
 }
 
-/* Control Group - Unified styling for all control elements */
+/* Control Group - Optimized for 5-column layout */
 .control-group {
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 12px;
-    padding: 20px;
+    padding: 16px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
     transition: all 0.3s ease;
-    min-height: 140px;
+    min-height: 120px;
     backdrop-filter: blur(5px);
 }
 
@@ -214,11 +214,14 @@ body {
 .control-group label {
     color: #ecf0f1;
     font-weight: 600;
-    font-size: 0.95rem;
-    margin-bottom: 5px;
+    font-size: 0.85rem;
+    margin-bottom: 4px;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .control-group label i {
@@ -227,12 +230,12 @@ body {
 }
 
 .control-input {
-    padding: 12px 15px;
+    padding: 10px 12px;
     border: 2px solid rgba(52, 73, 93, 0.6);
     border-radius: 8px;
     background: rgba(44, 62, 80, 0.8);
     color: #ecf0f1;
-    font-size: 1rem;
+    font-size: 0.9rem;
     width: 100%;
     box-sizing: border-box;
     transition: all 0.3s ease;
@@ -251,17 +254,17 @@ body {
 
 /* Professional Button Styling */
 .control-btn {
-    padding: 14px 20px;
+    padding: 10px 14px;
     border: none;
-    border-radius: 10px;
+    border-radius: 8px;
     font-weight: 600;
-    font-size: 0.95rem;
+    font-size: 0.85rem;
     cursor: pointer;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 6px;
     width: 100%;
     box-sizing: border-box;
     position: relative;
@@ -339,14 +342,14 @@ body {
 
 .community-btn {
     flex: 1;
-    padding: 12px 16px;
+    padding: 10px 12px;
     border: none;
     background: transparent;
     color: #ecf0f1;
     cursor: pointer;
     transition: all 0.3s ease;
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -941,11 +944,16 @@ body {
     filter: drop-shadow(0 0 8px #e74c3c);
 }
 
-/* Professional Responsive Design */
+/* Professional Responsive Design - Optimized for 5-column layout */
 @media (max-width: 1400px) {
     .control-grid {
-        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-        gap: 18px;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 12px;
+    }
+    
+    .control-group {
+        padding: 14px;
+        min-height: 110px;
     }
     
     .interaction-panel {
@@ -956,8 +964,32 @@ body {
 
 @media (max-width: 1200px) {
     .control-grid {
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap: 15px;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 10px;
+    }
+    
+    .control-group {
+        padding: 12px;
+        min-height: 100px;
+    }
+    
+    .control-group label {
+        font-size: 0.8rem;
+    }
+    
+    .control-input {
+        padding: 8px 10px;
+        font-size: 0.85rem;
+    }
+    
+    .control-btn {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+    }
+    
+    .community-btn {
+        padding: 8px 10px;
+        font-size: 0.75rem;
     }
     
     .interaction-panel {
@@ -972,8 +1004,8 @@ body {
 
 @media (max-width: 900px) {
     .control-grid {
-        grid-template-columns: 1fr;
-        gap: 15px;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
     }
     
     .interaction-panel {
@@ -983,6 +1015,7 @@ body {
     
     .control-group {
         min-height: auto;
+        padding: 14px;
     }
 }
 
