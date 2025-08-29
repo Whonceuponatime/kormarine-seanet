@@ -768,35 +768,52 @@ class NetworkDiagram {
     }
     
     updateDeviceImages(components) {
-        // Update device images in SVG
+        // Update device images in SVG patterns (entire device boxes)
         if (components.rpi && components.rpi.imageUrl) {
-            const rpiImage = document.getElementById('rpi-device-image');
-            if (rpiImage) rpiImage.setAttribute('href', components.rpi.imageUrl);
+            this.updatePatternImage('rpi-pattern', components.rpi.imageUrl, 120, 80);
         }
         
         if (components.switch && components.switch.imageUrl) {
-            const switchImage = document.getElementById('switch-device-image');
-            if (switchImage) switchImage.setAttribute('href', components.switch.imageUrl);
+            this.updatePatternImage('switch-pattern', components.switch.imageUrl, 200, 120);
         }
         
         if (components.device1 && components.device1.imageUrl) {
-            const device1Image = document.getElementById('device1-device-image');
-            if (device1Image) device1Image.setAttribute('href', components.device1.imageUrl);
+            this.updatePatternImage('device1-pattern', components.device1.imageUrl, 100, 70);
         }
         
         if (components.device2 && components.device2.imageUrl) {
-            const device2Image = document.getElementById('device2-device-image');
-            if (device2Image) device2Image.setAttribute('href', components.device2.imageUrl);
+            this.updatePatternImage('device2-pattern', components.device2.imageUrl, 100, 70);
         }
         
         if (components.device3 && components.device3.imageUrl) {
-            const device3Image = document.getElementById('device3-device-image');
-            if (device3Image) device3Image.setAttribute('href', components.device3.imageUrl);
+            this.updatePatternImage('device3-pattern', components.device3.imageUrl, 100, 70);
         }
         
         if (components.device4 && components.device4.imageUrl) {
-            const device4Image = document.getElementById('device4-device-image');
-            if (device4Image) device4Image.setAttribute('href', components.device4.imageUrl);
+            this.updatePatternImage('device4-pattern', components.device4.imageUrl, 100, 70);
+        }
+    }
+    
+    updatePatternImage(patternId, imageUrl, width, height) {
+        // Find the pattern element
+        const pattern = document.getElementById(patternId);
+        if (pattern) {
+            // Update the image href in the pattern
+            const image = pattern.querySelector('image');
+            if (image) {
+                image.setAttribute('href', imageUrl);
+                
+                // Adjust image size and position for better coverage
+                const imageSize = Math.min(width * 0.8, height * 0.8);
+                const x = (width - imageSize) / 2;
+                const y = (height - imageSize) / 2;
+                
+                image.setAttribute('x', x);
+                image.setAttribute('y', y);
+                image.setAttribute('width', imageSize);
+                image.setAttribute('height', imageSize);
+                image.setAttribute('opacity', '0.9');
+            }
         }
     }
     
@@ -984,6 +1001,8 @@ let networkDiagram;
 
 document.addEventListener('DOMContentLoaded', function() {
     networkDiagram = new NetworkDiagram();
+    // Make it globally accessible for admin panel integration
+    window.networkDiagram = networkDiagram;
 });
 
 // Cleanup on page unload

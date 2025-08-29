@@ -98,57 +98,74 @@ class AdminController {
     }
     
     updateConfigFromForm() {
-        // Update component configuration from form
+        // Update component configuration from form - with null checks
         this.currentConfig.components.rpi = {
-            name: document.getElementById('rpi-name').value,
-            description: document.getElementById('rpi-desc').value,
-            icon: document.getElementById('rpi-icon').value,
-            ip: document.getElementById('rpi-ip').value
+            name: this.getElementValue('rpi-name', 'Raspberry Pi'),
+            description: this.getElementValue('rpi-desc', 'SNMP Attacker'),
+            imageUrl: this.currentConfig.components.rpi.imageUrl || '/static/images/raspberry-pi-default.svg',
+            ip: this.getElementValue('rpi-ip', 'Auto-detect')
         };
         
         this.currentConfig.components.switch = {
-            name: document.getElementById('switch-name').value,
-            description: document.getElementById('switch-desc').value,
-            model: document.getElementById('switch-model').value,
-            defaultIP: document.getElementById('switch-default-ip').value
+            name: this.getElementValue('switch-name', 'Network Switch'),
+            description: this.getElementValue('switch-desc', 'SNMP v1/v2c Enabled'),
+            imageUrl: this.currentConfig.components.switch.imageUrl || '/static/images/switch-default.svg',
+            model: this.getElementValue('switch-model', 'Generic Switch'),
+            defaultIP: this.getElementValue('switch-default-ip', '192.168.1.100')
         };
         
         this.currentConfig.components.device1 = {
-            name: document.getElementById('device1-name').value,
-            type: document.getElementById('device1-type').value,
-            port: document.getElementById('device1-port').value
+            name: this.getElementValue('device1-name', 'Workstation'),
+            type: this.getElementValue('device1-type', 'workstation'),
+            imageUrl: this.currentConfig.components.device1.imageUrl || '/static/images/workstation-default.svg',
+            port: this.getElementValue('device1-port', 'Port 1')
         };
         
         this.currentConfig.components.device2 = {
-            name: document.getElementById('device2-name').value,
-            type: document.getElementById('device2-type').value,
-            port: document.getElementById('device2-port').value
+            name: this.getElementValue('device2-name', 'Printer'),
+            type: this.getElementValue('device2-type', 'printer'),
+            imageUrl: this.currentConfig.components.device2.imageUrl || '/static/images/printer-default.svg',
+            port: this.getElementValue('device2-port', 'Port 2')
         };
         
         this.currentConfig.components.device3 = {
-            name: document.getElementById('device3-name').value,
-            type: document.getElementById('device3-type').value,
-            port: document.getElementById('device3-port').value
+            name: this.getElementValue('device3-name', 'IoT Device'),
+            type: this.getElementValue('device3-type', 'iot'),
+            imageUrl: this.currentConfig.components.device3.imageUrl || '/static/images/iot-default.svg',
+            port: this.getElementValue('device3-port', 'Port 3')
         };
         
         this.currentConfig.components.device4 = {
-            name: document.getElementById('device4-name').value,
-            type: document.getElementById('device4-type').value,
-            port: document.getElementById('device4-port').value
+            name: this.getElementValue('device4-name', 'IP Camera'),
+            type: this.getElementValue('device4-type', 'camera'),
+            imageUrl: this.currentConfig.components.device4.imageUrl || '/static/images/camera-default.svg',
+            port: this.getElementValue('device4-port', 'Port 4')
         };
         
-        // Update display settings
+        // Update display settings with null checks
         this.currentConfig.display = {
-            hoverEffects: document.getElementById('enable-hover-effects').checked,
-            packetAnimations: document.getElementById('enable-packet-animations').checked,
-            attackIndicators: document.getElementById('enable-attack-indicators').checked,
-            connectionUpColor: document.getElementById('connection-up-color').value,
-            connectionDownColor: document.getElementById('connection-down-color').value,
-            attackColor: document.getElementById('attack-color').value,
-            showIPAddresses: document.getElementById('show-ip-addresses').checked,
-            showPortNumbers: document.getElementById('show-port-numbers').checked,
-            compactMode: document.getElementById('compact-mode').checked
+            hoverEffects: this.getElementChecked('enable-hover-effects', true),
+            packetAnimations: this.getElementChecked('enable-packet-animations', true),
+            attackIndicators: this.getElementChecked('enable-attack-indicators', true),
+            connectionUpColor: this.getElementValue('connection-up-color', '#27ae60'),
+            connectionDownColor: this.getElementValue('connection-down-color', '#e74c3c'),
+            attackColor: this.getElementValue('attack-color', '#f39c12'),
+            showIPAddresses: this.getElementChecked('show-ip-addresses', true),
+            showPortNumbers: this.getElementChecked('show-port-numbers', true),
+            compactMode: this.getElementChecked('compact-mode', false)
         };
+    }
+    
+    // Helper function to safely get element values
+    getElementValue(elementId, defaultValue) {
+        const element = document.getElementById(elementId);
+        return element ? element.value : defaultValue;
+    }
+    
+    // Helper function to safely get checkbox states
+    getElementChecked(elementId, defaultValue) {
+        const element = document.getElementById(elementId);
+        return element ? element.checked : defaultValue;
     }
     
     loadConfiguration() {
@@ -278,37 +295,43 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Configuration Management Functions
 function saveConfiguration() {
-    adminController.updateConfigFromForm();
-    
     try {
+        adminController.updateConfigFromForm();
+        
         localStorage.setItem('kormarineSeaNetConfig', JSON.stringify(adminController.currentConfig));
         adminController.addAdminLog('Configuration saved successfully', 'success');
         
-        // Also save to backend if needed
-        fetch('/api/config', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(adminController.currentConfig)
-        }).catch(error => {
-            adminController.addAdminLog('Warning: Could not sync to backend', 'warning');
-        });
+        // Update the main topology diagram if it's loaded
+        if (window.networkDiagram) {
+            window.networkDiagram.loadCustomizations();
+            adminController.addAdminLog('Topology diagram updated with new configuration', 'success');
+        }
         
     } catch (error) {
         adminController.addAdminLog(`Error saving configuration: ${error.message}`, 'error');
+        console.error('Save config error:', error);
     }
 }
 
 function previewConfiguration() {
-    adminController.updateConfigFromForm();
-    adminController.addAdminLog('Opening preview in new tab...', 'info');
-    
-    // Store preview config temporarily
-    sessionStorage.setItem('previewConfig', JSON.stringify(adminController.currentConfig));
-    
-    // Open main page in new tab for preview
-    window.open('/', '_blank');
-    
-    adminController.addAdminLog('Preview opened - check the new tab', 'success');
+    try {
+        adminController.updateConfigFromForm();
+        
+        // Save current config temporarily
+        const tempConfig = JSON.stringify(adminController.currentConfig);
+        localStorage.setItem('kormarineSeaNetConfig', tempConfig);
+        
+        adminController.addAdminLog('Opening preview in new tab...', 'info');
+        
+        // Open main page in new tab for preview
+        window.open('/', '_blank');
+        
+        adminController.addAdminLog('Preview opened - check the new tab', 'success');
+        
+    } catch (error) {
+        adminController.addAdminLog(`Error creating preview: ${error.message}`, 'error');
+        console.error('Preview config error:', error);
+    }
 }
 
 function resetConfiguration() {
@@ -403,6 +426,11 @@ async function handleImageUpload(input, component) {
             // Update the configuration
             adminController.currentConfig.components[component].imageUrl = result.url;
             
+            // Update the main topology diagram if it's loaded
+            if (window.networkDiagram) {
+                window.networkDiagram.updateDeviceImages(adminController.currentConfig.components);
+            }
+            
             // Show remove button
             const removeBtn = document.querySelector(`button[onclick="removeImage('${component}')"]`);
             if (removeBtn) {
@@ -451,6 +479,11 @@ async function removeImage(component) {
         const defaultUrl = defaultImages[component];
         adminController.currentConfig.components[component].imageUrl = defaultUrl;
         adminController.updateImagePreview(component, defaultUrl);
+        
+        // Update the main topology diagram if it's loaded
+        if (window.networkDiagram) {
+            window.networkDiagram.updateDeviceImages(adminController.currentConfig.components);
+        }
         
         // Hide remove button
         const removeBtn = document.querySelector(`button[onclick="removeImage('${component}')"]`);
