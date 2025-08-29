@@ -188,7 +188,13 @@ body {
 .target-config {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
+}
+
+.target-config label {
+    font-weight: 600;
+    color: #495057;
+    font-size: 0.95rem;
 }
 
 .discovery-actions, .led-controls {
