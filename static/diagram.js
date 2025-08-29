@@ -855,6 +855,9 @@ class NetworkDiagram {
             fallbackBox.setAttribute('width', newWidth);
             fallbackBox.setAttribute('height', newHeight);
         }
+        
+        // Update text positions and connection lines
+        this.updateElementPositionsAfterResize(newWidth, newHeight);
     }
 
     endResize(e) {
@@ -864,9 +867,182 @@ class NetworkDiagram {
         }
     }
     
+    updateElementPositionsAfterResize(newWidth, newHeight) {
+        if (!this.resizeElement) return;
+        
+        const imageId = this.resizeElement.id;
+        let deviceType = '';
+        let deviceGroup = null;
+        
+        // Determine device type and get the parent group
+        if (imageId.includes('rpi')) {
+            deviceType = 'rpi';
+            deviceGroup = document.getElementById('raspberry-pi');
+        } else if (imageId.includes('switch')) {
+            deviceType = 'switch';
+            deviceGroup = document.getElementById('network-switch');
+        } else if (imageId.includes('device1')) {
+            deviceType = 'device1';
+            deviceGroup = document.getElementById('device-1');
+        } else if (imageId.includes('device2')) {
+            deviceType = 'device2';
+            deviceGroup = document.getElementById('device-2');
+        } else if (imageId.includes('device3')) {
+            deviceType = 'device3';
+            deviceGroup = document.getElementById('device-3');
+        } else if (imageId.includes('device4')) {
+            deviceType = 'device4';
+            deviceGroup = document.getElementById('device-4');
+        }
+        
+        if (!deviceGroup) return;
+        
+        // Update text positions based on new image size
+        this.updateTextPositions(deviceGroup, deviceType, newWidth, newHeight);
+        
+        // Update resize handle position
+        this.updateResizeHandle(deviceGroup, newWidth, newHeight);
+        
+        // Update connection lines
+        this.updateConnectionsAfterResize(deviceType, newWidth, newHeight);
+    }
+    
+    updateTextPositions(deviceGroup, deviceType, width, height) {
+        const centerX = width / 2;
+        const textY = height + 15; // Position text below the image
+        const subtextY = height + 28;
+        
+        if (deviceType === 'rpi') {
+            const nameText = deviceGroup.querySelector('#rpi-device-name');
+            const descText = deviceGroup.querySelector('#rpi-device-desc');
+            if (nameText) {
+                nameText.setAttribute('x', centerX);
+                nameText.setAttribute('y', textY);
+            }
+            if (descText) {
+                descText.setAttribute('x', centerX);
+                descText.setAttribute('y', subtextY);
+            }
+        } else if (deviceType === 'switch') {
+            const nameText = deviceGroup.querySelector('#switch-device-name');
+            const ipText = deviceGroup.querySelector('#switch-ip');
+            const descText = deviceGroup.querySelector('#switch-device-desc');
+            if (nameText) {
+                nameText.setAttribute('x', centerX);
+                nameText.setAttribute('y', textY);
+            }
+            if (ipText) {
+                ipText.setAttribute('x', centerX);
+                ipText.setAttribute('y', textY + 13);
+            }
+            if (descText) {
+                descText.setAttribute('x', centerX);
+                descText.setAttribute('y', textY + 26);
+            }
+        } else {
+            // Target devices
+            const deviceNum = deviceType.replace('device', '');
+            const nameText = deviceGroup.querySelector(`#device${deviceNum}-device-name`);
+            const portText = deviceGroup.querySelector(`#device${deviceNum}-port-label`);
+            if (nameText) {
+                nameText.setAttribute('x', centerX);
+                nameText.setAttribute('y', textY);
+            }
+            if (portText) {
+                portText.setAttribute('x', centerX);
+                portText.setAttribute('y', subtextY);
+            }
+            
+            // Update connection status indicator position
+            const statusIndicator = deviceGroup.querySelector('.connection-status');
+            if (statusIndicator) {
+                statusIndicator.setAttribute('cx', width - 15);
+            }
+        }
+    }
+    
+    updateResizeHandle(deviceGroup, width, height) {
+        const resizeHandle = deviceGroup.querySelector('.resize-handle');
+        if (resizeHandle) {
+            resizeHandle.setAttribute('cx', width - 5);
+        }
+    }
+    
+    updateConnectionsAfterResize(deviceType, width, height) {
+        // Get current device position
+        let deviceGroup = null;
+        let connectionId = '';
+        
+        if (deviceType === 'rpi') {
+            deviceGroup = document.getElementById('raspberry-pi');
+            connectionId = 'connection-attacker';
+        } else if (deviceType.startsWith('device')) {
+            const deviceNum = deviceType.replace('device', '');
+            deviceGroup = document.getElementById(`device-${deviceNum}`);
+            connectionId = `connection-device-${deviceNum}`;
+        } else if (deviceType === 'switch') {
+            // Handle switch resizing connections
+            deviceGroup = document.getElementById('network-switch');
+            // Switch has multiple connections, handle differently
+            this.updateSwitchConnectionsAfterResize(width, height);
+            return; // Early return since we handle connections differently for switch
+        }
+        
+        if (!deviceGroup) return;
+        
+        // Get current transform position
+        const transform = deviceGroup.getAttribute('transform');
+        const translateMatch = transform.match(/translate\(([^,]+),\s*([^)]+)\)/);
+        if (!translateMatch) return;
+        
+        const x = parseFloat(translateMatch[1]);
+        const y = parseFloat(translateMatch[2]);
+        
+        // Update connection line endpoints
+        const connection = document.getElementById(connectionId);
+        if (connection && deviceType === 'rpi') {
+            // For raspberry pi, connect from right edge middle
+            connection.setAttribute('x1', x + width);
+            connection.setAttribute('y1', y + height / 2);
+        } else if (connection && deviceType.startsWith('device')) {
+            // For target devices, connect to left edge middle
+            connection.setAttribute('x2', x);
+            connection.setAttribute('y2', y + height / 2);
+        }
+    }
+    
+    updateSwitchConnectionsAfterResize(width, height) {
+        const switchGroup = document.getElementById('network-switch');
+        if (!switchGroup) return;
+        
+        // Get current switch position
+        const transform = switchGroup.getAttribute('transform');
+        const translateMatch = transform.match(/translate\(([^,]+),\s*([^)]+)\)/);
+        if (!translateMatch) return;
+        
+        const x = parseFloat(translateMatch[1]);
+        const y = parseFloat(translateMatch[2]);
+        
+        // Update attacker connection (incoming to switch)
+        const attackerConnection = document.getElementById('connection-attacker');
+        if (attackerConnection) {
+            attackerConnection.setAttribute('x2', x);
+            attackerConnection.setAttribute('y2', y + height / 2);
+        }
+        
+        // Update device connections (outgoing from switch)
+        for (let i = 1; i <= 4; i++) {
+            const deviceConnection = document.getElementById(`connection-device-${i}`);
+            if (deviceConnection) {
+                deviceConnection.setAttribute('x1', x + width);
+                deviceConnection.setAttribute('y1', y + height / 2 - 20 + (i * 10)); // Spread out connection points
+            }
+        }
+    }
+    
     // Drag and Drop Setup
     setupDragAndDrop() {
-        const draggableElements = ['raspberry-pi', 'device-1', 'device-2', 'device-3', 'device-4'];
+        const draggableElements = ['raspberry-pi', 'network-switch', 'device-1', 'device-2', 'device-3', 'device-4'];
         
         draggableElements.forEach(elementId => {
             const element = document.getElementById(elementId);
@@ -967,25 +1143,55 @@ class NetworkDiagram {
         // Update connection lines when devices are moved
         if (deviceId === 'raspberry-pi') {
             const connection = document.getElementById('connection-attacker');
-            if (connection) {
-                connection.setAttribute('x1', x + 120); // Connect from right edge of image
-                connection.setAttribute('y1', y + 40);  // Connect from middle of image
+            const rpiImage = document.getElementById('rpi-main-image');
+            if (connection && rpiImage) {
+                const width = parseInt(rpiImage.getAttribute('width'));
+                const height = parseInt(rpiImage.getAttribute('height'));
+                connection.setAttribute('x1', x + width); // Connect from right edge of image
+                connection.setAttribute('y1', y + height / 2);  // Connect from middle of image
+            }
+        }
+        
+        if (deviceId === 'network-switch') {
+            // Update all connections from the switch
+            const switchImage = document.getElementById('switch-main-image');
+            if (switchImage) {
+                const width = parseInt(switchImage.getAttribute('width'));
+                const height = parseInt(switchImage.getAttribute('height'));
+                
+                // Update attacker connection (incoming)
+                const attackerConnection = document.getElementById('connection-attacker');
+                if (attackerConnection) {
+                    attackerConnection.setAttribute('x2', x);
+                    attackerConnection.setAttribute('y2', y + height / 2);
+                }
+                
+                // Update device connections (outgoing)
+                for (let i = 1; i <= 4; i++) {
+                    const deviceConnection = document.getElementById(`connection-device-${i}`);
+                    if (deviceConnection) {
+                        deviceConnection.setAttribute('x1', x + width);
+                        deviceConnection.setAttribute('y1', y + height / 2 - 20 + (i * 10)); // Spread out connection points
+                    }
+                }
             }
         }
         
         if (deviceId.startsWith('device-')) {
             const deviceNum = deviceId.split('-')[1];
             const connection = document.getElementById(`connection-device-${deviceNum}`);
-            if (connection) {
+            const deviceImage = document.getElementById(`device${deviceNum}-main-image`);
+            if (connection && deviceImage) {
+                const height = parseInt(deviceImage.getAttribute('height'));
                 connection.setAttribute('x2', x);
-                connection.setAttribute('y2', y + 35); // Connect to middle of device image
+                connection.setAttribute('y2', y + height / 2); // Connect to middle of device image
             }
         }
     }
     
     saveComponentPositions() {
         const positions = {};
-        const draggableElements = ['raspberry-pi', 'device-1', 'device-2', 'device-3', 'device-4'];
+        const draggableElements = ['raspberry-pi', 'network-switch', 'device-1', 'device-2', 'device-3', 'device-4'];
         
         draggableElements.forEach(elementId => {
             const element = document.getElementById(elementId);
