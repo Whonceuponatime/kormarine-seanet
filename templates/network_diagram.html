@@ -15,10 +15,17 @@
                     <img src="/static/images/seacure-logo.png" alt="SEACURE Logo" class="header-logo">
                     <h1>Attack Simulator</h1>
                 </div>
-                <div class="nav-links">
-                    <a href="/" class="nav-link active">Network Topology</a>
-                    <a href="/settings" class="nav-link">Settings & Testing</a>
-                    <a href="/admin" class="nav-link">Admin Panel</a>
+                <div class="nav-container">
+                    <button class="hamburger-menu" id="hamburger-menu">
+                        <span class="hamburger-line"></span>
+                        <span class="hamburger-line"></span>
+                        <span class="hamburger-line"></span>
+                    </button>
+                    <div class="nav-menu" id="nav-menu">
+                        <a href="/" class="nav-link active">Network Topology</a>
+                        <a href="/settings" class="nav-link">Settings & Testing</a>
+                        <a href="/admin" class="nav-link">Admin Panel</a>
+                    </div>
                 </div>
             </div>
         </header>
@@ -321,6 +328,24 @@
         </div>
     </div>
 
-    <script src="{{ url_for('static', filename='diagram.js') }}"></script>
-</body>
+            <script src="{{ url_for('static', filename='diagram.js') }}"></script>
+        <script>
+            // Hamburger menu functionality
+            document.addEventListener('DOMContentLoaded', function() {
+                const hamburgerMenu = document.getElementById('hamburger-menu');
+                const navMenu = document.getElementById('nav-menu');
+                
+                hamburgerMenu.addEventListener('click', function() {
+                    navMenu.classList.toggle('active');
+                });
+                
+                // Close menu when clicking outside
+                document.addEventListener('click', function(event) {
+                    if (!hamburgerMenu.contains(event.target) && !navMenu.contains(event.target)) {
+                        navMenu.classList.remove('active');
+                    }
+                });
+            });
+        </script>
+    </body>
 </html>

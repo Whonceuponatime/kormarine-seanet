@@ -7,7 +7,7 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
     color: #2c3e50;
     min-height: 100vh;
     overflow-x: hidden;
@@ -23,10 +23,10 @@ body {
 .diagram-header {
     background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
     border: 2px solid #dc3545;
-    border-radius: 10px;
-    padding: 15px;
-    margin-bottom: 10px;
-    box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+    border-radius: 8px;
+    padding: 15px 20px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.15);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -39,15 +39,15 @@ body {
 }
 
 .header-logo {
-    height: 80px;
+    height: 90px;
     width: auto;
 }
 
 .header-content h1 {
     color: #dc3545;
-    font-size: 2.2rem;
+    font-size: 2rem;
     margin: 0;
-    font-weight: bold;
+    font-weight: 700;
 }
 
 .header-content h1 i {
@@ -61,33 +61,82 @@ body {
     margin-top: 5px;
 }
 
-.nav-links {
+/* Navigation Container */
+.nav-container {
+    position: relative;
+}
+
+/* Hamburger Menu */
+.hamburger-menu {
     display: flex;
-    gap: 15px;
-    margin-top: 15px;
+    flex-direction: column;
+    justify-content: space-around;
+    width: 30px;
+    height: 30px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+.hamburger-line {
+    width: 100%;
+    height: 3px;
+    background-color: #dc3545;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+}
+
+.hamburger-menu:hover .hamburger-line {
+    background-color: #c82333;
+}
+
+/* Navigation Menu */
+.nav-menu {
+    position: absolute;
+    top: 40px;
+    right: 0;
+    background: #ffffff;
+    border: 2px solid #007bff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15);
+    padding: 10px 0;
+    min-width: 180px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.nav-menu.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
 }
 
 .nav-link {
-    padding: 8px 16px;
-    background: rgba(220, 53, 69, 0.1);
-    color: #dc3545;
+    display: block;
+    padding: 12px 20px;
+    color: #495057;
     text-decoration: none;
-    border-radius: 20px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    border: 2px solid transparent;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
 }
 
 .nav-link:hover {
-    background: rgba(220, 53, 69, 0.2);
-    border-color: #dc3545;
-    transform: translateY(-2px);
+    background: #e3f2fd;
+    color: #007bff;
+    border-left-color: #007bff;
 }
 
 .nav-link.active {
     background: #dc3545;
     color: #ffffff;
-    border-color: #dc3545;
+    border-left-color: #dc3545;
+    font-weight: 600;
 }
 
 .led-row {
@@ -165,7 +214,7 @@ body {
 
 .action-btn {
     padding: 12px 20px;
-    background: linear-gradient(135deg, #3498db, #2980b9);
+    background: linear-gradient(135deg, #dc3545, #c82333);
     color: white;
     border: none;
     border-radius: 8px;
@@ -214,9 +263,9 @@ body {
 .community-btn {
     flex: 1;
     padding: 8px 10px;
-    border: 2px solid #dc3545;
+    border: 2px solid #007bff;
     background: #ffffff;
-    color: #dc3545;
+    color: #007bff;
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -231,8 +280,8 @@ body {
 }
 
 .community-btn:hover {
-    border-color: #dc3545;
-    background: #f8f9fa;
+    border-color: #0056b3;
+    background: #e3f2fd;
 }
 
 .community-btn.active:hover {
@@ -266,11 +315,11 @@ body {
 /* Network Diagram */
 .network-diagram {
     background: #ffffff;
-    border: 2px solid #dc3545;
-    border-radius: 15px;
+    border: 2px solid #007bff;
+    border-radius: 12px;
     padding: 5px;
     margin-bottom: 20px;
-    box-shadow: 0 10px 30px rgba(220, 53, 69, 0.2);
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.15);
     overflow: hidden;
     width: 100%;
 }
