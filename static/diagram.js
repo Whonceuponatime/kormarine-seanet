@@ -19,6 +19,7 @@ class NetworkDiagram {
         this.updateTargetIP();
         this.loadCustomizations();
         this.loadComponentPositions();
+        this.loadDeviceVisibilitySettings();
         this.setupDragAndDrop();
         this.setupImageResize();
         this.addInitialLog('System initialized and ready for demonstration');
@@ -56,12 +57,17 @@ class NetworkDiagram {
             this.clearLog();
         });
         
-        // Connected devices toggle
-        document.getElementById('show-connected-devices').addEventListener('change', (e) => {
-            this.toggleConnectedDevices(e.target.checked);
-        });
+        // Connected devices toggle moved to admin panel
         
         // Raspberry Pi click functionality removed
+        
+        // Listen for device visibility changes from admin panel
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'deviceVisibilityUpdate') {
+                const data = JSON.parse(e.newValue);
+                this.toggleSingleDevice(data.deviceId, data.show);
+            }
+        });
         
         // Drag and drop setup moved to init() to ensure proper initialization
     }
@@ -594,37 +600,47 @@ class NetworkDiagram {
         this.addInitialLog('Log cleared - ready for new demonstration');
     }
     
-    // Connected devices visibility toggle
-    toggleConnectedDevices(show) {
-        const connectedDevices = ['device-1', 'device-2', 'device-3', 'device-4'];
-        const connectionLines = ['connection-device-1', 'connection-device-2', 'connection-device-3', 'connection-device-4'];
-        const portLabels = ['switch-port-1', 'switch-port-2', 'switch-port-3', 'switch-port-4'];
+    // Individual device visibility toggle (controlled from admin panel)
+    toggleSingleDevice(deviceId, show) {
+        const device = document.getElementById(deviceId);
+        const connectionLine = document.getElementById(`connection-${deviceId}`);
+        const portNum = deviceId.split('-')[1];
+        const portLabel = document.getElementById(`switch-port-${portNum}`);
         
         // Toggle device visibility
-        connectedDevices.forEach(deviceId => {
-            const device = document.getElementById(deviceId);
-            if (device) {
-                device.style.display = show ? 'block' : 'none';
-            }
-        });
+        if (device) {
+            device.style.display = show ? 'block' : 'none';
+        }
         
-        // Toggle connection lines visibility
-        connectionLines.forEach(lineId => {
-            const line = document.getElementById(lineId);
-            if (line) {
-                line.style.display = show ? 'block' : 'none';
-            }
-        });
+        // Toggle connection line visibility
+        if (connectionLine) {
+            connectionLine.style.display = show ? 'block' : 'none';
+        }
         
-        // Toggle port labels on switch
-        portLabels.forEach(labelId => {
-            const label = document.getElementById(labelId);
-            if (label) {
-                label.style.display = show ? 'block' : 'none';
-            }
-        });
+        // Toggle corresponding port label on switch
+        if (portLabel) {
+            portLabel.style.display = show ? 'block' : 'none';
+        }
         
-        this.addLog(`Connected devices ${show ? 'shown' : 'hidden'}`, 'info');
+        this.addLog(`${deviceId.replace('-', ' ')} ${show ? 'shown' : 'hidden'}`, 'info');
+    }
+
+    // Load device visibility settings on page load
+    loadDeviceVisibilitySettings() {
+        const saved = localStorage.getItem('kormarineSeaNetConfig');
+        if (saved) {
+            try {
+                const config = JSON.parse(saved);
+                if (config.display) {
+                    this.toggleSingleDevice('device-1', config.display.showDevice1 !== false);
+                    this.toggleSingleDevice('device-2', config.display.showDevice2 !== false);
+                    this.toggleSingleDevice('device-3', config.display.showDevice3 !== false);
+                    this.toggleSingleDevice('device-4', config.display.showDevice4 !== false);
+                }
+            } catch (error) {
+                console.error('Error loading device visibility settings:', error);
+            }
+        }
     }
     
     // LED Control Functions removed - available on settings page

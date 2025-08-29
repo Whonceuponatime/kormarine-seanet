@@ -152,7 +152,11 @@ class AdminController {
             attackColor: this.getElementValue('attack-color', '#f39c12'),
             showIPAddresses: this.getElementChecked('show-ip-addresses', true),
             showPortNumbers: this.getElementChecked('show-port-numbers', true),
-            compactMode: this.getElementChecked('compact-mode', false)
+            compactMode: this.getElementChecked('compact-mode', false),
+            showDevice1: this.getElementChecked('show-device-1', true),
+            showDevice2: this.getElementChecked('show-device-2', true),
+            showDevice3: this.getElementChecked('show-device-3', true),
+            showDevice4: this.getElementChecked('show-device-4', true)
         };
     }
     
@@ -166,6 +170,50 @@ class AdminController {
     getElementChecked(elementId, defaultValue) {
         const element = document.getElementById(elementId);
         return element ? element.checked : defaultValue;
+    }
+
+    // Device visibility control functions
+    toggleDeviceVisibility(deviceId, show) {
+        // Update the configuration
+        this.updateConfigFromForm();
+        
+        // Save to localStorage
+        this.saveConfiguration();
+        
+        // Send message to topology page if it's open
+        this.broadcastDeviceVisibility(deviceId, show);
+    }
+
+    toggleAllDevices() {
+        const allChecked = ['device-1', 'device-2', 'device-3', 'device-4'].every(deviceId => {
+            const checkbox = document.getElementById(`show-${deviceId}`);
+            return checkbox ? checkbox.checked : true;
+        });
+        
+        // Toggle all to opposite state
+        ['device-1', 'device-2', 'device-3', 'device-4'].forEach(deviceId => {
+            const checkbox = document.getElementById(`show-${deviceId}`);
+            if (checkbox) {
+                checkbox.checked = !allChecked;
+                this.toggleDeviceVisibility(deviceId, !allChecked);
+            }
+        });
+    }
+
+    broadcastDeviceVisibility(deviceId, show) {
+        // Use localStorage to communicate with topology page
+        const visibilityData = {
+            deviceId: deviceId,
+            show: show,
+            timestamp: Date.now()
+        };
+        localStorage.setItem('deviceVisibilityUpdate', JSON.stringify(visibilityData));
+        
+        // Trigger storage event manually for same-origin communication
+        window.dispatchEvent(new StorageEvent('storage', {
+            key: 'deviceVisibilityUpdate',
+            newValue: JSON.stringify(visibilityData)
+        }));
     }
     
     loadConfiguration() {
