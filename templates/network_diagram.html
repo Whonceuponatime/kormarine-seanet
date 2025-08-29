@@ -101,10 +101,10 @@
                     <!-- Switch Ports -->
                     <g class="switch-ports">
                         <!-- Port labels on the switch (relative to switch position) -->
-                        <text x="190" y="30" text-anchor="middle" class="port-label" id="switch-port-1">Port 1</text>
+                        <text x="190" y="20" text-anchor="middle" class="port-label" id="switch-port-1">Port 1</text>
                         <text x="190" y="50" text-anchor="middle" class="port-label" id="switch-port-2">Port 2</text>
-                        <text x="190" y="70" text-anchor="middle" class="port-label" id="switch-port-3">Port 3</text>
-                        <text x="190" y="90" text-anchor="middle" class="port-label" id="switch-port-4">Port 4</text>
+                        <text x="190" y="80" text-anchor="middle" class="port-label" id="switch-port-3">Port 3</text>
+                        <text x="190" y="110" text-anchor="middle" class="port-label" id="switch-port-4">Port 4</text>
                     </g>
                     
                     <!-- Resize handle -->
@@ -201,13 +201,13 @@
 
                     
                     <!-- Switch to Devices -->
-                    <line id="connection-device-1" x1="700" y1="230" x2="900" y2="185" 
+                    <line id="connection-device-1" x1="700" y1="220" x2="900" y2="185" 
                           stroke="#27ae60" stroke-width="3" class="device-connection" data-port="1"/>
                     <line id="connection-device-2" x1="700" y1="250" x2="900" y2="305" 
                           stroke="#27ae60" stroke-width="3" class="device-connection" data-port="2"/>
-                    <line id="connection-device-3" x1="700" y1="270" x2="900" y2="425" 
+                    <line id="connection-device-3" x1="700" y1="280" x2="900" y2="425" 
                           stroke="#27ae60" stroke-width="3" class="device-connection" data-port="3"/>
-                    <line id="connection-device-4" x1="700" y1="290" x2="900" y2="545" 
+                    <line id="connection-device-4" x1="700" y1="310" x2="900" y2="545" 
                           stroke="#27ae60" stroke-width="3" class="device-connection" data-port="4"/>
                 </g>
 
@@ -250,6 +250,12 @@
 
 
             <div class="status-display">
+                <div class="topology-controls">
+                    <label class="toggle-label">
+                        <input type="checkbox" id="show-connected-devices" checked>
+                        <span class="toggle-text">Show Connected Devices</span>
+                    </label>
+                </div>
                 <div class="interaction-hint">
                     <i class="fas fa-info-circle"></i>
                     <span>Drag components to reposition • Use Settings page for LED controls</span>

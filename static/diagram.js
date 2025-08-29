@@ -56,6 +56,11 @@ class NetworkDiagram {
             this.clearLog();
         });
         
+        // Connected devices toggle
+        document.getElementById('show-connected-devices').addEventListener('change', (e) => {
+            this.toggleConnectedDevices(e.target.checked);
+        });
+        
         // Raspberry Pi click functionality removed
         
         // Drag and drop setup moved to init() to ensure proper initialization
@@ -589,6 +594,39 @@ class NetworkDiagram {
         this.addInitialLog('Log cleared - ready for new demonstration');
     }
     
+    // Connected devices visibility toggle
+    toggleConnectedDevices(show) {
+        const connectedDevices = ['device-1', 'device-2', 'device-3', 'device-4'];
+        const connectionLines = ['connection-device-1', 'connection-device-2', 'connection-device-3', 'connection-device-4'];
+        const portLabels = ['switch-port-1', 'switch-port-2', 'switch-port-3', 'switch-port-4'];
+        
+        // Toggle device visibility
+        connectedDevices.forEach(deviceId => {
+            const device = document.getElementById(deviceId);
+            if (device) {
+                device.style.display = show ? 'block' : 'none';
+            }
+        });
+        
+        // Toggle connection lines visibility
+        connectionLines.forEach(lineId => {
+            const line = document.getElementById(lineId);
+            if (line) {
+                line.style.display = show ? 'block' : 'none';
+            }
+        });
+        
+        // Toggle port labels on switch
+        portLabels.forEach(labelId => {
+            const label = document.getElementById(labelId);
+            if (label) {
+                label.style.display = show ? 'block' : 'none';
+            }
+        });
+        
+        this.addLog(`Connected devices ${show ? 'shown' : 'hidden'}`, 'info');
+    }
+    
     // LED Control Functions removed - available on settings page
     
     async toggleManualLED(pin) {
@@ -891,7 +929,7 @@ class NetworkDiagram {
                 const portLabel = deviceGroup.querySelector(`#switch-port-${i}`);
                 if (portLabel) {
                     portLabel.setAttribute('x', width - 10);
-                    portLabel.setAttribute('y', 10 + (i * 20)); // Increased spacing from 15 to 20
+                    portLabel.setAttribute('y', -10 + (i * 30)); // Increased spacing to 30px
                 }
             }
         } else {
@@ -985,7 +1023,7 @@ class NetworkDiagram {
                     const deviceConnection = document.getElementById(`connection-device-${i}`);
                     if (deviceConnection) {
                         deviceConnection.setAttribute('x1', x + width);
-                        deviceConnection.setAttribute('y1', y + height / 2 - 30 + (i * 20)); // Increased spacing from 10 to 20
+                        deviceConnection.setAttribute('y1', y + height / 2 - 45 + (i * 30)); // Increased spacing to 30px
                     }
                 }
     }
