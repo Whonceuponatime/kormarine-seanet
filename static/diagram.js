@@ -706,30 +706,88 @@ class NetworkDiagram {
             }
         }
         
-        // Update device names in the SVG
+        // Update device names, descriptions, and images in the SVG
         this.updateDeviceLabels(config.components);
+        this.updateDeviceImages(config.components);
     }
     
     updateDeviceLabels(components) {
+        // Update Raspberry Pi
+        if (components.rpi) {
+            const rpiName = document.getElementById('rpi-device-name');
+            const rpiDesc = document.getElementById('rpi-device-desc');
+            if (rpiName) rpiName.textContent = components.rpi.name;
+            if (rpiDesc) rpiDesc.textContent = components.rpi.description;
+        }
+        
+        // Update Switch
+        if (components.switch) {
+            const switchName = document.getElementById('switch-device-name');
+            const switchDesc = document.getElementById('switch-device-desc');
+            if (switchName) switchName.textContent = components.switch.name;
+            if (switchDesc) switchDesc.textContent = components.switch.description;
+        }
+        
         // Update device text elements in SVG
         if (components.device1) {
-            const device1Text = document.querySelector('#device-1 .device-text-small');
+            const device1Text = document.getElementById('device1-device-name');
+            const device1Port = document.getElementById('device1-port-label');
             if (device1Text) device1Text.textContent = components.device1.name;
+            if (device1Port) device1Port.textContent = components.device1.port;
         }
         
         if (components.device2) {
-            const device2Text = document.querySelector('#device-2 .device-text-small');
+            const device2Text = document.getElementById('device2-device-name');
+            const device2Port = document.getElementById('device2-port-label');
             if (device2Text) device2Text.textContent = components.device2.name;
+            if (device2Port) device2Port.textContent = components.device2.port;
         }
         
         if (components.device3) {
-            const device3Text = document.querySelector('#device-3 .device-text-small');
+            const device3Text = document.getElementById('device3-device-name');
+            const device3Port = document.getElementById('device3-port-label');
             if (device3Text) device3Text.textContent = components.device3.name;
+            if (device3Port) device3Port.textContent = components.device3.port;
         }
         
         if (components.device4) {
-            const device4Text = document.querySelector('#device-4 .device-text-small');
+            const device4Text = document.getElementById('device4-device-name');
+            const device4Port = document.getElementById('device4-port-label');
             if (device4Text) device4Text.textContent = components.device4.name;
+            if (device4Port) device4Port.textContent = components.device4.port;
+        }
+    }
+    
+    updateDeviceImages(components) {
+        // Update device images in SVG
+        if (components.rpi && components.rpi.imageUrl) {
+            const rpiImage = document.getElementById('rpi-device-image');
+            if (rpiImage) rpiImage.setAttribute('href', components.rpi.imageUrl);
+        }
+        
+        if (components.switch && components.switch.imageUrl) {
+            const switchImage = document.getElementById('switch-device-image');
+            if (switchImage) switchImage.setAttribute('href', components.switch.imageUrl);
+        }
+        
+        if (components.device1 && components.device1.imageUrl) {
+            const device1Image = document.getElementById('device1-device-image');
+            if (device1Image) device1Image.setAttribute('href', components.device1.imageUrl);
+        }
+        
+        if (components.device2 && components.device2.imageUrl) {
+            const device2Image = document.getElementById('device2-device-image');
+            if (device2Image) device2Image.setAttribute('href', components.device2.imageUrl);
+        }
+        
+        if (components.device3 && components.device3.imageUrl) {
+            const device3Image = document.getElementById('device3-device-image');
+            if (device3Image) device3Image.setAttribute('href', components.device3.imageUrl);
+        }
+        
+        if (components.device4 && components.device4.imageUrl) {
+            const device4Image = document.getElementById('device4-device-image');
+            if (device4Image) device4Image.setAttribute('href', components.device4.imageUrl);
         }
     }
     

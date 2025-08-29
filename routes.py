@@ -9,8 +9,18 @@ import json
 import time
 import threading
 import os
+import shutil
+from werkzeug.utils import secure_filename
 from flask import Flask, jsonify, request, Response, render_template, send_from_directory
 from config import *
+
+# Image upload configuration
+UPLOAD_FOLDER = 'uploads'
+STATIC_IMAGES_FOLDER = 'static/images'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'svg'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 class Routes:
@@ -174,6 +184,64 @@ class Routes:
         @self.app.get("/admin")
         def admin():
             return render_template('admin.html')
+        
+        # Image upload route
+        @self.app.post("/upload-image")
+        def upload_image():
+            if 'file' not in request.files:
+                return jsonify({"ok": False, "error": "No file provided"}), 400
+            
+            file = request.files['file']
+            component = request.form.get('component', '')
+            
+            if file.filename == '':
+                return jsonify({"ok": False, "error": "No file selected"}), 400
+            
+            if not allowed_file(file.filename):
+                return jsonify({"ok": False, "error": "Invalid file type. Use PNG, JPG, JPEG, GIF, or SVG"}), 400
+            
+            if file and allowed_file(file.filename):
+                # Create secure filename
+                filename = secure_filename(file.filename)
+                timestamp = str(int(time.time()))
+                filename = f"{component}_{timestamp}_{filename}"
+                
+                # Save to uploads folder
+                upload_path = os.path.join(UPLOAD_FOLDER, filename)
+                file.save(upload_path)
+                
+                # Copy to static/images for serving
+                static_path = os.path.join(STATIC_IMAGES_FOLDER, filename)
+                shutil.copy2(upload_path, static_path)
+                
+                # Return the URL path for the image
+                image_url = f"/static/images/{filename}"
+                
+                return jsonify({
+                    "ok": True, 
+                    "filename": filename,
+                    "url": image_url,
+                    "component": component
+                })
+            
+            return jsonify({"ok": False, "error": "Upload failed"}), 500
+        
+        # Delete image route
+        @self.app.delete("/delete-image/<filename>")
+        def delete_image(filename):
+            try:
+                # Remove from both locations
+                upload_path = os.path.join(UPLOAD_FOLDER, filename)
+                static_path = os.path.join(STATIC_IMAGES_FOLDER, filename)
+                
+                if os.path.exists(upload_path):
+                    os.remove(upload_path)
+                if os.path.exists(static_path):
+                    os.remove(static_path)
+                
+                return jsonify({"ok": True, "message": "Image deleted successfully"})
+            except Exception as e:
+                return jsonify({"ok": False, "error": str(e)}), 500
         
         # Additional CORS headers for development
         @self.app.after_request

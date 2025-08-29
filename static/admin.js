@@ -3,38 +3,43 @@ class AdminController {
     constructor() {
         this.defaultConfig = {
             components: {
-                rpi: {
-                    name: 'Raspberry Pi',
-                    description: 'SNMP Attacker',
-                    icon: '🍓',
-                    ip: 'Auto-detect'
-                },
-                switch: {
-                    name: 'Network Switch',
-                    description: 'SNMP v1/v2c Enabled',
-                    model: 'Generic Switch',
-                    defaultIP: '192.168.1.100'
-                },
-                device1: {
-                    name: 'Workstation',
-                    type: 'workstation',
-                    port: 'Port 1'
-                },
-                device2: {
-                    name: 'Printer',
-                    type: 'printer',
-                    port: 'Port 2'
-                },
-                device3: {
-                    name: 'IoT Device',
-                    type: 'iot',
-                    port: 'Port 3'
-                },
-                device4: {
-                    name: 'IP Camera',
-                    type: 'camera',
-                    port: 'Port 4'
-                }
+                            rpi: {
+                name: 'Raspberry Pi',
+                description: 'SNMP Attacker',
+                imageUrl: '/static/images/raspberry-pi-default.png',
+                ip: 'Auto-detect'
+            },
+                            switch: {
+                name: 'Network Switch',
+                description: 'SNMP v1/v2c Enabled',
+                imageUrl: '/static/images/switch-default.png',
+                model: 'Generic Switch',
+                defaultIP: '192.168.1.100'
+            },
+                            device1: {
+                name: 'Workstation',
+                type: 'workstation',
+                imageUrl: '/static/images/workstation-default.png',
+                port: 'Port 1'
+            },
+            device2: {
+                name: 'Printer',
+                type: 'printer',
+                imageUrl: '/static/images/printer-default.png',
+                port: 'Port 2'
+            },
+            device3: {
+                name: 'IoT Device',
+                type: 'iot',
+                imageUrl: '/static/images/iot-default.png',
+                port: 'Port 3'
+            },
+            device4: {
+                name: 'IP Camera',
+                type: 'camera',
+                imageUrl: '/static/images/camera-default.png',
+                port: 'Port 4'
+            }
             },
             display: {
                 hoverEffects: true,
@@ -88,32 +93,8 @@ class AdminController {
     }
     
     updateDeviceIcon(deviceNum, deviceType) {
-        const iconMap = {
-            workstation: '🖥️',
-            server: '🖲️',
-            laptop: '💻',
-            desktop: '🖥️',
-            printer: '🖨️',
-            scanner: '📠',
-            copier: '📄',
-            fax: '📠',
-            iot: '📱',
-            phone: '📞',
-            tablet: '📱',
-            sensor: '🌡️',
-            camera: '📹',
-            nvr: '📼',
-            access: '🚪',
-            alarm: '🚨'
-        };
-        
-        const icon = iconMap[deviceType] || '📱';
-        const iconElement = document.querySelector(`[data-device="${deviceNum}"] .component-icon`);
-        if (iconElement) {
-            iconElement.textContent = icon;
-        }
-        
-        this.addAdminLog(`Updated Device ${deviceNum} icon to ${icon} (${deviceType})`, 'info');
+        // This method is now deprecated since we use image uploads
+        this.addAdminLog(`Device ${deviceNum} type changed to ${deviceType}`, 'info');
     }
     
     updateConfigFromForm() {
@@ -194,29 +175,37 @@ class AdminController {
         // Component settings
         document.getElementById('rpi-name').value = config.components.rpi.name;
         document.getElementById('rpi-desc').value = config.components.rpi.description;
-        document.getElementById('rpi-icon').value = config.components.rpi.icon;
         document.getElementById('rpi-ip').value = config.components.rpi.ip;
+        
+        // Update image previews
+        this.updateImagePreview('rpi', config.components.rpi.imageUrl);
         
         document.getElementById('switch-name').value = config.components.switch.name;
         document.getElementById('switch-desc').value = config.components.switch.description;
         document.getElementById('switch-model').value = config.components.switch.model;
         document.getElementById('switch-default-ip').value = config.components.switch.defaultIP;
         
+        this.updateImagePreview('switch', config.components.switch.imageUrl);
+        
         document.getElementById('device1-name').value = config.components.device1.name;
         document.getElementById('device1-type').value = config.components.device1.type;
         document.getElementById('device1-port').value = config.components.device1.port;
+        this.updateImagePreview('device1', config.components.device1.imageUrl);
         
         document.getElementById('device2-name').value = config.components.device2.name;
         document.getElementById('device2-type').value = config.components.device2.type;
         document.getElementById('device2-port').value = config.components.device2.port;
+        this.updateImagePreview('device2', config.components.device2.imageUrl);
         
         document.getElementById('device3-name').value = config.components.device3.name;
         document.getElementById('device3-type').value = config.components.device3.type;
         document.getElementById('device3-port').value = config.components.device3.port;
+        this.updateImagePreview('device3', config.components.device3.imageUrl);
         
         document.getElementById('device4-name').value = config.components.device4.name;
         document.getElementById('device4-type').value = config.components.device4.type;
         document.getElementById('device4-port').value = config.components.device4.port;
+        this.updateImagePreview('device4', config.components.device4.imageUrl);
         
         // Display settings
         document.getElementById('enable-hover-effects').checked = config.display.hoverEffects;
@@ -255,6 +244,27 @@ class AdminController {
         const container = document.getElementById('admin-log-container');
         container.innerHTML = '';
         this.addAdminLog('Admin log cleared', 'info');
+    }
+    
+    updateImagePreview(component, imageUrl) {
+        const preview = document.getElementById(`${component}-image-preview`);
+        const iconPreview = document.getElementById(`${component}-icon-preview`);
+        
+        if (preview && imageUrl) {
+            const img = preview.querySelector('img');
+            if (img) {
+                img.src = imageUrl;
+                img.style.display = 'block';
+            }
+        }
+        
+        if (iconPreview && imageUrl) {
+            const img = iconPreview.querySelector('img');
+            if (img) {
+                img.src = imageUrl;
+                img.style.display = 'block';
+            }
+        }
     }
 }
 
@@ -348,6 +358,117 @@ function importConfiguration(event) {
         }
     };
     reader.readAsText(file);
+}
+
+// Image Upload Functions
+async function handleImageUpload(input, component) {
+    const file = input.files[0];
+    if (!file) return;
+    
+    // Validate file type
+    const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/svg+xml'];
+    if (!allowedTypes.includes(file.type)) {
+        adminController.addAdminLog(`Invalid file type for ${component}. Use PNG, JPG, JPEG, GIF, or SVG`, 'error');
+        input.value = '';
+        return;
+    }
+    
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+        adminController.addAdminLog(`File too large for ${component}. Maximum size is 5MB`, 'error');
+        input.value = '';
+        return;
+    }
+    
+    adminController.addAdminLog(`Uploading image for ${component}...`, 'info');
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('component', component);
+    
+    try {
+        const response = await fetch('/upload-image', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const result = await response.json();
+        
+        if (result.ok) {
+            adminController.addAdminLog(`Image uploaded successfully for ${component}`, 'success');
+            
+            // Update the preview
+            adminController.updateImagePreview(component, result.url);
+            
+            // Update the configuration
+            adminController.currentConfig.components[component].imageUrl = result.url;
+            
+            // Show remove button
+            const removeBtn = document.querySelector(`button[onclick="removeImage('${component}')"]`);
+            if (removeBtn) {
+                removeBtn.style.display = 'flex';
+            }
+            
+        } else {
+            adminController.addAdminLog(`Upload failed for ${component}: ${result.error}`, 'error');
+            input.value = '';
+        }
+    } catch (error) {
+        adminController.addAdminLog(`Upload error for ${component}: ${error.message}`, 'error');
+        input.value = '';
+    }
+}
+
+async function removeImage(component) {
+    if (!confirm(`Are you sure you want to remove the image for ${component}?`)) {
+        return;
+    }
+    
+    adminController.addAdminLog(`Removing image for ${component}...`, 'info');
+    
+    try {
+        // Get current image URL
+        const currentUrl = adminController.currentConfig.components[component].imageUrl;
+        if (currentUrl && !currentUrl.includes('default.png')) {
+            const filename = currentUrl.split('/').pop();
+            
+            // Delete from server
+            await fetch(`/delete-image/${filename}`, {
+                method: 'DELETE'
+            });
+        }
+        
+        // Reset to default image
+        const defaultImages = {
+            'rpi': '/static/images/raspberry-pi-default.png',
+            'switch': '/static/images/switch-default.png',
+            'device1': '/static/images/workstation-default.png',
+            'device2': '/static/images/printer-default.png',
+            'device3': '/static/images/iot-default.png',
+            'device4': '/static/images/camera-default.png'
+        };
+        
+        const defaultUrl = defaultImages[component];
+        adminController.currentConfig.components[component].imageUrl = defaultUrl;
+        adminController.updateImagePreview(component, defaultUrl);
+        
+        // Hide remove button
+        const removeBtn = document.querySelector(`button[onclick="removeImage('${component}')"]`);
+        if (removeBtn) {
+            removeBtn.style.display = 'none';
+        }
+        
+        // Clear file input
+        const fileInput = document.getElementById(`${component}-image`);
+        if (fileInput) {
+            fileInput.value = '';
+        }
+        
+        adminController.addAdminLog(`Image removed for ${component}`, 'success');
+        
+    } catch (error) {
+        adminController.addAdminLog(`Error removing image for ${component}: ${error.message}`, 'error');
+    }
 }
 
 // Preset Management Functions

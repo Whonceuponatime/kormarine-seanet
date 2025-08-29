@@ -263,8 +263,10 @@ The server outputs status messages to console. Check for:
 ### Additional Features
 
 - **Settings Page**: Test individual GPIO pins and control wave animations
-- **Admin Panel**: Customize component names, icons, and network topology appearance
+- **Admin Panel**: Customize component names, upload custom device images, and manage network topology appearance
+- **Image Upload System**: Upload PNG, JPG, GIF, or SVG images for each network component
 - **No LED Status**: Removed header LED display as requested - you can see the physical LEDs directly
+- **Fixed Hover Flickering**: Resolved the persistent hover flickering issue on topology components
 
 ## License
 
