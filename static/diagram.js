@@ -19,6 +19,8 @@ class NetworkDiagram {
         this.updateTargetIP();
         this.loadCustomizations();
         this.loadComponentPositions();
+        this.setupDragAndDrop();
+        this.setupImageResize();
         this.addInitialLog('System initialized and ready for demonstration');
     }
     
@@ -45,22 +47,7 @@ class NetworkDiagram {
             this.performSNMPWalk();
         });
         
-        // LED control buttons
-        document.getElementById('demo-packet-btn').addEventListener('click', () => {
-            this.triggerLEDDemo();
-        });
-        
-        document.getElementById('start-chaser-btn').addEventListener('click', () => {
-            this.startChaser();
-        });
-        
-        document.getElementById('stop-animation-btn').addEventListener('click', () => {
-            this.stopAnimation();
-        });
-        
-        document.getElementById('all-off-btn').addEventListener('click', () => {
-            this.allOff();
-        });
+        // LED control buttons removed - available on settings page
         
         // Manual LED control removed per user request
         
@@ -69,16 +56,9 @@ class NetworkDiagram {
             this.clearLog();
         });
         
-        // Raspberry Pi click for LED demo
-        document.getElementById('raspberry-pi').addEventListener('click', (e) => {
-            if (!this.isDragging) {
-                this.triggerLEDDemo();
-            }
-        });
+        // Raspberry Pi click functionality removed
         
-        // Set up drag and drop for all devices
-        this.setupDragAndDrop();
-        this.setupImageResize();
+        // Drag and drop setup moved to init() to ensure proper initialization
     }
     
     updateTargetIP() {
