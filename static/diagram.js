@@ -1088,8 +1088,8 @@ class NetworkDiagram {
             const svgRect = svg.getBoundingClientRect();
             
             // Convert mouse coordinates to SVG coordinates
-                    const svgX = ((e.clientX - svgRect.left) / svgRect.width) * 1400;
-        const svgY = ((e.clientY - svgRect.top) / svgRect.height) * 700;
+                    const svgX = ((e.clientX - svgRect.left) / svgRect.width) * 840;
+        const svgY = ((e.clientY - svgRect.top) / svgRect.height) * 420;
             
             this.dragOffset.x = svgX - currentX;
             this.dragOffset.y = svgY - currentY;
@@ -1109,12 +1109,12 @@ class NetworkDiagram {
         const svg = document.getElementById('network-svg');
         const rect = svg.getBoundingClientRect();
         
-        const svgX = ((e.clientX - rect.left) / rect.width) * 1400;
-        const svgY = ((e.clientY - rect.top) / rect.height) * 700;
+        const svgX = ((e.clientX - rect.left) / rect.width) * 840;
+        const svgY = ((e.clientY - rect.top) / rect.height) * 420;
         
         // Calculate new position
-        const newX = Math.max(0, Math.min(1300, svgX - this.dragOffset.x));
-        const newY = Math.max(0, Math.min(580, svgY - this.dragOffset.y));
+        const newX = Math.max(0, Math.min(780, svgX - this.dragOffset.x));
+        const newY = Math.max(0, Math.min(350, svgY - this.dragOffset.y));
         
         // Update transform
         this.dragElement.setAttribute('transform', `translate(${newX}, ${newY})`);
