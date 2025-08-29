@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+    <rect width="64" height="64" fill="#3498db" rx="6"/>
+    <rect x="8" y="8" width="48" height="32" fill="#2980b9" rx="4"/>
+    <circle cx="16" cy="48" r="3" fill="#27ae60"/>
+    <circle cx="24" cy="48" r="3" fill="#27ae60"/>
+    <circle cx="32" cy="48" r="3" fill="#27ae60"/>
+    <circle cx="40" cy="48" r="3" fill="#27ae60"/>
+    <circle cx="48" cy="48" r="3" fill="#27ae60"/>
+    <text x="32" y="28" text-anchor="middle" font-size="10" fill="white" font-family="Arial">SWITCH</text>
+    <circle cx="52" cy="12" r="2" fill="#f39c12"/>
+    <text x="52" y="20" text-anchor="middle" font-size="6" fill="white" font-family="Arial">ACT</text>
+</svg>

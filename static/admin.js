@@ -3,41 +3,41 @@ class AdminController {
     constructor() {
         this.defaultConfig = {
             components: {
-                            rpi: {
+                                        rpi: {
                 name: 'Raspberry Pi',
                 description: 'SNMP Attacker',
-                imageUrl: '/static/images/raspberry-pi-default.png',
+                imageUrl: '/static/images/raspberry-pi-default.svg',
                 ip: 'Auto-detect'
             },
-                            switch: {
+            switch: {
                 name: 'Network Switch',
                 description: 'SNMP v1/v2c Enabled',
-                imageUrl: '/static/images/switch-default.png',
+                imageUrl: '/static/images/switch-default.svg',
                 model: 'Generic Switch',
                 defaultIP: '192.168.1.100'
             },
-                            device1: {
+            device1: {
                 name: 'Workstation',
                 type: 'workstation',
-                imageUrl: '/static/images/workstation-default.png',
+                imageUrl: '/static/images/workstation-default.svg',
                 port: 'Port 1'
             },
             device2: {
                 name: 'Printer',
                 type: 'printer',
-                imageUrl: '/static/images/printer-default.png',
+                imageUrl: '/static/images/printer-default.svg',
                 port: 'Port 2'
             },
             device3: {
                 name: 'IoT Device',
                 type: 'iot',
-                imageUrl: '/static/images/iot-default.png',
+                imageUrl: '/static/images/iot-default.svg',
                 port: 'Port 3'
             },
             device4: {
                 name: 'IP Camera',
                 type: 'camera',
-                imageUrl: '/static/images/camera-default.png',
+                imageUrl: '/static/images/camera-default.svg',
                 port: 'Port 4'
             }
             },
@@ -440,12 +440,12 @@ async function removeImage(component) {
         
         // Reset to default image
         const defaultImages = {
-            'rpi': '/static/images/raspberry-pi-default.png',
-            'switch': '/static/images/switch-default.png',
-            'device1': '/static/images/workstation-default.png',
-            'device2': '/static/images/printer-default.png',
-            'device3': '/static/images/iot-default.png',
-            'device4': '/static/images/camera-default.png'
+            'rpi': '/static/images/raspberry-pi-default.svg',
+            'switch': '/static/images/switch-default.svg',
+            'device1': '/static/images/workstation-default.svg',
+            'device2': '/static/images/printer-default.svg',
+            'device3': '/static/images/iot-default.svg',
+            'device4': '/static/images/camera-default.svg'
         };
         
         const defaultUrl = defaultImages[component];

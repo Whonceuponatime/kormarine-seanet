@@ -11,7 +11,7 @@ import threading
 import os
 import shutil
 from werkzeug.utils import secure_filename
-from flask import Flask, jsonify, request, Response, render_template, send_from_directory
+from flask import Flask, jsonify, request, Response, render_template, send_from_directory, redirect
 from config import *
 
 # Image upload configuration
@@ -267,6 +267,48 @@ class Routes:
             except Exception as e:
                 print(f"Save positions error: {e}")
                 return jsonify({"ok": False, "error": str(e)}), 500
+        
+        # Serve images from static/images directory
+        @self.app.route('/static/images/<path:filename>')
+        def serve_image(filename):
+            try:
+                images_dir = os.path.join(os.path.dirname(__file__), 'static', 'images')
+                if os.path.exists(os.path.join(images_dir, filename)):
+                    return send_from_directory(images_dir, filename)
+                else:
+                    # Redirect to placeholder if image not found
+                    component_type = filename.split('-')[0] if '-' in filename else filename.split('_')[0] if '_' in filename else 'device'
+                    return redirect(f'/placeholder/{component_type}')
+            except Exception as e:
+                print(f"Image serving error: {e}")
+                component_type = filename.split('-')[0] if '-' in filename else 'device'
+                return redirect(f'/placeholder/{component_type}')
+        
+        # Generate placeholder SVG for missing images
+        @self.app.route('/placeholder/<component_type>')
+        def generate_placeholder_svg(component_type):
+            icons = {
+                'rpi': '🍓',
+                'raspberry': '🍓', 
+                'switch': '🔀',
+                'device1': '🖥️',
+                'workstation': '🖥️',
+                'device2': '🖨️',
+                'printer': '🖨️',
+                'device3': '📱',
+                'iot': '📱',
+                'device4': '📹',
+                'camera': '📹'
+            }
+            
+            icon = icons.get(component_type, '📦')
+            
+            svg_content = f'''<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+    <rect width="64" height="64" fill="#34495e" rx="8"/>
+    <text x="32" y="40" text-anchor="middle" font-size="24" fill="white">{icon}</text>
+</svg>'''
+            return svg_content, 200, {'Content-Type': 'image/svg+xml'}
         
         # Additional CORS headers for development
         @self.app.after_request
