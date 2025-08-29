@@ -172,124 +172,210 @@ body {
     color: white;
 }
 
-/* Control Panel */
+/* Control Panel - Professional Layout */
 .control-panel {
-    background: rgba(52, 73, 93, 0.9);
+    background: linear-gradient(135deg, rgba(52, 73, 93, 0.95) 0%, rgba(44, 62, 80, 0.95) 100%);
+    border: 2px solid rgba(52, 152, 219, 0.3);
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.control-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    align-items: start;
+}
+
+/* Control Group - Unified styling for all control elements */
+.control-group {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 12px;
     padding: 20px;
-    margin-bottom: 20px;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-    gap: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: all 0.3s ease;
+    min-height: 140px;
+    backdrop-filter: blur(5px);
+}
+
+.control-group:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(52, 152, 219, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.control-group label {
+    color: #ecf0f1;
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 5px;
+    display: flex;
     align-items: center;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-}
-
-.target-config {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.discovery-actions, .led-controls {
-    display: flex;
-    flex-direction: column;
     gap: 8px;
 }
 
-.target-config label {
-    color: #bdc3c7;
-    font-weight: 600;
+.control-group label i {
+    color: #3498db;
+    font-size: 1.1rem;
 }
 
-.target-config input {
-    padding: 10px 15px;
-    border: 2px solid #34495e;
+.control-input {
+    padding: 12px 15px;
+    border: 2px solid rgba(52, 73, 93, 0.6);
     border-radius: 8px;
-    background: #2c3e50;
+    background: rgba(44, 62, 80, 0.8);
     color: #ecf0f1;
     font-size: 1rem;
-    width: 200px;
+    width: 100%;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
 }
 
-.target-config input:focus {
+.control-input:focus {
     outline: none;
     border-color: #3498db;
+    background: rgba(44, 62, 80, 0.95);
     box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
 }
 
-.action-btn {
-    padding: 12px 20px;
-    background: linear-gradient(135deg, #dc3545, #c82333);
-    color: white;
+.control-input::placeholder {
+    color: rgba(236, 240, 241, 0.5);
+}
+
+/* Professional Button Styling */
+.control-btn {
+    padding: 14px 20px;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     font-weight: 600;
+    font-size: 0.95rem;
     cursor: pointer;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
+    width: 100%;
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
 }
 
-.action-btn:hover {
-    background: linear-gradient(135deg, #2980b9, #21618c);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+.control-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
 }
 
-.discovery-btn {
-    background: linear-gradient(135deg, #dc3545, #c82333);
+.control-btn:hover::before {
+    left: 100%;
+}
+
+.control-btn.primary {
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
     color: white;
-    padding: 10px 15px;
-    font-size: 0.9rem;
+    box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
 }
 
-.discovery-btn:hover {
-    background: linear-gradient(135deg, #e67e22, #d35400);
+.control-btn.primary:hover {
+    background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(231, 76, 60, 0.4);
+}
+
+.control-btn.secondary {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+}
+
+.control-btn.secondary:hover {
+    background: linear-gradient(135deg, #2980b9 0%, #21618c 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4);
+}
+
+.control-btn:active {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.control-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.control-btn i {
+    font-size: 1.1rem;
 }
 
 /* LED button styles removed - buttons moved to settings page */
 
 /* LED button hover styles removed */
 
-/* Community Buttons */
+/* Community Button Group */
 .community-buttons {
     display: flex;
-    gap: 8px;
+    gap: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 2px solid rgba(52, 152, 219, 0.3);
+    background: rgba(44, 62, 80, 0.5);
 }
 
 .community-btn {
     flex: 1;
-    padding: 10px 12px;
-    border: 2px solid #007bff;
-    background: #ffffff;
-    color: #007bff;
-    border-radius: 6px;
+    padding: 12px 16px;
+    border: none;
+    background: transparent;
+    color: #ecf0f1;
     cursor: pointer;
     transition: all 0.3s ease;
     font-weight: 600;
     font-size: 0.9rem;
-    height: 40px;
-    box-sizing: border-box;
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
 }
 
-.community-btn.active {
-    background: #dc3545;
-    border-color: #dc3545;
-    color: #ffffff;
+.community-btn:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 20%;
+    bottom: 20%;
+    width: 1px;
+    background: rgba(255, 255, 255, 0.2);
 }
 
 .community-btn:hover {
-    border-color: #0056b3;
-    background: #e3f2fd;
+    background: rgba(52, 152, 219, 0.2);
+    color: #3498db;
+}
+
+.community-btn.active {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    color: white;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .community-btn.active:hover {
-    background: #2980b9;
+    background: linear-gradient(135deg, #2980b9 0%, #21618c 100%);
 }
 
 .attack-status {
@@ -568,19 +654,28 @@ body {
     fill: #27ae60;
 }
 
-/* Interaction Panel */
+/* Professional Interaction Panel */
 .interaction-panel {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 25px;
 }
 
-/* Manual LED Controls */
-.manual-controls {
-    background: rgba(52, 73, 93, 0.9);
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+/* Unified Panel Styling */
+.manual-controls, .discovered-ports, .attack-log {
+    background: linear-gradient(135deg, rgba(52, 73, 93, 0.95) 0%, rgba(44, 62, 80, 0.95) 100%);
+    border: 2px solid rgba(52, 152, 219, 0.3);
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.manual-controls:hover, .discovered-ports:hover, .attack-log:hover {
+    border-color: rgba(52, 152, 219, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.15);
 }
 
 .manual-led-grid {
@@ -627,25 +722,38 @@ body {
     box-shadow: 0 0 8px #e74c3c;
 }
 
-.discovered-ports, .attack-log {
-    background: rgba(52, 73, 93, 0.9);
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-}
-
-.discovered-ports h3, .attack-log h3 {
+/* Panel Headers - Unified styling */
+.manual-controls h3, .discovered-ports h3, .attack-log h3 {
     color: #ecf0f1;
-    margin-bottom: 15px;
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 20px;
     display: flex;
     align-items: center;
-    gap: 10px;
-    border-bottom: 2px solid #34495e;
-    padding-bottom: 8px;
+    gap: 12px;
+    border-bottom: 2px solid rgba(52, 152, 219, 0.3);
+    padding-bottom: 12px;
+    position: relative;
 }
 
-.discovered-ports h3 i, .attack-log h3 i {
+.manual-controls h3::after, .discovered-ports h3::after, .attack-log h3::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 60px;
+    height: 2px;
+    background: linear-gradient(90deg, #3498db, #2980b9);
+    border-radius: 2px;
+}
+
+.manual-controls h3 i, .discovered-ports h3 i, .attack-log h3 i {
     color: #3498db;
+    font-size: 1.4rem;
+    padding: 8px;
+    background: rgba(52, 152, 219, 0.15);
+    border-radius: 8px;
+    border: 1px solid rgba(52, 152, 219, 0.3);
 }
 
 /* Ports Grid */
@@ -833,57 +941,109 @@ body {
     filter: drop-shadow(0 0 8px #e74c3c);
 }
 
-/* Responsive Design */
-@media (max-width: 1200px) {
-    .interaction-panel {
-        grid-template-columns: 1fr 1fr;
+/* Professional Responsive Design */
+@media (max-width: 1400px) {
+    .control-grid {
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 18px;
     }
     
-    .control-panel {
-        grid-template-columns: 1fr 1fr;
+    .interaction-panel {
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 20px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .control-grid {
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
         gap: 15px;
+    }
+    
+    .interaction-panel {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 18px;
+    }
+    
+    .control-panel, .manual-controls, .discovered-ports, .attack-log {
+        padding: 20px;
     }
 }
 
 @media (max-width: 900px) {
-    .interaction-panel {
-        grid-template-columns: 1fr;
-    }
-    
-    .control-panel {
+    .control-grid {
         grid-template-columns: 1fr;
         gap: 15px;
+    }
+    
+    .interaction-panel {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .control-group {
+        min-height: auto;
     }
 }
 
 @media (max-width: 768px) {
     .diagram-header {
-        flex-direction: column;
-        gap: 20px;
-        text-align: center;
+        padding: 15px 20px;
+        margin-bottom: 15px;
     }
     
-    .control-panel {
-        flex-direction: column;
-        gap: 15px;
-        text-align: center;
+    .header-content h1 {
+        font-size: 2rem;
     }
     
-    .target-config {
-        flex-direction: column;
+    .header-logo {
+        height: 100px;
+    }
+    
+    .control-panel, .manual-controls, .discovered-ports, .attack-log {
+        padding: 18px;
+        margin-bottom: 18px;
+    }
+    
+    .control-group {
+        padding: 15px;
         gap: 10px;
     }
     
-    .target-config input {
-        width: 100%;
-    }
-    
     #network-svg {
-        height: 400px;
+        height: 300px;
     }
     
     .ports-grid {
         grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .manual-controls h3, .discovered-ports h3, .attack-log h3 {
+        font-size: 1.1rem;
+        margin-bottom: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .control-panel, .manual-controls, .discovered-ports, .attack-log {
+        padding: 15px;
+        border-radius: 12px;
+    }
+    
+    .control-group {
+        padding: 12px;
+        border-radius: 10px;
+    }
+    
+    .control-btn {
+        padding: 12px 16px;
+        font-size: 0.9rem;
+    }
+    
+    .community-btn {
+        padding: 10px 12px;
+        font-size: 0.85rem;
     }
 }
 

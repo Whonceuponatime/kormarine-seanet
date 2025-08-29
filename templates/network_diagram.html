@@ -236,17 +236,17 @@
         <div class="control-panel">
             <div class="control-grid">
                 <div class="control-group">
-                    <label>Target IP:</label>
+                    <label><i class="fas fa-crosshairs"></i> Target IP Address:</label>
                     <input type="text" id="target-ip" value="192.168.1.100" placeholder="192.168.1.100" class="control-input">
                 </div>
                 
                 <div class="control-group">
-                    <label>Target Port:</label>
+                    <label><i class="fas fa-ethernet"></i> Target Port:</label>
                     <input type="number" id="target-port" min="1" max="48" placeholder="Port #" class="control-input">
                 </div>
                 
                 <div class="control-group">
-                    <label>Community:</label>
+                    <label><i class="fas fa-key"></i> SNMP Community:</label>
                     <div class="community-buttons">
                         <button class="community-btn active" data-community="public">Public</button>
                         <button class="community-btn" data-community="private">Private</button>
@@ -254,12 +254,14 @@
                 </div>
                 
                 <div class="control-group">
+                    <label><i class="fas fa-radar"></i> Network Discovery:</label>
                     <button id="discover-btn" class="control-btn primary">
                         <i class="fas fa-search"></i> Discover Network
                     </button>
                 </div>
                 
                 <div class="control-group">
+                    <label><i class="fas fa-route"></i> SNMP Operations:</label>
                     <button id="snmp-walk-btn" class="control-btn secondary">
                         <i class="fas fa-walking"></i> SNMP Walk
                     </button>
