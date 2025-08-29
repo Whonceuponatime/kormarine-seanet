@@ -15,7 +15,7 @@ class NetworkDiagram {
     
     init() {
         this.setupEventListeners();
-        this.startLEDMonitoring();
+        // LED monitoring removed per user request
         this.updateTargetIP();
         this.loadCustomizations();
         this.loadComponentPositions();
@@ -62,12 +62,7 @@ class NetworkDiagram {
             this.allOff();
         });
         
-        // Manual LED control buttons
-        document.querySelectorAll('.manual-led-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                this.toggleManualLED(btn.dataset.pin);
-            });
-        });
+        // Manual LED control removed per user request
         
         // Clear log button
         document.getElementById('clear-log').addEventListener('click', () => {
@@ -114,7 +109,7 @@ class NetworkDiagram {
             // Reconnect after 5 seconds
             setTimeout(() => {
                 if (this.eventSource.readyState === EventSource.CLOSED) {
-                    this.startLEDMonitoring();
+                    // LED monitoring removed per user request
                 }
             }, 5000);
         };
@@ -198,7 +193,7 @@ class NetworkDiagram {
             
             if (data.ok) {
                 this.addLog('SNMP walk completed successfully', 'success');
-                this.flashActivityLED();
+                // Activity LED flash removed
             } else {
                 this.addLog(`SNMP walk failed: ${data.error || 'Unknown error'}`, 'error');
             }
@@ -218,7 +213,7 @@ class NetworkDiagram {
             if (data.ok) {
                 this.addLog('Interface discovery completed', 'success');
                 this.parseInterfaces(data.interfaces);
-                this.flashActivityLED();
+                // Activity LED flash removed
             } else {
                 this.addLog(`Interface discovery failed: ${data.error || 'Unknown error'}`, 'error');
             }
@@ -359,7 +354,7 @@ class NetworkDiagram {
                 this.addLog(`${actionText} successful on port ${ifIndex}`, 'success');
                 this.updatePortStatus(ifIndex, action);
                 this.updateDeviceStatus(portNumber, action);
-                this.flashActivityLED();
+                // Activity LED flash removed
             } else {
                 this.addLog(`${actionText} failed: ${data.error || 'Unknown error'}`, 'error');
             }
@@ -511,15 +506,7 @@ class NetworkDiagram {
         }, 2000);
     }
     
-    flashActivityLED() {
-        const activityLED = document.getElementById('switch-activity');
-        if (activityLED) {
-            activityLED.style.fill = '#27ae60';
-            setTimeout(() => {
-                activityLED.style.fill = '#f39c12';
-            }, 500);
-        }
-    }
+    // Activity LED flash removed per user request
     
     setAttackMode(active) {
         const svg = document.getElementById('network-svg');
@@ -559,23 +546,7 @@ class NetworkDiagram {
         }
     }
     
-    // LED Demo Function
-    async triggerLEDDemo() {
-        this.addLog('Triggering LED demonstration', 'info');
-        
-        try {
-            const response = await fetch('/demo/packet', { method: 'POST' });
-            const data = await response.json();
-            
-            if (data.ok) {
-                this.addLog('LED demo animation triggered', 'success');
-            } else {
-                this.addLog('LED demo failed', 'error');
-            }
-        } catch (error) {
-            this.addLog(`LED demo error: ${error.message}`, 'error');
-        }
-    }
+    // LED demo function removed per user request
     
     // Logging Functions
     addLog(message, type = 'info') {
@@ -624,7 +595,7 @@ class NetworkDiagram {
             
             if (data.ok) {
                 this.addLog(`LED chaser started at ${data.hz} Hz`, 'success');
-                this.flashActivityLED();
+                // Activity LED flash removed
             } else {
                 this.addLog('Failed to start LED chaser', 'error');
             }
@@ -642,7 +613,7 @@ class NetworkDiagram {
             
             if (data.ok) {
                 this.addLog('LED animations stopped', 'success');
-                this.flashActivityLED();
+                // Activity LED flash removed
             } else {
                 this.addLog('Failed to stop LED animations', 'error');
             }
@@ -660,7 +631,7 @@ class NetworkDiagram {
             
             if (data.ok) {
                 this.addLog('All LEDs turned off', 'success');
-                this.flashActivityLED();
+                // Activity LED flash removed
             } else {
                 this.addLog('Failed to turn off LEDs', 'error');
             }
@@ -678,7 +649,7 @@ class NetworkDiagram {
             
             if (data.ok) {
                 this.addLog(`LED ${pin} activated`, 'success');
-                this.flashActivityLED();
+                // Activity LED flash removed
             } else {
                 this.addLog(`Failed to activate LED ${pin}`, 'error');
             }
@@ -922,8 +893,8 @@ class NetworkDiagram {
         if (deviceId === 'raspberry-pi') {
             const connection = document.getElementById('connection-attacker');
             if (connection) {
-                connection.setAttribute('x1', x + 120); // Adjust for device width
-                connection.setAttribute('y1', y + 40);  // Adjust for device height
+                connection.setAttribute('x1', x + 120); // Connect from right edge of image
+                connection.setAttribute('y1', y + 40);  // Connect from middle of image
             }
         }
         

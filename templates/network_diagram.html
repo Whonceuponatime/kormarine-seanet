@@ -115,20 +115,9 @@
                     <rect x="0" y="0" width="120" height="80" rx="10" fill="url(#rpGradient)" stroke="#7d3c98" stroke-width="2" 
                           style="display: none;" id="rpi-fallback-box"/>
                     
-                    <!-- LED visualization -->
-                    <g class="led-display" transform="translate(10, 85)">
-                        <circle class="led-indicator" id="rpi-led-17" cx="0" cy="0" r="4" fill="#34495e"/>
-                        <circle class="led-indicator" id="rpi-led-27" cx="15" cy="0" r="4" fill="#34495e"/>
-                        <circle class="led-indicator" id="rpi-led-22" cx="30" cy="0" r="4" fill="#34495e"/>
-                        <circle class="led-indicator" id="rpi-led-10" cx="45" cy="0" r="4" fill="#34495e"/>
-                        <circle class="led-indicator" id="rpi-led-9" cx="60" cy="0" r="4" fill="#34495e"/>
-                        <circle class="led-indicator" id="rpi-led-5" cx="75" cy="0" r="4" fill="#34495e"/>
-                        <circle class="led-indicator" id="rpi-led-6" cx="90" cy="0" r="4" fill="#34495e"/>
-                    </g>
-                    
                     <!-- Text positioned below the image -->
-                    <text x="60" y="105" text-anchor="middle" class="device-text-below" id="rpi-device-name">test</text>
-                    <text x="60" y="118" text-anchor="middle" class="device-subtext-below" id="rpi-device-desc">SNMP Attacker</text>
+                    <text x="60" y="95" text-anchor="middle" class="device-text-below" id="rpi-device-name">test</text>
+                    <text x="60" y="108" text-anchor="middle" class="device-subtext-below" id="rpi-device-desc">SNMP Attacker</text>
                 </g>
 
                 <!-- Network Switch (Target) -->
@@ -145,15 +134,6 @@
                     <g class="switch-ports">
                         <!-- Port indicators will be dynamically generated -->
                     </g>
-                    
-                    <!-- Status indicators on the image -->
-                    <circle cx="20" cy="100" r="6" fill="#27ae60" class="power-led">
-                        <animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite"/>
-                    </circle>
-                    <text x="35" y="105" class="status-text-overlay">PWR</text>
-                    
-                    <circle cx="160" cy="100" r="6" fill="#f39c12" class="activity-led" id="switch-activity"/>
-                    <text x="175" y="105" class="status-text-overlay">ACT</text>
                     
                     <!-- Text positioned below the image -->
                     <text x="100" y="140" text-anchor="middle" class="device-text-below" id="switch-device-name">Network Switch</text>
