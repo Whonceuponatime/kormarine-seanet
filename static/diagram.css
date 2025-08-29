@@ -188,13 +188,7 @@ body {
 .target-config {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-}
-
-.target-config label {
-    font-weight: 600;
-    color: #495057;
-    font-size: 0.95rem;
+    gap: 10px;
 }
 
 .discovery-actions, .led-controls {
@@ -255,16 +249,9 @@ body {
     background: linear-gradient(135deg, #e67e22, #d35400);
 }
 
-.led-btn {
-    background: linear-gradient(135deg, #dc3545, #c82333);
-    color: white;
-    padding: 10px 15px;
-    font-size: 0.9rem;
-}
+/* LED button styles removed - buttons moved to settings page */
 
-.led-btn:hover {
-    background: linear-gradient(135deg, #8e44ad, #7d3c98);
-}
+/* LED button hover styles removed */
 
 /* Community Buttons */
 .community-buttons {

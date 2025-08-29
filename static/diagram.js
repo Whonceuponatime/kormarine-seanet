@@ -609,60 +609,7 @@ class NetworkDiagram {
         this.addInitialLog('Log cleared - ready for new demonstration');
     }
     
-    // LED Control Functions
-    async startChaser() {
-        this.addLog('Starting LED chaser animation', 'info');
-        
-        try {
-            const response = await fetch('/start?hz=2');
-            const data = await response.json();
-            
-            if (data.ok) {
-                this.addLog(`LED chaser started at ${data.hz} Hz`, 'success');
-                // Activity LED flash removed
-            } else {
-                this.addLog('Failed to start LED chaser', 'error');
-            }
-        } catch (error) {
-            this.addLog(`Error starting LED chaser: ${error.message}`, 'error');
-        }
-    }
-    
-    async stopAnimation() {
-        this.addLog('Stopping LED animations', 'info');
-        
-        try {
-            const response = await fetch('/stop');
-            const data = await response.json();
-            
-            if (data.ok) {
-                this.addLog('LED animations stopped', 'success');
-                // Activity LED flash removed
-            } else {
-                this.addLog('Failed to stop LED animations', 'error');
-            }
-        } catch (error) {
-            this.addLog(`Error stopping LED animations: ${error.message}`, 'error');
-        }
-    }
-    
-    async allOff() {
-        this.addLog('Turning off all LEDs', 'info');
-        
-        try {
-            const response = await fetch('/off');
-            const data = await response.json();
-            
-            if (data.ok) {
-                this.addLog('All LEDs turned off', 'success');
-                // Activity LED flash removed
-            } else {
-                this.addLog('Failed to turn off LEDs', 'error');
-            }
-        } catch (error) {
-            this.addLog(`Error turning off LEDs: ${error.message}`, 'error');
-        }
-    }
+    // LED Control Functions removed - available on settings page
     
     async toggleManualLED(pin) {
         this.addLog(`Toggling LED ${pin}`, 'info');
