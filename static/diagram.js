@@ -58,11 +58,11 @@ class NetworkDiagram {
         });
         
         // Target port selection
-        document.getElementById('target-port').addEventListener('change', (e) => {
+        document.getElementById('target-port').addEventListener('input', (e) => {
             this.selectedPort = e.target.value;
             this.highlightTargetPort(e.target.value);
             if (e.target.value) {
-                this.addLog(`Target port selected: Port ${e.target.value}`, 'info');
+                this.addLog(`Target port selected: ${e.target.value}`, 'info');
             }
         });
         
@@ -185,15 +185,33 @@ class NetworkDiagram {
     }
     
     async performSNMPWalk() {
-        this.addLog('Performing SNMP walk...', 'info');
+        if (!this.targetIP) {
+            this.addLog('Please enter a target IP address', 'error');
+            return;
+        }
+
+        // Use selected port for targeted SNMP attack
+        if (this.selectedPort) {
+            this.addLog(`Performing SNMP walk on ${this.targetIP} targeting port ${this.selectedPort}`, 'info');
+        } else {
+            this.addLog(`Performing SNMP walk on ${this.targetIP}`, 'info');
+        }
+        
         this.animatePacket('snmp-walk');
         
         try {
-            const response = await fetch(`/snmp/walk?target=${encodeURIComponent(this.targetIP)}&community=public`);
+            // Build URL with port parameter for targeted attacks
+            let url = `/snmp/walk?target=${encodeURIComponent(this.targetIP)}&community=${this.communityString}`;
+            if (this.selectedPort) {
+                url += `&port=${this.selectedPort}`;
+            }
+            
+            const response = await fetch(url);
             const data = await response.json();
             
             if (data.ok) {
-                this.addLog('SNMP walk completed successfully', 'success');
+                const portMsg = this.selectedPort ? ` on port ${this.selectedPort}` : '';
+                this.addLog(`SNMP walk completed successfully${portMsg}`, 'success');
                 // Activity LED flash removed
             } else {
                 this.addLog(`SNMP walk failed: ${data.error || 'Unknown error'}`, 'error');

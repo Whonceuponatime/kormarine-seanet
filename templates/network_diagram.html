@@ -234,37 +234,35 @@
         </div>
 
         <div class="control-panel">
-            <div class="target-config">
-                <label>Target IP:</label>
-                <input type="text" id="target-ip" value="192.168.1.100" placeholder="192.168.1.100">
-                <label>Community:</label>
-                <div class="community-buttons">
-                    <button class="community-btn active" data-community="public">Public (Read)</button>
-                    <button class="community-btn" data-community="private">Private (Write)</button>
+            <div class="control-grid">
+                <div class="control-group">
+                    <label>Target IP:</label>
+                    <input type="text" id="target-ip" value="192.168.1.100" placeholder="192.168.1.100" class="control-input">
                 </div>
-            </div>
-
-            <div class="discovery-actions">
-                <button id="discover-btn" class="action-btn discovery-btn">
-                    <i class="fas fa-search"></i> Discover Network
-                </button>
-                <button id="snmp-walk-btn" class="action-btn discovery-btn">
-                    <i class="fas fa-walking"></i> SNMP Walk
-                </button>
-            </div>
-
-
-
-            <div class="status-display">
-                <div class="target-port-section">
+                
+                <div class="control-group">
                     <label>Target Port:</label>
-                    <select id="target-port" class="port-selector">
-                        <option value="">Select Port</option>
-                        <option value="1">Port 1</option>
-                        <option value="2">Port 2</option>
-                        <option value="3">Port 3</option>
-                        <option value="4">Port 4</option>
-                    </select>
+                    <input type="number" id="target-port" min="1" max="48" placeholder="Port #" class="control-input">
+                </div>
+                
+                <div class="control-group">
+                    <label>Community:</label>
+                    <div class="community-buttons">
+                        <button class="community-btn active" data-community="public">Public</button>
+                        <button class="community-btn" data-community="private">Private</button>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <button id="discover-btn" class="control-btn primary">
+                        <i class="fas fa-search"></i> Discover Network
+                    </button>
+                </div>
+                
+                <div class="control-group">
+                    <button id="snmp-walk-btn" class="control-btn secondary">
+                        <i class="fas fa-walking"></i> SNMP Walk
+                    </button>
                 </div>
             </div>
         </div>
