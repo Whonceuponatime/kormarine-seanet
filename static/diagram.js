@@ -768,66 +768,54 @@ class NetworkDiagram {
     }
     
     updateDeviceImages(components) {
-        // Update device images in SVG patterns (entire device boxes)
+        // Update main device images (that replace the colored boxes)
         if (components.rpi && components.rpi.imageUrl) {
-            this.updatePatternImage('rpi-pattern', components.rpi.imageUrl, 120, 80);
+            const rpiImage = document.getElementById('rpi-main-image');
+            if (rpiImage) {
+                rpiImage.setAttribute('href', components.rpi.imageUrl);
+            }
         }
         
         if (components.switch && components.switch.imageUrl) {
-            this.updatePatternImage('switch-pattern', components.switch.imageUrl, 200, 120);
+            const switchImage = document.getElementById('switch-main-image');
+            if (switchImage) {
+                switchImage.setAttribute('href', components.switch.imageUrl);
+            }
         }
         
         if (components.device1 && components.device1.imageUrl) {
-            this.updatePatternImage('device1-pattern', components.device1.imageUrl, 100, 70);
+            const device1Image = document.getElementById('device1-main-image');
+            if (device1Image) {
+                device1Image.setAttribute('href', components.device1.imageUrl);
+            }
         }
         
         if (components.device2 && components.device2.imageUrl) {
-            this.updatePatternImage('device2-pattern', components.device2.imageUrl, 100, 70);
+            const device2Image = document.getElementById('device2-main-image');
+            if (device2Image) {
+                device2Image.setAttribute('href', components.device2.imageUrl);
+            }
         }
         
         if (components.device3 && components.device3.imageUrl) {
-            this.updatePatternImage('device3-pattern', components.device3.imageUrl, 100, 70);
+            const device3Image = document.getElementById('device3-main-image');
+            if (device3Image) {
+                device3Image.setAttribute('href', components.device3.imageUrl);
+            }
         }
         
         if (components.device4 && components.device4.imageUrl) {
-            this.updatePatternImage('device4-pattern', components.device4.imageUrl, 100, 70);
+            const device4Image = document.getElementById('device4-main-image');
+            if (device4Image) {
+                device4Image.setAttribute('href', components.device4.imageUrl);
+            }
         }
     }
     
+    // This method is no longer needed since we use direct image elements
     updatePatternImage(patternId, imageUrl, width, height) {
-        // Find the pattern element
-        const pattern = document.getElementById(patternId);
-        if (pattern) {
-            // Update the image href in the pattern
-            const image = pattern.querySelector('image');
-            if (image) {
-                image.setAttribute('href', imageUrl);
-                
-                // Position images in upper area to avoid text overlap
-                if (patternId === 'rpi-pattern') {
-                    // Raspberry Pi - position in upper left area
-                    image.setAttribute('x', '5');
-                    image.setAttribute('y', '5');
-                    image.setAttribute('width', '50');
-                    image.setAttribute('height', '35');
-                } else if (patternId === 'switch-pattern') {
-                    // Switch - position in upper left area
-                    image.setAttribute('x', '10');
-                    image.setAttribute('y', '5');
-                    image.setAttribute('width', '60');
-                    image.setAttribute('height', '40');
-                } else {
-                    // Target devices - position in upper area
-                    image.setAttribute('x', '5');
-                    image.setAttribute('y', '5');
-                    image.setAttribute('width', '40');
-                    image.setAttribute('height', '25');
-                }
-                
-                image.setAttribute('opacity', '0.8');
-                image.setAttribute('preserveAspectRatio', 'xMidYMid meet');
-            }
-        }
+        // Deprecated - using direct image elements now
+        console.log(`Pattern update called for ${patternId} - using direct images instead`);
     }
     
     // Drag and Drop Setup
@@ -875,7 +863,7 @@ class NetworkDiagram {
             
             // Convert mouse coordinates to SVG coordinates
             const svgX = ((e.clientX - svgRect.left) / svgRect.width) * 1200;
-            const svgY = ((e.clientY - svgRect.top) / svgRect.height) * 800;
+            const svgY = ((e.clientY - svgRect.top) / svgRect.height) * 900;
             
             this.dragOffset.x = svgX - currentX;
             this.dragOffset.y = svgY - currentY;
@@ -896,11 +884,11 @@ class NetworkDiagram {
         const rect = svg.getBoundingClientRect();
         
         const svgX = ((e.clientX - rect.left) / rect.width) * 1200;
-        const svgY = ((e.clientY - rect.top) / rect.height) * 800;
+        const svgY = ((e.clientY - rect.top) / rect.height) * 900;
         
         // Calculate new position
         const newX = Math.max(0, Math.min(1100, svgX - this.dragOffset.x));
-        const newY = Math.max(0, Math.min(730, svgY - this.dragOffset.y));
+        const newY = Math.max(0, Math.min(780, svgY - this.dragOffset.y));
         
         // Update transform
         this.dragElement.setAttribute('transform', `translate(${newX}, ${newY})`);
@@ -944,7 +932,7 @@ class NetworkDiagram {
             const connection = document.getElementById(`connection-device-${deviceNum}`);
             if (connection) {
                 connection.setAttribute('x2', x);
-                connection.setAttribute('y2', y + 35); // Adjust for device height
+                connection.setAttribute('y2', y + 35); // Connect to middle of device image
             }
         }
     }

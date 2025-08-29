@@ -64,7 +64,7 @@
         </div>
 
         <div class="network-diagram">
-            <svg id="network-svg" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+            <svg id="network-svg" viewBox="0 0 1200 900" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                     <!-- Gradients for modern styling -->
                     <linearGradient id="attackerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -84,36 +84,7 @@
                         <stop offset="100%" style="stop-color:#8e44ad;stop-opacity:1" />
                     </linearGradient>
                     
-                    <!-- Image patterns for device backgrounds -->
-                    <pattern id="rpi-pattern" x="0" y="0" width="120" height="80" patternUnits="userSpaceOnUse">
-                        <rect width="120" height="80" fill="url(#rpGradient)" opacity="0.3"/>
-                        <image x="5" y="5" width="50" height="35" href="/static/images/raspberry-pi-default.svg" preserveAspectRatio="xMidYMid meet" opacity="0.6"/>
-                    </pattern>
-                    
-                    <pattern id="switch-pattern" x="0" y="0" width="200" height="120" patternUnits="userSpaceOnUse">
-                        <rect width="200" height="120" fill="url(#switchGradient)" opacity="0.3"/>
-                        <image x="10" y="5" width="60" height="40" href="/static/images/switch-default.svg" preserveAspectRatio="xMidYMid meet" opacity="0.6"/>
-                    </pattern>
-                    
-                    <pattern id="device1-pattern" x="0" y="0" width="100" height="70" patternUnits="userSpaceOnUse">
-                        <rect width="100" height="70" fill="url(#deviceGradient)" opacity="0.3"/>
-                        <image x="5" y="5" width="40" height="25" href="/static/images/workstation-default.svg" preserveAspectRatio="xMidYMid meet" opacity="0.6"/>
-                    </pattern>
-                    
-                    <pattern id="device2-pattern" x="0" y="0" width="100" height="70" patternUnits="userSpaceOnUse">
-                        <rect width="100" height="70" fill="url(#deviceGradient)" opacity="0.3"/>
-                        <image x="5" y="5" width="40" height="25" href="/static/images/printer-default.svg" preserveAspectRatio="xMidYMid meet" opacity="0.6"/>
-                    </pattern>
-                    
-                    <pattern id="device3-pattern" x="0" y="0" width="100" height="70" patternUnits="userSpaceOnUse">
-                        <rect width="100" height="70" fill="url(#deviceGradient)" opacity="0.3"/>
-                        <image x="5" y="5" width="40" height="25" href="/static/images/iot-default.svg" preserveAspectRatio="xMidYMid meet" opacity="0.6"/>
-                    </pattern>
-                    
-                    <pattern id="device4-pattern" x="0" y="0" width="100" height="70" patternUnits="userSpaceOnUse">
-                        <rect width="100" height="70" fill="url(#deviceGradient)" opacity="0.3"/>
-                        <image x="5" y="5" width="40" height="25" href="/static/images/camera-default.svg" preserveAspectRatio="xMidYMid meet" opacity="0.6"/>
-                    </pattern>
+
 
                     <!-- Animation definitions -->
                     <marker id="arrowhead" markerWidth="10" markerHeight="7" 
@@ -136,89 +107,127 @@
 
                 <!-- Raspberry Pi (Attacker) -->
                 <g id="raspberry-pi" class="device clickable" transform="translate(50, 350)">
-                    <rect x="0" y="0" width="120" height="80" rx="10" fill="url(#rpi-pattern)" stroke="#7d3c98" stroke-width="2"/>
+                    <!-- Main device image (replaces the colored box) -->
+                    <image id="rpi-main-image" x="0" y="0" width="120" height="80" href="/static/images/raspberry-pi-default.svg" 
+                           preserveAspectRatio="xMidYMid meet" style="border-radius: 10px;"/>
                     
-                    <!-- Text background for better visibility -->
-                    <rect x="55" y="40" width="65" height="35" fill="rgba(0,0,0,0.7)" rx="4"/>
+                    <!-- Fallback colored box (shown if image fails to load) -->
+                    <rect x="0" y="0" width="120" height="80" rx="10" fill="url(#rpGradient)" stroke="#7d3c98" stroke-width="2" 
+                          style="display: none;" id="rpi-fallback-box"/>
                     
                     <!-- LED visualization -->
-                    <g class="led-display" transform="translate(10, 65)">
-                        <circle class="led-indicator" id="rpi-led-17" cx="0" cy="0" r="3" fill="#34495e"/>
-                        <circle class="led-indicator" id="rpi-led-27" cx="10" cy="0" r="3" fill="#34495e"/>
-                        <circle class="led-indicator" id="rpi-led-22" cx="20" cy="0" r="3" fill="#34495e"/>
-                        <circle class="led-indicator" id="rpi-led-10" cx="30" cy="0" r="3" fill="#34495e"/>
-                        <circle class="led-indicator" id="rpi-led-9" cx="40" cy="0" r="3" fill="#34495e"/>
-                        <circle class="led-indicator" id="rpi-led-5" cx="50" cy="0" r="3" fill="#34495e"/>
-                        <circle class="led-indicator" id="rpi-led-6" cx="60" cy="0" r="3" fill="#34495e"/>
+                    <g class="led-display" transform="translate(10, 85)">
+                        <circle class="led-indicator" id="rpi-led-17" cx="0" cy="0" r="4" fill="#34495e"/>
+                        <circle class="led-indicator" id="rpi-led-27" cx="15" cy="0" r="4" fill="#34495e"/>
+                        <circle class="led-indicator" id="rpi-led-22" cx="30" cy="0" r="4" fill="#34495e"/>
+                        <circle class="led-indicator" id="rpi-led-10" cx="45" cy="0" r="4" fill="#34495e"/>
+                        <circle class="led-indicator" id="rpi-led-9" cx="60" cy="0" r="4" fill="#34495e"/>
+                        <circle class="led-indicator" id="rpi-led-5" cx="75" cy="0" r="4" fill="#34495e"/>
+                        <circle class="led-indicator" id="rpi-led-6" cx="90" cy="0" r="4" fill="#34495e"/>
                     </g>
                     
-                    <!-- Text with better visibility -->
-                    <text x="87" y="52" text-anchor="middle" class="device-text-contrast" id="rpi-device-name">Raspberry Pi</text>
-                    <text x="87" y="65" text-anchor="middle" class="device-subtext-contrast" id="rpi-device-desc">SNMP Attacker</text>
+                    <!-- Text positioned below the image -->
+                    <text x="60" y="105" text-anchor="middle" class="device-text-below" id="rpi-device-name">test</text>
+                    <text x="60" y="118" text-anchor="middle" class="device-subtext-below" id="rpi-device-desc">SNMP Attacker</text>
                 </g>
 
                 <!-- Network Switch (Target) -->
                 <g id="network-switch" class="device" transform="translate(500, 300)">
-                    <rect x="0" y="0" width="200" height="120" rx="8" fill="url(#switch-pattern)" stroke="#2980b9" stroke-width="3"/>
+                    <!-- Main device image (replaces the colored box) -->
+                    <image id="switch-main-image" x="0" y="0" width="200" height="120" href="/static/images/switch-default.svg" 
+                           preserveAspectRatio="xMidYMid meet" style="border-radius: 8px;"/>
                     
-                    <!-- Text background for better visibility -->
-                    <rect x="70" y="45" width="130" height="45" fill="rgba(0,0,0,0.7)" rx="6"/>
+                    <!-- Fallback colored box (shown if image fails to load) -->
+                    <rect x="0" y="0" width="200" height="120" rx="8" fill="url(#switchGradient)" stroke="#2980b9" stroke-width="3" 
+                          style="display: none;" id="switch-fallback-box"/>
                     
                     <!-- Switch Ports -->
                     <g class="switch-ports">
                         <!-- Port indicators will be dynamically generated -->
                     </g>
                     
-                    <!-- Status indicators -->
-                    <circle cx="20" cy="90" r="6" fill="#27ae60" class="power-led">
+                    <!-- Status indicators on the image -->
+                    <circle cx="20" cy="100" r="6" fill="#27ae60" class="power-led">
                         <animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite"/>
                     </circle>
-                    <text x="35" y="95" class="status-text">PWR</text>
+                    <text x="35" y="105" class="status-text-overlay">PWR</text>
                     
-                    <circle cx="160" cy="90" r="6" fill="#f39c12" class="activity-led" id="switch-activity"/>
-                    <text x="175" y="95" class="status-text">ACT</text>
+                    <circle cx="160" cy="100" r="6" fill="#f39c12" class="activity-led" id="switch-activity"/>
+                    <text x="175" y="105" class="status-text-overlay">ACT</text>
                     
-                    <!-- Text overlay with better contrast -->
-                    <text x="135" y="60" text-anchor="middle" class="device-text-contrast" id="switch-device-name">Network Switch</text>
-                    <text x="135" y="73" text-anchor="middle" class="device-subtext-contrast" id="switch-ip">192.168.1.100</text>
-                    <text x="135" y="85" text-anchor="middle" class="device-subtext-contrast" id="switch-device-desc">SNMP v1/v2c Enabled</text>
+                    <!-- Text positioned below the image -->
+                    <text x="100" y="140" text-anchor="middle" class="device-text-below" id="switch-device-name">Network Switch</text>
+                    <text x="100" y="153" text-anchor="middle" class="device-subtext-below" id="switch-ip">192.168.1.100</text>
+                    <text x="100" y="166" text-anchor="middle" class="device-subtext-below" id="switch-device-desc">SNMP v1/v2c Enabled</text>
                 </g>
 
                 <!-- Target Devices -->
                 <g id="device-1" class="device" transform="translate(900, 200)">
-                    <rect x="0" y="0" width="100" height="70" rx="5" fill="url(#device1-pattern)" stroke="#229954" stroke-width="2"/>
-                    <!-- Text background -->
-                    <rect x="5" y="35" width="90" height="30" fill="rgba(0,0,0,0.7)" rx="3"/>
-                    <text x="50" y="48" text-anchor="middle" class="device-text-contrast-small" id="device1-device-name">Workstation</text>
-                    <text x="50" y="58" text-anchor="middle" class="device-subtext-contrast-small" id="device1-port-label">Port 1</text>
+                    <!-- Main device image (replaces the colored box) -->
+                    <image id="device1-main-image" x="0" y="0" width="100" height="70" href="/static/images/workstation-default.svg" 
+                           preserveAspectRatio="xMidYMid meet" style="border-radius: 5px;"/>
+                    
+                    <!-- Fallback colored box -->
+                    <rect x="0" y="0" width="100" height="70" rx="5" fill="url(#deviceGradient)" stroke="#229954" stroke-width="2" 
+                          style="display: none;" id="device1-fallback-box"/>
+                    
+                    <!-- Status indicator on image -->
                     <circle cx="85" cy="10" r="4" fill="#27ae60" class="connection-status" id="device-1-status"/>
+                    
+                    <!-- Text positioned below the image -->
+                    <text x="50" y="85" text-anchor="middle" class="device-text-below" id="device1-device-name">Workstation</text>
+                    <text x="50" y="98" text-anchor="middle" class="device-subtext-below" id="device1-port-label">Port 1</text>
                 </g>
 
-                <g id="device-2" class="device" transform="translate(900, 300)">
-                    <rect x="0" y="0" width="100" height="70" rx="5" fill="url(#device2-pattern)" stroke="#229954" stroke-width="2"/>
-                    <!-- Text background -->
-                    <rect x="5" y="35" width="90" height="30" fill="rgba(0,0,0,0.7)" rx="3"/>
-                    <text x="50" y="48" text-anchor="middle" class="device-text-contrast-small" id="device2-device-name">Printer</text>
-                    <text x="50" y="58" text-anchor="middle" class="device-subtext-contrast-small" id="device2-port-label">Port 2</text>
+                <g id="device-2" class="device" transform="translate(900, 320)">
+                    <!-- Main device image (replaces the colored box) -->
+                    <image id="device2-main-image" x="0" y="0" width="100" height="70" href="/static/images/printer-default.svg" 
+                           preserveAspectRatio="xMidYMid meet" style="border-radius: 5px;"/>
+                    
+                    <!-- Fallback colored box -->
+                    <rect x="0" y="0" width="100" height="70" rx="5" fill="url(#deviceGradient)" stroke="#229954" stroke-width="2" 
+                          style="display: none;" id="device2-fallback-box"/>
+                    
+                    <!-- Status indicator on image -->
                     <circle cx="85" cy="10" r="4" fill="#27ae60" class="connection-status" id="device-2-status"/>
+                    
+                    <!-- Text positioned below the image -->
+                    <text x="50" y="85" text-anchor="middle" class="device-text-below" id="device2-device-name">Printer</text>
+                    <text x="50" y="98" text-anchor="middle" class="device-subtext-below" id="device2-port-label">Port 2</text>
                 </g>
 
-                <g id="device-3" class="device" transform="translate(900, 400)">
-                    <rect x="0" y="0" width="100" height="70" rx="5" fill="url(#device3-pattern)" stroke="#229954" stroke-width="2"/>
-                    <!-- Text background -->
-                    <rect x="5" y="35" width="90" height="30" fill="rgba(0,0,0,0.7)" rx="3"/>
-                    <text x="50" y="48" text-anchor="middle" class="device-text-contrast-small" id="device3-device-name">IoT Device</text>
-                    <text x="50" y="58" text-anchor="middle" class="device-subtext-contrast-small" id="device3-port-label">Port 3</text>
+                <g id="device-3" class="device" transform="translate(900, 440)">
+                    <!-- Main device image (replaces the colored box) -->
+                    <image id="device3-main-image" x="0" y="0" width="100" height="70" href="/static/images/iot-default.svg" 
+                           preserveAspectRatio="xMidYMid meet" style="border-radius: 5px;"/>
+                    
+                    <!-- Fallback colored box -->
+                    <rect x="0" y="0" width="100" height="70" rx="5" fill="url(#deviceGradient)" stroke="#229954" stroke-width="2" 
+                          style="display: none;" id="device3-fallback-box"/>
+                    
+                    <!-- Status indicator on image -->
                     <circle cx="85" cy="10" r="4" fill="#27ae60" class="connection-status" id="device-3-status"/>
+                    
+                    <!-- Text positioned below the image -->
+                    <text x="50" y="85" text-anchor="middle" class="device-text-below" id="device3-device-name">IoT Device</text>
+                    <text x="50" y="98" text-anchor="middle" class="device-subtext-below" id="device3-port-label">Port 3</text>
                 </g>
 
-                <g id="device-4" class="device" transform="translate(900, 500)">
-                    <rect x="0" y="0" width="100" height="70" rx="5" fill="url(#device4-pattern)" stroke="#229954" stroke-width="2"/>
-                    <!-- Text background -->
-                    <rect x="5" y="35" width="90" height="30" fill="rgba(0,0,0,0.7)" rx="3"/>
-                    <text x="50" y="48" text-anchor="middle" class="device-text-contrast-small" id="device4-device-name">IP Camera</text>
-                    <text x="50" y="58" text-anchor="middle" class="device-subtext-contrast-small" id="device4-port-label">Port 4</text>
+                <g id="device-4" class="device" transform="translate(900, 560)">
+                    <!-- Main device image (replaces the colored box) -->
+                    <image id="device4-main-image" x="0" y="0" width="100" height="70" href="/static/images/camera-default.svg" 
+                           preserveAspectRatio="xMidYMid meet" style="border-radius: 5px;"/>
+                    
+                    <!-- Fallback colored box -->
+                    <rect x="0" y="0" width="100" height="70" rx="5" fill="url(#deviceGradient)" stroke="#229954" stroke-width="2" 
+                          style="display: none;" id="device4-fallback-box"/>
+                    
+                    <!-- Status indicator on image -->
                     <circle cx="85" cy="10" r="4" fill="#27ae60" class="connection-status" id="device-4-status"/>
+                    
+                    <!-- Text positioned below the image -->
+                    <text x="50" y="85" text-anchor="middle" class="device-text-below" id="device4-device-name">IP Camera</text>
+                    <text x="50" y="98" text-anchor="middle" class="device-subtext-below" id="device4-port-label">Port 4</text>
                 </g>
 
                 <!-- Network Connections -->
@@ -234,11 +243,11 @@
                     <!-- Switch to Devices -->
                     <line id="connection-device-1" x1="700" y1="340" x2="900" y2="235" 
                           stroke="#27ae60" stroke-width="3" class="device-connection" data-port="1"/>
-                    <line id="connection-device-2" x1="700" y1="360" x2="900" y2="335" 
+                    <line id="connection-device-2" x1="700" y1="360" x2="900" y2="355" 
                           stroke="#27ae60" stroke-width="3" class="device-connection" data-port="2"/>
-                    <line id="connection-device-3" x1="700" y1="380" x2="900" y2="435" 
+                    <line id="connection-device-3" x1="700" y1="380" x2="900" y2="475" 
                           stroke="#27ae60" stroke-width="3" class="device-connection" data-port="3"/>
-                    <line id="connection-device-4" x1="700" y1="400" x2="900" y2="535" 
+                    <line id="connection-device-4" x1="700" y1="400" x2="900" y2="595" 
                           stroke="#27ae60" stroke-width="3" class="device-connection" data-port="4"/>
                 </g>
 
