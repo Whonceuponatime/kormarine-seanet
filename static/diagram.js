@@ -78,6 +78,7 @@ class NetworkDiagram {
         
         // Set up drag and drop for all devices
         this.setupDragAndDrop();
+        this.setupImageResize();
     }
     
     updateTargetIP() {
@@ -783,10 +784,84 @@ class NetworkDiagram {
         }
     }
     
-    // This method is no longer needed since we use direct image elements
-    updatePatternImage(patternId, imageUrl, width, height) {
-        // Deprecated - using direct image elements now
-        console.log(`Pattern update called for ${patternId} - using direct images instead`);
+    // Image resizing functionality
+    setupImageResize() {
+        this.isResizing = false;
+        this.resizeElement = null;
+        this.resizeStartSize = { width: 0, height: 0 };
+        this.resizeStartMouse = { x: 0, y: 0 };
+
+        // Add event listeners for resize handles
+        document.querySelectorAll('.resize-handle').forEach(handle => {
+            handle.addEventListener('mousedown', this.startResize.bind(this));
+        });
+
+        document.addEventListener('mousemove', this.resize.bind(this));
+        document.addEventListener('mouseup', this.endResize.bind(this));
+    }
+
+    startResize(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        this.isResizing = true;
+        const deviceType = e.target.dataset.device;
+        
+        // Find the corresponding image element
+        if (deviceType === 'rpi') {
+            this.resizeElement = document.getElementById('rpi-main-image');
+        } else if (deviceType === 'switch') {
+            this.resizeElement = document.getElementById('switch-main-image');
+        } else if (deviceType.startsWith('device')) {
+            this.resizeElement = document.getElementById(`${deviceType}-main-image`);
+        }
+        
+        if (this.resizeElement) {
+            const currentWidth = parseInt(this.resizeElement.getAttribute('width'));
+            const currentHeight = parseInt(this.resizeElement.getAttribute('height'));
+            
+            this.resizeStartSize = { width: currentWidth, height: currentHeight };
+            this.resizeStartMouse = { x: e.clientX, y: e.clientY };
+            
+            // Prevent dragging while resizing
+            this.isDragging = false;
+        }
+    }
+
+    resize(e) {
+        if (!this.isResizing || !this.resizeElement) return;
+        
+        e.preventDefault();
+        
+        const deltaX = e.clientX - this.resizeStartMouse.x;
+        const deltaY = e.clientY - this.resizeStartMouse.y;
+        
+        // Calculate new size (maintain aspect ratio)
+        const aspectRatio = this.resizeStartSize.width / this.resizeStartSize.height;
+        let newWidth = Math.max(50, this.resizeStartSize.width + deltaX);
+        let newHeight = newWidth / aspectRatio;
+        
+        // Set minimum and maximum sizes
+        newWidth = Math.max(50, Math.min(300, newWidth));
+        newHeight = Math.max(35, Math.min(200, newHeight));
+        
+        this.resizeElement.setAttribute('width', newWidth);
+        this.resizeElement.setAttribute('height', newHeight);
+        
+        // Update fallback box if it exists
+        const deviceId = this.resizeElement.id.replace('-main-image', '-fallback-box');
+        const fallbackBox = document.getElementById(deviceId);
+        if (fallbackBox) {
+            fallbackBox.setAttribute('width', newWidth);
+            fallbackBox.setAttribute('height', newHeight);
+        }
+    }
+
+    endResize(e) {
+        if (this.isResizing) {
+            this.isResizing = false;
+            this.resizeElement = null;
+        }
     }
     
     // Drag and Drop Setup
@@ -833,8 +908,8 @@ class NetworkDiagram {
             const svgRect = svg.getBoundingClientRect();
             
             // Convert mouse coordinates to SVG coordinates
-            const svgX = ((e.clientX - svgRect.left) / svgRect.width) * 1200;
-            const svgY = ((e.clientY - svgRect.top) / svgRect.height) * 900;
+                    const svgX = ((e.clientX - svgRect.left) / svgRect.width) * 1200;
+        const svgY = ((e.clientY - svgRect.top) / svgRect.height) * 700;
             
             this.dragOffset.x = svgX - currentX;
             this.dragOffset.y = svgY - currentY;
@@ -855,11 +930,11 @@ class NetworkDiagram {
         const rect = svg.getBoundingClientRect();
         
         const svgX = ((e.clientX - rect.left) / rect.width) * 1200;
-        const svgY = ((e.clientY - rect.top) / rect.height) * 900;
+        const svgY = ((e.clientY - rect.top) / rect.height) * 700;
         
         // Calculate new position
         const newX = Math.max(0, Math.min(1100, svgX - this.dragOffset.x));
-        const newY = Math.max(0, Math.min(780, svgY - this.dragOffset.y));
+        const newY = Math.max(0, Math.min(580, svgY - this.dragOffset.y));
         
         // Update transform
         this.dragElement.setAttribute('transform', `translate(${newX}, ${newY})`);

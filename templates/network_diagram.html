@@ -64,7 +64,7 @@
         </div>
 
         <div class="network-diagram">
-            <svg id="network-svg" viewBox="0 0 1200 900" xmlns="http://www.w3.org/2000/svg">
+            <svg id="network-svg" viewBox="0 0 1200 700" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                     <!-- Gradients for modern styling -->
                     <linearGradient id="attackerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -101,12 +101,10 @@
                 <!-- Background -->
                 <rect width="100%" height="100%" fill="#ecf0f1" opacity="0.3"/>
                 
-                <!-- Network Cloud -->
-                <ellipse cx="600" cy="100" rx="300" ry="60" fill="#bdc3c7" opacity="0.5" stroke="#7f8c8d" stroke-width="2"/>
-                <text x="600" y="105" text-anchor="middle" class="cloud-text">Network / Internet</text>
+
 
                 <!-- Raspberry Pi (Attacker) -->
-                <g id="raspberry-pi" class="device clickable" transform="translate(50, 350)">
+                <g id="raspberry-pi" class="device clickable" transform="translate(50, 250)">
                     <!-- Main device image (replaces the colored box) -->
                     <image id="rpi-main-image" x="0" y="0" width="120" height="80" href="/static/images/raspberry-pi-default.svg" 
                            preserveAspectRatio="xMidYMid meet" style="border-radius: 10px;"/>
@@ -115,13 +113,16 @@
                     <rect x="0" y="0" width="120" height="80" rx="10" fill="url(#rpGradient)" stroke="#7d3c98" stroke-width="2" 
                           style="display: none;" id="rpi-fallback-box"/>
                     
+                    <!-- Resize handle -->
+                    <circle class="resize-handle" cx="115" cy="5" r="5" data-device="rpi"/>
+                    
                     <!-- Text positioned below the image -->
                     <text x="60" y="95" text-anchor="middle" class="device-text-below" id="rpi-device-name">test</text>
                     <text x="60" y="108" text-anchor="middle" class="device-subtext-below" id="rpi-device-desc">SNMP Attacker</text>
                 </g>
 
                 <!-- Network Switch (Target) -->
-                <g id="network-switch" class="device" transform="translate(500, 300)">
+                <g id="network-switch" class="device" transform="translate(500, 200)">
                     <!-- Main device image (replaces the colored box) -->
                     <image id="switch-main-image" x="0" y="0" width="200" height="120" href="/static/images/switch-default.svg" 
                            preserveAspectRatio="xMidYMid meet" style="border-radius: 8px;"/>
@@ -135,6 +136,9 @@
                         <!-- Port indicators will be dynamically generated -->
                     </g>
                     
+                    <!-- Resize handle -->
+                    <circle class="resize-handle" cx="195" cy="5" r="5" data-device="switch"/>
+                    
                     <!-- Text positioned below the image -->
                     <text x="100" y="140" text-anchor="middle" class="device-text-below" id="switch-device-name">Network Switch</text>
                     <text x="100" y="153" text-anchor="middle" class="device-subtext-below" id="switch-ip">192.168.1.100</text>
@@ -142,7 +146,7 @@
                 </g>
 
                 <!-- Target Devices -->
-                <g id="device-1" class="device" transform="translate(900, 200)">
+                <g id="device-1" class="device" transform="translate(900, 150)">
                     <!-- Main device image (replaces the colored box) -->
                     <image id="device1-main-image" x="0" y="0" width="100" height="70" href="/static/images/workstation-default.svg" 
                            preserveAspectRatio="xMidYMid meet" style="border-radius: 5px;"/>
@@ -154,12 +158,15 @@
                     <!-- Status indicator on image -->
                     <circle cx="85" cy="10" r="4" fill="#27ae60" class="connection-status" id="device-1-status"/>
                     
+                    <!-- Resize handle -->
+                    <circle class="resize-handle" cx="95" cy="5" r="4" data-device="device1"/>
+                    
                     <!-- Text positioned below the image -->
                     <text x="50" y="85" text-anchor="middle" class="device-text-below" id="device1-device-name">Workstation</text>
                     <text x="50" y="98" text-anchor="middle" class="device-subtext-below" id="device1-port-label">Port 1</text>
                 </g>
 
-                <g id="device-2" class="device" transform="translate(900, 320)">
+                <g id="device-2" class="device" transform="translate(900, 270)">
                     <!-- Main device image (replaces the colored box) -->
                     <image id="device2-main-image" x="0" y="0" width="100" height="70" href="/static/images/printer-default.svg" 
                            preserveAspectRatio="xMidYMid meet" style="border-radius: 5px;"/>
@@ -171,12 +178,15 @@
                     <!-- Status indicator on image -->
                     <circle cx="85" cy="10" r="4" fill="#27ae60" class="connection-status" id="device-2-status"/>
                     
+                    <!-- Resize handle -->
+                    <circle class="resize-handle" cx="95" cy="5" r="4" data-device="device2"/>
+                    
                     <!-- Text positioned below the image -->
                     <text x="50" y="85" text-anchor="middle" class="device-text-below" id="device2-device-name">Printer</text>
                     <text x="50" y="98" text-anchor="middle" class="device-subtext-below" id="device2-port-label">Port 2</text>
                 </g>
 
-                <g id="device-3" class="device" transform="translate(900, 440)">
+                <g id="device-3" class="device" transform="translate(900, 390)">
                     <!-- Main device image (replaces the colored box) -->
                     <image id="device3-main-image" x="0" y="0" width="100" height="70" href="/static/images/iot-default.svg" 
                            preserveAspectRatio="xMidYMid meet" style="border-radius: 5px;"/>
@@ -188,12 +198,15 @@
                     <!-- Status indicator on image -->
                     <circle cx="85" cy="10" r="4" fill="#27ae60" class="connection-status" id="device-3-status"/>
                     
+                    <!-- Resize handle -->
+                    <circle class="resize-handle" cx="95" cy="5" r="4" data-device="device3"/>
+                    
                     <!-- Text positioned below the image -->
                     <text x="50" y="85" text-anchor="middle" class="device-text-below" id="device3-device-name">IoT Device</text>
                     <text x="50" y="98" text-anchor="middle" class="device-subtext-below" id="device3-port-label">Port 3</text>
                 </g>
 
-                <g id="device-4" class="device" transform="translate(900, 560)">
+                <g id="device-4" class="device" transform="translate(900, 510)">
                     <!-- Main device image (replaces the colored box) -->
                     <image id="device4-main-image" x="0" y="0" width="100" height="70" href="/static/images/camera-default.svg" 
                            preserveAspectRatio="xMidYMid meet" style="border-radius: 5px;"/>
@@ -205,6 +218,9 @@
                     <!-- Status indicator on image -->
                     <circle cx="85" cy="10" r="4" fill="#27ae60" class="connection-status" id="device-4-status"/>
                     
+                    <!-- Resize handle -->
+                    <circle class="resize-handle" cx="95" cy="5" r="4" data-device="device4"/>
+                    
                     <!-- Text positioned below the image -->
                     <text x="50" y="85" text-anchor="middle" class="device-text-below" id="device4-device-name">IP Camera</text>
                     <text x="50" y="98" text-anchor="middle" class="device-subtext-below" id="device4-port-label">Port 4</text>
@@ -213,21 +229,19 @@
                 <!-- Network Connections -->
                 <g class="connections">
                     <!-- Attacker to Switch -->
-                    <line id="connection-attacker" x1="170" y1="390" x2="500" y2="360" 
+                    <line id="connection-attacker" x1="170" y1="290" x2="500" y2="260" 
                           stroke="#e74c3c" stroke-width="3" stroke-dasharray="5,5" opacity="0.7"/>
                     
-                    <!-- Switch to Internet -->
-                    <line id="connection-internet" x1="600" y1="300" x2="600" y2="160" 
-                          stroke="#3498db" stroke-width="4" opacity="0.8"/>
+
                     
                     <!-- Switch to Devices -->
-                    <line id="connection-device-1" x1="700" y1="340" x2="900" y2="235" 
+                    <line id="connection-device-1" x1="700" y1="240" x2="900" y2="185" 
                           stroke="#27ae60" stroke-width="3" class="device-connection" data-port="1"/>
-                    <line id="connection-device-2" x1="700" y1="360" x2="900" y2="355" 
+                    <line id="connection-device-2" x1="700" y1="260" x2="900" y2="305" 
                           stroke="#27ae60" stroke-width="3" class="device-connection" data-port="2"/>
-                    <line id="connection-device-3" x1="700" y1="380" x2="900" y2="475" 
+                    <line id="connection-device-3" x1="700" y1="280" x2="900" y2="425" 
                           stroke="#27ae60" stroke-width="3" class="device-connection" data-port="3"/>
-                    <line id="connection-device-4" x1="700" y1="400" x2="900" y2="595" 
+                    <line id="connection-device-4" x1="700" y1="300" x2="900" y2="545" 
                           stroke="#27ae60" stroke-width="3" class="device-connection" data-port="4"/>
                 </g>
 
