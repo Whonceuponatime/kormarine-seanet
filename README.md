@@ -21,10 +21,14 @@ A modular HTTP server for Raspberry Pi that controls GPIO LEDs and provides netw
 ├── command_executor.py    # Shell command execution (ping, SNMP)
 ├── routes.py              # Flask routes and API endpoints
 ├── templates/
-│   └── index.html         # Interactive web interface
+│   ├── network_diagram.html  # Main interactive topology diagram
+│   ├── settings.html         # GPIO testing and wave animations
+│   └── admin.html            # Component customization and admin panel
 ├── static/
-│   ├── style.css          # Modern CSS styling
-│   └── script.js          # Interactive JavaScript functionality
+│   ├── diagram.css        # Comprehensive CSS styling for all pages
+│   ├── diagram.js         # Main topology functionality
+│   ├── settings.js        # GPIO testing and wave controls
+│   └── admin.js           # Admin panel and customization features
 ├── requirements.txt       # Python dependencies
 └── README.md             # This file
 ```
@@ -78,17 +82,22 @@ The server will start on `http://0.0.0.0:5050`
 
 ## Usage
 
-### Web Interfaces
+### Multi-Page Interface System
 
-Access the web interfaces at `http://<raspberry-pi-ip>:5050`
+Access the interface at `http://<raspberry-pi-ip>:5050`
 
-#### 1. Control Interface (`/`)
-The main control interface provides a comprehensive SNMP attack demonstration platform:
+The system now includes **three specialized interfaces**:
 
-#### 2. Interactive Network Diagram (`/diagram`)
-A visual, interactive network topology diagram with real-time animations and click-to-attack functionality.
+#### 🎯 **Main Topology** (`/`) 
+Interactive network diagram with SNMP attack demonstrations
 
-### Control Interface Features
+#### ⚙️ **Settings & Testing** (`/settings`)
+GPIO pin testing and wave animation controls
+
+#### 🛡️ **Admin Panel** (`/admin`)
+Component customization and configuration management
+
+### Interface Features
 
 #### Target Configuration
 - **Target IP**: Set the IP address of the vulnerable switch
@@ -114,31 +123,35 @@ A visual, interactive network topology diagram with real-time animations and cli
 - **Command Output**: Live console showing executed commands and results
 - **Visual Feedback**: Color-coded success/error indicators
 
-### Interactive Network Diagram Features
-
 #### 🎯 **Visual Network Topology**
 - **Animated SVG Diagram**: Professional network topology visualization
-- **Real-time LED Sync**: Diagram LEDs mirror physical GPIO status
+- **Real-time LED Sync**: Diagram LEDs mirror physical GPIO status  
 - **Device Representations**: Raspberry Pi (attacker), switch (target), connected devices
 - **Connection Visualization**: Dynamic network links with status indicators
 
-#### 🔍 **Interactive Discovery**
-- **Click-to-Discover**: Single button network scanning
-- **Animated Packets**: Visual SNMP packet flow from attacker to target
-- **Port Discovery**: Real-time interface detection and display
-- **Status Visualization**: Live port status (up/down) with color coding
+#### 🔍 **Interactive Discovery & Reconnaissance**
+- **SNMP Walk**: Execute SNMP walks with visual packet animations
+- **Network Discovery**: Single-click interface scanning with real-time results
+- **Port Discovery**: Live interface detection and status display
+- **Community String Selection**: Toggle between 'public' (read) and 'private' (write) access
 
 #### ⚔️ **Visual Attack Demonstration**
 - **Click-to-Attack**: Select any discovered port for demonstration
 - **Packet Animation**: Attack packets flow from Pi → Switch → Target Device
 - **LED Choreography**: Physical LEDs show attack progression (1→2→3→4→5→6→7)
 - **Restore Functionality**: Reverse LED sequence for service restoration (7→6→5→4→3→2→1)
-- **Live Updates**: Real-time status changes on diagram and physical hardware
+- **Live Status Updates**: Real-time changes on both diagram and physical hardware
 
-#### 📊 **Enhanced Feedback**
-- **Attack Log Console**: Real-time command execution and results
-- **Visual Status Indicators**: Device health, connection status, attack progress
-- **Synchronized Hardware**: Physical LEDs match diagram animations
+#### 🎛️ **Comprehensive LED Control**
+- **Manual LED Control**: Individual LED activation (pins 17, 27, 22, 10, 9, 5, 6)
+- **Animation Controls**: Start/stop chaser animations, demo packet sequences
+- **Real-time Synchronization**: All LED controls sync with physical hardware
+- **Visual Feedback**: LED status indicators throughout the interface
+
+#### 📊 **Enhanced Feedback & Monitoring**
+- **Command Output Console**: Real-time SNMP command execution and results
+- **Attack Progress Visualization**: Color-coded status indicators and animations
+- **Live LED Status**: Header display showing real-time GPIO pin states
 - **Professional Presentation**: Clean, modern interface suitable for demonstrations
 
 ### API Endpoints
@@ -236,6 +249,22 @@ The server outputs status messages to console. Check for:
 - Manageable switch with SNMP v1/v2c enabled
 - Default community strings: 'public' (read) and 'private' (write)
 - Firewall rules to restrict access to demonstration network only
+
+## Quick Start Demo
+
+1. **Start Server**: `python app.py`
+2. **Main Interface**: Navigate to `http://<pi-ip>:5050`
+3. **Configure Target**: Enter your switch IP address
+4. **Discover Network**: Click "Discover Network" to scan for ports
+5. **Attack Demo**: Click "Attack" on any discovered port
+6. **Watch LEDs**: Observe the 1→2→3→4→5→6→7 LED sequence during attacks
+7. **Restore Service**: Click "Restore" to bring ports back up with reverse LED sequence
+
+### Additional Features
+
+- **Settings Page**: Test individual GPIO pins and control wave animations
+- **Admin Panel**: Customize component names, icons, and network topology appearance
+- **No LED Status**: Removed header LED display as requested - you can see the physical LEDs directly
 
 ## License
 

@@ -14,6 +14,7 @@ class NetworkDiagram {
         this.setupEventListeners();
         this.startLEDMonitoring();
         this.updateTargetIP();
+        this.loadCustomizations();
         this.addInitialLog('System initialized and ready for demonstration');
     }
     
@@ -24,9 +25,44 @@ class NetworkDiagram {
             this.updateTargetIP();
         });
         
-        // Discover button
+        // Community string buttons
+        document.querySelectorAll('.community-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                this.selectCommunity(btn.dataset.community);
+            });
+        });
+        
+        // Discovery buttons
         document.getElementById('discover-btn').addEventListener('click', () => {
             this.discoverNetwork();
+        });
+        
+        document.getElementById('snmp-walk-btn').addEventListener('click', () => {
+            this.performSNMPWalk();
+        });
+        
+        // LED control buttons
+        document.getElementById('demo-packet-btn').addEventListener('click', () => {
+            this.triggerLEDDemo();
+        });
+        
+        document.getElementById('start-chaser-btn').addEventListener('click', () => {
+            this.startChaser();
+        });
+        
+        document.getElementById('stop-animation-btn').addEventListener('click', () => {
+            this.stopAnimation();
+        });
+        
+        document.getElementById('all-off-btn').addEventListener('click', () => {
+            this.allOff();
+        });
+        
+        // Manual LED control buttons
+        document.querySelectorAll('.manual-led-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                this.toggleManualLED(btn.dataset.pin);
+            });
         });
         
         // Clear log button
@@ -89,8 +125,34 @@ class NetworkDiagram {
                 if (svgLED) {
                     svgLED.classList.toggle('on', value === 1);
                 }
+                
+                // Update manual control LEDs
+                const manualLED = document.getElementById(`manual-led-${pin}`);
+                if (manualLED) {
+                    manualLED.classList.toggle('on', value === 1);
+                }
+                
+                // Update manual button state
+                const manualBtn = document.querySelector(`[data-pin="${pin}"]`);
+                if (manualBtn) {
+                    manualBtn.classList.toggle('active', value === 1);
+                }
             });
         }
+    }
+    
+    // Community string selection
+    selectCommunity(community) {
+        this.currentCommunity = community;
+        document.getElementById('community-string').value = community;
+        
+        // Update button states
+        document.querySelectorAll('.community-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        document.querySelector(`[data-community="${community}"]`).classList.add('active');
+        
+        this.addLog(`Community string changed to: ${community}`, 'info');
     }
     
     // Network Discovery
@@ -541,6 +603,134 @@ class NetworkDiagram {
         const container = document.getElementById('log-container');
         container.innerHTML = '';
         this.addInitialLog('Log cleared - ready for new demonstration');
+    }
+    
+    // LED Control Functions
+    async startChaser() {
+        this.addLog('Starting LED chaser animation', 'info');
+        
+        try {
+            const response = await fetch('/start?hz=2');
+            const data = await response.json();
+            
+            if (data.ok) {
+                this.addLog(`LED chaser started at ${data.hz} Hz`, 'success');
+                this.flashActivityLED();
+            } else {
+                this.addLog('Failed to start LED chaser', 'error');
+            }
+        } catch (error) {
+            this.addLog(`Error starting LED chaser: ${error.message}`, 'error');
+        }
+    }
+    
+    async stopAnimation() {
+        this.addLog('Stopping LED animations', 'info');
+        
+        try {
+            const response = await fetch('/stop');
+            const data = await response.json();
+            
+            if (data.ok) {
+                this.addLog('LED animations stopped', 'success');
+                this.flashActivityLED();
+            } else {
+                this.addLog('Failed to stop LED animations', 'error');
+            }
+        } catch (error) {
+            this.addLog(`Error stopping LED animations: ${error.message}`, 'error');
+        }
+    }
+    
+    async allOff() {
+        this.addLog('Turning off all LEDs', 'info');
+        
+        try {
+            const response = await fetch('/off');
+            const data = await response.json();
+            
+            if (data.ok) {
+                this.addLog('All LEDs turned off', 'success');
+                this.flashActivityLED();
+            } else {
+                this.addLog('Failed to turn off LEDs', 'error');
+            }
+        } catch (error) {
+            this.addLog(`Error turning off LEDs: ${error.message}`, 'error');
+        }
+    }
+    
+    async toggleManualLED(pin) {
+        this.addLog(`Toggling LED ${pin}`, 'info');
+        
+        try {
+            const response = await fetch(`/on${pin}`);
+            const data = await response.json();
+            
+            if (data.ok) {
+                this.addLog(`LED ${pin} activated`, 'success');
+                this.flashActivityLED();
+            } else {
+                this.addLog(`Failed to activate LED ${pin}`, 'error');
+            }
+        } catch (error) {
+            this.addLog(`Error toggling LED ${pin}: ${error.message}`, 'error');
+        }
+    }
+    
+    // Load customizations from localStorage
+    loadCustomizations() {
+        const saved = localStorage.getItem('kormarineSeaNetConfig');
+        if (saved) {
+            try {
+                const config = JSON.parse(saved);
+                this.applyCustomizations(config);
+                this.addLog('Applied saved customizations', 'info');
+            } catch (error) {
+                console.error('Error loading customizations:', error);
+            }
+        }
+    }
+    
+    applyCustomizations(config) {
+        if (!config.components) return;
+        
+        // Update component names and descriptions
+        const switchIP = document.getElementById('switch-ip');
+        if (switchIP && config.components.switch) {
+            // Update default target IP if configured
+            if (config.components.switch.defaultIP && config.components.switch.defaultIP !== this.targetIP) {
+                document.getElementById('target-ip').value = config.components.switch.defaultIP;
+                this.targetIP = config.components.switch.defaultIP;
+                this.updateTargetIP();
+            }
+        }
+        
+        // Update device names in the SVG
+        this.updateDeviceLabels(config.components);
+    }
+    
+    updateDeviceLabels(components) {
+        // Update device text elements in SVG
+        if (components.device1) {
+            const device1Text = document.querySelector('#device-1 .device-text-small');
+            if (device1Text) device1Text.textContent = components.device1.name;
+        }
+        
+        if (components.device2) {
+            const device2Text = document.querySelector('#device-2 .device-text-small');
+            if (device2Text) device2Text.textContent = components.device2.name;
+        }
+        
+        if (components.device3) {
+            const device3Text = document.querySelector('#device-3 .device-text-small');
+            if (device3Text) device3Text.textContent = components.device3.name;
+        }
+        
+        if (components.device4) {
+            const device4Text = document.querySelector('#device-4 .device-text-small');
+            if (device4Text) device4Text.textContent = components.device4.name;
+        }
     }
     
     // Cleanup

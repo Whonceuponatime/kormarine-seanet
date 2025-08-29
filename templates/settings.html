@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings & Testing - Kormarine SeaNet</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='diagram.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="diagram-container">
+        <header class="diagram-header">
+            <div class="header-content">
+                <h1><i class="fas fa-cog"></i> Settings & Testing</h1>
+                <p class="subtitle">GPIO Testing and Wave Animation Controls</p>
+                <div class="nav-links">
+                    <a href="/" class="nav-link">Network Topology</a>
+                    <a href="/settings" class="nav-link active">Settings & Testing</a>
+                    <a href="/admin" class="nav-link">Admin Panel</a>
+                </div>
+            </div>
+        </header>
+
+        <div class="settings-container">
+            <!-- GPIO Testing Section -->
+            <div class="settings-section">
+                <h2><i class="fas fa-microchip"></i> GPIO Pin Testing</h2>
+                <p class="section-description">Test individual GPIO pins to ensure proper LED functionality</p>
+                
+                <div class="gpio-grid">
+                    <div class="gpio-item" data-pin="17">
+                        <div class="gpio-info">
+                            <div class="pin-header">
+                                <span class="pin-number">Pin 17</span>
+                                <span class="pin-description">LED 1 (Red RGB - Active LOW)</span>
+                            </div>
+                            <div class="pin-status">
+                                <div class="status-indicator" id="status-17">OFF</div>
+                                <div class="led-visual" id="led-visual-17"></div>
+                            </div>
+                        </div>
+                        <div class="gpio-controls">
+                            <button class="gpio-btn on-btn" onclick="testGPIO(17, 'on')">
+                                <i class="fas fa-lightbulb"></i> Turn ON
+                            </button>
+                            <button class="gpio-btn off-btn" onclick="testGPIO(17, 'off')">
+                                <i class="fas fa-power-off"></i> Turn OFF
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="gpio-item" data-pin="27">
+                        <div class="gpio-info">
+                            <div class="pin-header">
+                                <span class="pin-number">Pin 27</span>
+                                <span class="pin-description">LED 2 (Active HIGH)</span>
+                            </div>
+                            <div class="pin-status">
+                                <div class="status-indicator" id="status-27">OFF</div>
+                                <div class="led-visual" id="led-visual-27"></div>
+                            </div>
+                        </div>
+                        <div class="gpio-controls">
+                            <button class="gpio-btn on-btn" onclick="testGPIO(27, 'on')">
+                                <i class="fas fa-lightbulb"></i> Turn ON
+                            </button>
+                            <button class="gpio-btn off-btn" onclick="testGPIO(27, 'off')">
+                                <i class="fas fa-power-off"></i> Turn OFF
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="gpio-item" data-pin="22">
+                        <div class="gpio-info">
+                            <div class="pin-header">
+                                <span class="pin-number">Pin 22</span>
+                                <span class="pin-description">LED 3 (Active HIGH)</span>
+                            </div>
+                            <div class="pin-status">
+                                <div class="status-indicator" id="status-22">OFF</div>
+                                <div class="led-visual" id="led-visual-22"></div>
+                            </div>
+                        </div>
+                        <div class="gpio-controls">
+                            <button class="gpio-btn on-btn" onclick="testGPIO(22, 'on')">
+                                <i class="fas fa-lightbulb"></i> Turn ON
+                            </button>
+                            <button class="gpio-btn off-btn" onclick="testGPIO(22, 'off')">
+                                <i class="fas fa-power-off"></i> Turn OFF
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="gpio-item" data-pin="10">
+                        <div class="gpio-info">
+                            <div class="pin-header">
+                                <span class="pin-number">Pin 10</span>
+                                <span class="pin-description">LED 4 (Active HIGH)</span>
+                            </div>
+                            <div class="pin-status">
+                                <div class="status-indicator" id="status-10">OFF</div>
+                                <div class="led-visual" id="led-visual-10"></div>
+                            </div>
+                        </div>
+                        <div class="gpio-controls">
+                            <button class="gpio-btn on-btn" onclick="testGPIO(10, 'on')">
+                                <i class="fas fa-lightbulb"></i> Turn ON
+                            </button>
+                            <button class="gpio-btn off-btn" onclick="testGPIO(10, 'off')">
+                                <i class="fas fa-power-off"></i> Turn OFF
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="gpio-item" data-pin="9">
+                        <div class="gpio-info">
+                            <div class="pin-header">
+                                <span class="pin-number">Pin 9</span>
+                                <span class="pin-description">LED 5 (Active HIGH)</span>
+                            </div>
+                            <div class="pin-status">
+                                <div class="status-indicator" id="status-9">OFF</div>
+                                <div class="led-visual" id="led-visual-9"></div>
+                            </div>
+                        </div>
+                        <div class="gpio-controls">
+                            <button class="gpio-btn on-btn" onclick="testGPIO(9, 'on')">
+                                <i class="fas fa-lightbulb"></i> Turn ON
+                            </button>
+                            <button class="gpio-btn off-btn" onclick="testGPIO(9, 'off')">
+                                <i class="fas fa-power-off"></i> Turn OFF
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="gpio-item" data-pin="5">
+                        <div class="gpio-info">
+                            <div class="pin-header">
+                                <span class="pin-number">Pin 5</span>
+                                <span class="pin-description">LED 6 (Active HIGH)</span>
+                            </div>
+                            <div class="pin-status">
+                                <div class="status-indicator" id="status-5">OFF</div>
+                                <div class="led-visual" id="led-visual-5"></div>
+                            </div>
+                        </div>
+                        <div class="gpio-controls">
+                            <button class="gpio-btn on-btn" onclick="testGPIO(5, 'on')">
+                                <i class="fas fa-lightbulb"></i> Turn ON
+                            </button>
+                            <button class="gpio-btn off-btn" onclick="testGPIO(5, 'off')">
+                                <i class="fas fa-power-off"></i> Turn OFF
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="gpio-item" data-pin="6">
+                        <div class="gpio-info">
+                            <div class="pin-header">
+                                <span class="pin-number">Pin 6</span>
+                                <span class="pin-description">LED 7 (Active HIGH)</span>
+                            </div>
+                            <div class="pin-status">
+                                <div class="status-indicator" id="status-6">OFF</div>
+                                <div class="led-visual" id="led-visual-6"></div>
+                            </div>
+                        </div>
+                        <div class="gpio-controls">
+                            <button class="gpio-btn on-btn" onclick="testGPIO(6, 'on')">
+                                <i class="fas fa-lightbulb"></i> Turn ON
+                            </button>
+                            <button class="gpio-btn off-btn" onclick="testGPIO(6, 'off')">
+                                <i class="fas fa-power-off"></i> Turn OFF
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="gpio-bulk-controls">
+                    <button class="bulk-btn test-sequence" onclick="runTestSequence()">
+                        <i class="fas fa-play-circle"></i> Run Test Sequence
+                    </button>
+                    <button class="bulk-btn all-on" onclick="allGPIOOn()">
+                        <i class="fas fa-sun"></i> All ON
+                    </button>
+                    <button class="bulk-btn all-off" onclick="allGPIOOff()">
+                        <i class="fas fa-moon"></i> All OFF
+                    </button>
+                </div>
+            </div>
+
+            <!-- Wave Animation Section -->
+            <div class="settings-section">
+                <h2><i class="fas fa-water"></i> Wave Animation Controls</h2>
+                <p class="section-description">Control LED wave animations with customizable speed and patterns</p>
+                
+                <div class="wave-controls">
+                    <div class="wave-config">
+                        <div class="config-item">
+                            <label for="wave-speed">Wave Speed (Hz):</label>
+                            <input type="range" id="wave-speed" min="0.5" max="10" step="0.5" value="2">
+                            <span id="speed-display">2.0 Hz</span>
+                        </div>
+                        
+                        <div class="config-item">
+                            <label for="wave-pattern">Wave Pattern:</label>
+                            <select id="wave-pattern">
+                                <option value="forward">Forward (1→7)</option>
+                                <option value="backward">Backward (7→1)</option>
+                                <option value="roundtrip">Round Trip (1→7→1)</option>
+                                <option value="bounce">Bounce (1→7→1→7...)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="wave-actions">
+                        <button class="wave-btn start-wave" onclick="startWaveAnimation()">
+                            <i class="fas fa-play"></i> Start Wave
+                        </button>
+                        <button class="wave-btn stop-wave" onclick="stopWaveAnimation()">
+                            <i class="fas fa-stop"></i> Stop Wave
+                        </button>
+                        <button class="wave-btn single-wave" onclick="singleWave()">
+                            <i class="fas fa-step-forward"></i> Single Wave
+                        </button>
+                    </div>
+                </div>
+
+                <div class="wave-status">
+                    <div class="status-item">
+                        <span class="status-label">Status:</span>
+                        <span id="wave-status" class="status-value">Stopped</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Current Speed:</span>
+                        <span id="current-speed" class="status-value">2.0 Hz</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Pattern:</span>
+                        <span id="current-pattern" class="status-value">Forward</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Status Section -->
+            <div class="settings-section">
+                <h2><i class="fas fa-info-circle"></i> System Status</h2>
+                <p class="section-description">Real-time system information and diagnostics</p>
+                
+                <div class="status-grid">
+                    <div class="status-card">
+                        <div class="card-header">
+                            <i class="fas fa-microchip"></i>
+                            <span>GPIO Controller</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="status-indicator-large" id="gpio-status">Connected</div>
+                            <small>pigpiod daemon status</small>
+                        </div>
+                    </div>
+
+                    <div class="status-card">
+                        <div class="card-header">
+                            <i class="fas fa-server"></i>
+                            <span>SNMP Tools</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="status-indicator-large" id="snmp-status">Available</div>
+                            <small>snmpwalk, snmpget, snmpset</small>
+                        </div>
+                    </div>
+
+                    <div class="status-card">
+                        <div class="card-header">
+                            <i class="fas fa-wifi"></i>
+                            <span>Network Interface</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="status-indicator-large" id="network-status">Active</div>
+                            <small>HTTP server listening</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-log">
+            <h3><i class="fas fa-terminal"></i> Test Log</h3>
+            <div class="log-container" id="test-log-container">
+                <div class="log-entry info">
+                    <span class="timestamp">[Ready]</span>
+                    <span class="message">GPIO testing interface ready</span>
+                </div>
+            </div>
+            <button id="clear-test-log" class="clear-btn">
+                <i class="fas fa-trash"></i> Clear Log
+            </button>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='settings.js') }}"></script>
+</body>
+</html>

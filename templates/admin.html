@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Kormarine SeaNet</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='diagram.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="diagram-container">
+        <header class="diagram-header">
+            <div class="header-content">
+                <h1><i class="fas fa-user-shield"></i> Admin Panel</h1>
+                <p class="subtitle">Customize Network Components and Display Settings</p>
+                <div class="nav-links">
+                    <a href="/" class="nav-link">Network Topology</a>
+                    <a href="/settings" class="nav-link">Settings & Testing</a>
+                    <a href="/admin" class="nav-link active">Admin Panel</a>
+                </div>
+            </div>
+        </header>
+
+        <div class="settings-container">
+            <!-- Component Customization Section -->
+            <div class="settings-section">
+                <h2><i class="fas fa-edit"></i> Component Customization</h2>
+                <p class="section-description">Customize the names, descriptions, and icons of network components in the topology diagram</p>
+                
+                <div class="component-grid">
+                    <!-- Raspberry Pi Configuration -->
+                    <div class="component-card">
+                        <div class="component-header">
+                            <div class="component-icon">🍓</div>
+                            <div class="component-title">
+                                <h3>Raspberry Pi (Attacker)</h3>
+                                <span class="component-type">Source Device</span>
+                            </div>
+                        </div>
+                        
+                        <div class="component-form">
+                            <div class="form-group">
+                                <label>Display Name:</label>
+                                <input type="text" id="rpi-name" value="Raspberry Pi" placeholder="Device name">
+                            </div>
+                            <div class="form-group">
+                                <label>Description:</label>
+                                <input type="text" id="rpi-desc" value="SNMP Attacker" placeholder="Device description">
+                            </div>
+                            <div class="form-group">
+                                <label>Icon/Emoji:</label>
+                                <input type="text" id="rpi-icon" value="🍓" placeholder="🍓" maxlength="2">
+                            </div>
+                            <div class="form-group">
+                                <label>IP Address:</label>
+                                <input type="text" id="rpi-ip" value="Auto-detect" placeholder="192.168.1.50">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Network Switch Configuration -->
+                    <div class="component-card">
+                        <div class="component-header">
+                            <div class="component-icon">🔀</div>
+                            <div class="component-title">
+                                <h3>Network Switch (Target)</h3>
+                                <span class="component-type">Target Device</span>
+                            </div>
+                        </div>
+                        
+                        <div class="component-form">
+                            <div class="form-group">
+                                <label>Display Name:</label>
+                                <input type="text" id="switch-name" value="Network Switch" placeholder="Switch name">
+                            </div>
+                            <div class="form-group">
+                                <label>Description:</label>
+                                <input type="text" id="switch-desc" value="SNMP v1/v2c Enabled" placeholder="Switch description">
+                            </div>
+                            <div class="form-group">
+                                <label>Brand/Model:</label>
+                                <input type="text" id="switch-model" value="Generic Switch" placeholder="Cisco 2960, HP ProCurve, etc.">
+                            </div>
+                            <div class="form-group">
+                                <label>Default IP:</label>
+                                <input type="text" id="switch-default-ip" value="192.168.1.100" placeholder="192.168.1.100">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Device 1 Configuration -->
+                    <div class="component-card">
+                        <div class="component-header">
+                            <div class="component-icon">🖥️</div>
+                            <div class="component-title">
+                                <h3>Connected Device 1</h3>
+                                <span class="component-type">End Device</span>
+                            </div>
+                        </div>
+                        
+                        <div class="component-form">
+                            <div class="form-group">
+                                <label>Device Name:</label>
+                                <input type="text" id="device1-name" value="Workstation" placeholder="Device name">
+                            </div>
+                            <div class="form-group">
+                                <label>Device Type:</label>
+                                <select id="device1-type">
+                                    <option value="workstation">🖥️ Workstation</option>
+                                    <option value="server">🖲️ Server</option>
+                                    <option value="laptop">💻 Laptop</option>
+                                    <option value="desktop">🖥️ Desktop</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Port Label:</label>
+                                <input type="text" id="device1-port" value="Port 1" placeholder="Port 1">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Device 2 Configuration -->
+                    <div class="component-card">
+                        <div class="component-header">
+                            <div class="component-icon">🖨️</div>
+                            <div class="component-title">
+                                <h3>Connected Device 2</h3>
+                                <span class="component-type">End Device</span>
+                            </div>
+                        </div>
+                        
+                        <div class="component-form">
+                            <div class="form-group">
+                                <label>Device Name:</label>
+                                <input type="text" id="device2-name" value="Printer" placeholder="Device name">
+                            </div>
+                            <div class="form-group">
+                                <label>Device Type:</label>
+                                <select id="device2-type">
+                                    <option value="printer">🖨️ Printer</option>
+                                    <option value="scanner">📠 Scanner</option>
+                                    <option value="copier">📄 Copier</option>
+                                    <option value="fax">📠 Fax Machine</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Port Label:</label>
+                                <input type="text" id="device2-port" value="Port 2" placeholder="Port 2">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Device 3 Configuration -->
+                    <div class="component-card">
+                        <div class="component-header">
+                            <div class="component-icon">📱</div>
+                            <div class="component-title">
+                                <h3>Connected Device 3</h3>
+                                <span class="component-type">End Device</span>
+                            </div>
+                        </div>
+                        
+                        <div class="component-form">
+                            <div class="form-group">
+                                <label>Device Name:</label>
+                                <input type="text" id="device3-name" value="IoT Device" placeholder="Device name">
+                            </div>
+                            <div class="form-group">
+                                <label>Device Type:</label>
+                                <select id="device3-type">
+                                    <option value="iot">📱 IoT Device</option>
+                                    <option value="phone">📞 IP Phone</option>
+                                    <option value="tablet">📱 Tablet</option>
+                                    <option value="sensor">🌡️ Sensor</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Port Label:</label>
+                                <input type="text" id="device3-port" value="Port 3" placeholder="Port 3">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Device 4 Configuration -->
+                    <div class="component-card">
+                        <div class="component-header">
+                            <div class="component-icon">📹</div>
+                            <div class="component-title">
+                                <h3>Connected Device 4</h3>
+                                <span class="component-type">End Device</span>
+                            </div>
+                        </div>
+                        
+                        <div class="component-form">
+                            <div class="form-group">
+                                <label>Device Name:</label>
+                                <input type="text" id="device4-name" value="IP Camera" placeholder="Device name">
+                            </div>
+                            <div class="form-group">
+                                <label>Device Type:</label>
+                                <select id="device4-type">
+                                    <option value="camera">📹 IP Camera</option>
+                                    <option value="nvr">📼 NVR</option>
+                                    <option value="access">🚪 Access Control</option>
+                                    <option value="alarm">🚨 Alarm System</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Port Label:</label>
+                                <input type="text" id="device4-port" value="Port 4" placeholder="Port 4">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="admin-actions">
+                    <button class="admin-btn save-config" onclick="saveConfiguration()">
+                        <i class="fas fa-save"></i> Save Configuration
+                    </button>
+                    <button class="admin-btn preview-config" onclick="previewConfiguration()">
+                        <i class="fas fa-eye"></i> Preview Changes
+                    </button>
+                    <button class="admin-btn reset-config" onclick="resetConfiguration()">
+                        <i class="fas fa-undo"></i> Reset to Defaults
+                    </button>
+                    <button class="admin-btn export-config" onclick="exportConfiguration()">
+                        <i class="fas fa-download"></i> Export Config
+                    </button>
+                </div>
+            </div>
+
+            <!-- Display Settings Section -->
+            <div class="settings-section">
+                <h2><i class="fas fa-palette"></i> Display Settings</h2>
+                <p class="section-description">Customize the appearance and behavior of the network topology diagram</p>
+                
+                <div class="display-settings">
+                    <div class="setting-group">
+                        <h3>Animation Settings</h3>
+                        <div class="setting-item">
+                            <label>
+                                <input type="checkbox" id="enable-hover-effects" checked>
+                                Enable hover effects on components
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <label>
+                                <input type="checkbox" id="enable-packet-animations" checked>
+                                Show animated packet flow
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <label>
+                                <input type="checkbox" id="enable-attack-indicators" checked>
+                                Display attack progress indicators
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="setting-group">
+                        <h3>Color Scheme</h3>
+                        <div class="setting-item">
+                            <label for="connection-up-color">Connection UP color:</label>
+                            <input type="color" id="connection-up-color" value="#27ae60">
+                        </div>
+                        <div class="setting-item">
+                            <label for="connection-down-color">Connection DOWN color:</label>
+                            <input type="color" id="connection-down-color" value="#e74c3c">
+                        </div>
+                        <div class="setting-item">
+                            <label for="attack-color">Attack indicator color:</label>
+                            <input type="color" id="attack-color" value="#f39c12">
+                        </div>
+                    </div>
+
+                    <div class="setting-group">
+                        <h3>Layout Options</h3>
+                        <div class="setting-item">
+                            <label>
+                                <input type="checkbox" id="show-ip-addresses" checked>
+                                Show IP addresses on components
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <label>
+                                <input type="checkbox" id="show-port-numbers" checked>
+                                Show port numbers on connections
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <label>
+                                <input type="checkbox" id="compact-mode">
+                                Compact layout mode
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configuration Management Section -->
+            <div class="settings-section">
+                <h2><i class="fas fa-cogs"></i> Configuration Management</h2>
+                <p class="section-description">Import, export, and manage configuration presets</p>
+                
+                <div class="config-management">
+                    <div class="preset-section">
+                        <h3>Configuration Presets</h3>
+                        <div class="preset-list">
+                            <div class="preset-item">
+                                <span class="preset-name">Default Network Lab</span>
+                                <div class="preset-actions">
+                                    <button class="preset-btn load" onclick="loadPreset('default')">Load</button>
+                                    <button class="preset-btn delete" onclick="deletePreset('default')">Delete</button>
+                                </div>
+                            </div>
+                            <div class="preset-item">
+                                <span class="preset-name">Corporate Environment</span>
+                                <div class="preset-actions">
+                                    <button class="preset-btn load" onclick="loadPreset('corporate')">Load</button>
+                                    <button class="preset-btn delete" onclick="deletePreset('corporate')">Delete</button>
+                                </div>
+                            </div>
+                            <div class="preset-item">
+                                <span class="preset-name">Home Network</span>
+                                <div class="preset-actions">
+                                    <button class="preset-btn load" onclick="loadPreset('home')">Load</button>
+                                    <button class="preset-btn delete" onclick="deletePreset('home')">Delete</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="preset-create">
+                            <input type="text" id="new-preset-name" placeholder="Enter preset name...">
+                            <button class="preset-btn create" onclick="createPreset()">
+                                <i class="fas fa-plus"></i> Create Preset
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="import-export-section">
+                        <h3>Import/Export</h3>
+                        <div class="file-operations">
+                            <div class="file-op">
+                                <label for="config-import">Import Configuration:</label>
+                                <input type="file" id="config-import" accept=".json" onchange="importConfiguration(event)">
+                            </div>
+                            <div class="file-op">
+                                <button class="file-btn export" onclick="exportConfiguration()">
+                                    <i class="fas fa-download"></i> Export Current Config
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-log">
+            <h3><i class="fas fa-history"></i> Configuration Log</h3>
+            <div class="log-container" id="admin-log-container">
+                <div class="log-entry info">
+                    <span class="timestamp">[Ready]</span>
+                    <span class="message">Admin panel initialized</span>
+                </div>
+            </div>
+            <button id="clear-admin-log" class="clear-btn">
+                <i class="fas fa-trash"></i> Clear Log
+            </button>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='admin.js') }}"></script>
+</body>
+</html>

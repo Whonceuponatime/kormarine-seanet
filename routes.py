@@ -155,15 +155,25 @@ class Routes:
                 return jsonify(**result), 400
             return jsonify(**result)
         
-        # Main page route
+        # Main page route - Interactive Network Diagram
         @self.app.get("/")
         def index():
-            return render_template('index.html')
+            return render_template('network_diagram.html')
         
-        # Interactive network diagram route
+        # Keep diagram route for backward compatibility
         @self.app.get("/diagram")
         def network_diagram():
             return render_template('network_diagram.html')
+        
+        # Settings page route
+        @self.app.get("/settings")
+        def settings():
+            return render_template('settings.html')
+        
+        # Admin panel route
+        @self.app.get("/admin")
+        def admin():
+            return render_template('admin.html')
         
         # Additional CORS headers for development
         @self.app.after_request
