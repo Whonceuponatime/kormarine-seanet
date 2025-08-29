@@ -30,48 +30,6 @@
             </div>
         </header>
 
-        <div class="control-panel">
-            <div class="target-config">
-                <label>Target IP:</label>
-                <input type="text" id="target-ip" value="192.168.1.100" placeholder="192.168.1.100">
-                <label>Community:</label>
-                <div class="community-buttons">
-                    <button class="community-btn active" data-community="public">Public (Read)</button>
-                    <button class="community-btn" data-community="private">Private (Write)</button>
-                </div>
-                <input type="text" id="community-string" value="public" readonly style="display:none;">
-            </div>
-            <div class="discovery-actions">
-                <button id="discover-btn" class="action-btn discovery-btn">
-                    <i class="fas fa-search"></i> Discover Network
-                </button>
-                <button id="snmp-walk-btn" class="action-btn discovery-btn">
-                    <i class="fas fa-walking"></i> SNMP Walk
-                </button>
-            </div>
-            <div class="led-controls">
-                <button id="demo-packet-btn" class="action-btn led-btn">
-                    <i class="fas fa-bolt"></i> Demo Packet
-                </button>
-                <button id="start-chaser-btn" class="action-btn led-btn">
-                    <i class="fas fa-play"></i> Start Chaser
-                </button>
-                <button id="stop-animation-btn" class="action-btn led-btn">
-                    <i class="fas fa-stop"></i> Stop
-                </button>
-                <button id="all-off-btn" class="action-btn led-btn">
-                    <i class="fas fa-power-off"></i> All Off
-                </button>
-            </div>
-                            <div class="attack-status">
-                    <span id="status-text">Ready for demonstration</span>
-                    <div class="interaction-hint">
-                        <i class="fas fa-info-circle"></i>
-                        <span>Drag components to reposition • Click Raspberry Pi for LED demo</span>
-                    </div>
-                </div>
-        </div>
-
         <div class="network-diagram" style="padding: 2px; width: 100%;">
             <svg id="network-svg" viewBox="0 0 1400 700" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;">
                 <defs>
