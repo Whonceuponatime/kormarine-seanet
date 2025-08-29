@@ -247,9 +247,14 @@
                 
                 <div class="control-group">
                     <label><i class="fas fa-rocket"></i> Attack Control:</label>
-                    <button id="start-attack-btn" class="control-btn attack">
-                        <i class="fas fa-play"></i> Start Attack
-                    </button>
+                    <div class="attack-buttons">
+                        <button id="port-down-btn" class="control-btn port-down">
+                            <i class="fas fa-arrow-down"></i> Port Down
+                        </button>
+                        <button id="port-up-btn" class="control-btn port-up">
+                            <i class="fas fa-arrow-up"></i> Port Up
+                        </button>
+                    </div>
                 </div>
                 
                 <div class="control-group">
@@ -278,39 +283,7 @@
                 </div>
             </div>
             
-            <div class="manual-controls">
-                <h3><i class="fas fa-hand-paper"></i> Manual LED Control</h3>
-                <div class="manual-led-grid">
-                    <button class="manual-led-btn" data-pin="17">
-                        <div class="led-indicator-small" id="manual-led-17"></div>
-                        <span>LED 1 (Pin 17)</span>
-                    </button>
-                    <button class="manual-led-btn" data-pin="27">
-                        <div class="led-indicator-small" id="manual-led-27"></div>
-                        <span>LED 2 (Pin 27)</span>
-                    </button>
-                    <button class="manual-led-btn" data-pin="22">
-                        <div class="led-indicator-small" id="manual-led-22"></div>
-                        <span>LED 3 (Pin 22)</span>
-                    </button>
-                    <button class="manual-led-btn" data-pin="10">
-                        <div class="led-indicator-small" id="manual-led-10"></div>
-                        <span>LED 4 (Pin 10)</span>
-                    </button>
-                    <button class="manual-led-btn" data-pin="9">
-                        <div class="led-indicator-small" id="manual-led-9"></div>
-                        <span>LED 5 (Pin 9)</span>
-                    </button>
-                    <button class="manual-led-btn" data-pin="5">
-                        <div class="led-indicator-small" id="manual-led-5"></div>
-                        <span>LED 6 (Pin 5)</span>
-                    </button>
-                    <button class="manual-led-btn" data-pin="6">
-                        <div class="led-indicator-small" id="manual-led-6"></div>
-                        <span>LED 7 (Pin 6)</span>
-                    </button>
-                </div>
-            </div>
+
             
             <div class="attack-log">
                 <h3><i class="fas fa-terminal"></i> Command Output & Attack Log</h3>
