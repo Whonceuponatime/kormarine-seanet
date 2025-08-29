@@ -6,6 +6,9 @@ class NetworkDiagram {
         this.eventSource = null;
         this.isAttacking = false;
         this.currentAttackPort = null;
+        this.isDragging = false;
+        this.dragElement = null;
+        this.dragOffset = { x: 0, y: 0 };
         
         this.init();
     }
@@ -15,6 +18,7 @@ class NetworkDiagram {
         this.startLEDMonitoring();
         this.updateTargetIP();
         this.loadCustomizations();
+        this.loadComponentPositions();
         this.addInitialLog('System initialized and ready for demonstration');
     }
     
@@ -71,9 +75,14 @@ class NetworkDiagram {
         });
         
         // Raspberry Pi click for LED demo
-        document.getElementById('raspberry-pi').addEventListener('click', () => {
-            this.triggerLEDDemo();
+        document.getElementById('raspberry-pi').addEventListener('click', (e) => {
+            if (!this.isDragging) {
+                this.triggerLEDDemo();
+            }
         });
+        
+        // Set up drag and drop for all devices
+        this.setupDragAndDrop();
     }
     
     updateTargetIP() {
@@ -788,6 +797,177 @@ class NetworkDiagram {
         if (components.device4 && components.device4.imageUrl) {
             const device4Image = document.getElementById('device4-device-image');
             if (device4Image) device4Image.setAttribute('href', components.device4.imageUrl);
+        }
+    }
+    
+    // Drag and Drop Setup
+    setupDragAndDrop() {
+        const draggableElements = ['raspberry-pi', 'device-1', 'device-2', 'device-3', 'device-4'];
+        
+        draggableElements.forEach(elementId => {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.style.cursor = 'move';
+                
+                element.addEventListener('mousedown', (e) => {
+                    this.startDrag(e, element);
+                });
+            }
+        });
+        
+        // Global mouse events
+        document.addEventListener('mousemove', (e) => {
+            this.drag(e);
+        });
+        
+        document.addEventListener('mouseup', () => {
+            this.stopDrag();
+        });
+    }
+    
+    startDrag(e, element) {
+        e.preventDefault();
+        this.isDragging = true;
+        this.dragElement = element;
+        
+        // Get current transform
+        const transform = element.getAttribute('transform');
+        const match = transform.match(/translate\(([^,]+),\s*([^)]+)\)/);
+        
+        if (match) {
+            const currentX = parseFloat(match[1]);
+            const currentY = parseFloat(match[2]);
+            
+            // Calculate offset from mouse to element origin
+            const rect = element.getBoundingClientRect();
+            const svg = document.getElementById('network-svg');
+            const svgRect = svg.getBoundingClientRect();
+            
+            // Convert mouse coordinates to SVG coordinates
+            const svgX = ((e.clientX - svgRect.left) / svgRect.width) * 1200;
+            const svgY = ((e.clientY - svgRect.top) / svgRect.height) * 800;
+            
+            this.dragOffset.x = svgX - currentX;
+            this.dragOffset.y = svgY - currentY;
+        }
+        
+        // Add visual feedback
+        element.classList.add('dragging');
+        this.addLog(`Started dragging ${element.id.replace('-', ' ')}`, 'info');
+    }
+    
+    drag(e) {
+        if (!this.isDragging || !this.dragElement) return;
+        
+        e.preventDefault();
+        
+        // Get SVG coordinates
+        const svg = document.getElementById('network-svg');
+        const rect = svg.getBoundingClientRect();
+        
+        const svgX = ((e.clientX - rect.left) / rect.width) * 1200;
+        const svgY = ((e.clientY - rect.top) / rect.height) * 800;
+        
+        // Calculate new position
+        const newX = Math.max(0, Math.min(1100, svgX - this.dragOffset.x));
+        const newY = Math.max(0, Math.min(730, svgY - this.dragOffset.y));
+        
+        // Update transform
+        this.dragElement.setAttribute('transform', `translate(${newX}, ${newY})`);
+        
+        // Update connections if it's a device
+        this.updateConnectionsForDevice(this.dragElement.id, newX, newY);
+    }
+    
+    stopDrag() {
+        if (this.isDragging && this.dragElement) {
+            // Remove visual feedback
+            this.dragElement.classList.remove('dragging');
+            
+            // Save new position
+            const transform = this.dragElement.getAttribute('transform');
+            this.addLog(`Moved ${this.dragElement.id.replace('-', ' ')} - position saved`, 'success');
+            
+            // Save positions to localStorage
+            this.saveComponentPositions();
+            
+            // Add small delay before resetting drag state to prevent accidental clicks
+            setTimeout(() => {
+                this.isDragging = false;
+                this.dragElement = null;
+            }, 100);
+        }
+    }
+    
+    updateConnectionsForDevice(deviceId, x, y) {
+        // Update connection lines when devices are moved
+        if (deviceId === 'raspberry-pi') {
+            const connection = document.getElementById('connection-attacker');
+            if (connection) {
+                connection.setAttribute('x1', x + 120); // Adjust for device width
+                connection.setAttribute('y1', y + 40);  // Adjust for device height
+            }
+        }
+        
+        if (deviceId.startsWith('device-')) {
+            const deviceNum = deviceId.split('-')[1];
+            const connection = document.getElementById(`connection-device-${deviceNum}`);
+            if (connection) {
+                connection.setAttribute('x2', x);
+                connection.setAttribute('y2', y + 35); // Adjust for device height
+            }
+        }
+    }
+    
+    saveComponentPositions() {
+        const positions = {};
+        const draggableElements = ['raspberry-pi', 'device-1', 'device-2', 'device-3', 'device-4'];
+        
+        draggableElements.forEach(elementId => {
+            const element = document.getElementById(elementId);
+            if (element) {
+                const transform = element.getAttribute('transform');
+                const match = transform.match(/translate\(([^,]+),\s*([^)]+)\)/);
+                if (match) {
+                    positions[elementId] = {
+                        x: parseFloat(match[1]),
+                        y: parseFloat(match[2])
+                    };
+                }
+            }
+        });
+        
+        // Save to localStorage
+        localStorage.setItem('componentPositions', JSON.stringify(positions));
+        
+        // Also send to server
+        fetch('/save-positions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(positions)
+        }).catch(error => {
+            console.error('Error saving positions to server:', error);
+        });
+    }
+    
+    loadComponentPositions() {
+        const saved = localStorage.getItem('componentPositions');
+        if (saved) {
+            try {
+                const positions = JSON.parse(saved);
+                
+                Object.entries(positions).forEach(([elementId, pos]) => {
+                    const element = document.getElementById(elementId);
+                    if (element) {
+                        element.setAttribute('transform', `translate(${pos.x}, ${pos.y})`);
+                        this.updateConnectionsForDevice(elementId, pos.x, pos.y);
+                    }
+                });
+                
+                this.addLog('Loaded saved component positions', 'info');
+            } catch (error) {
+                console.error('Error loading positions:', error);
+            }
         }
     }
     

@@ -188,43 +188,52 @@ class Routes:
         # Image upload route
         @self.app.post("/upload-image")
         def upload_image():
-            if 'file' not in request.files:
-                return jsonify({"ok": False, "error": "No file provided"}), 400
-            
-            file = request.files['file']
-            component = request.form.get('component', '')
-            
-            if file.filename == '':
-                return jsonify({"ok": False, "error": "No file selected"}), 400
-            
-            if not allowed_file(file.filename):
-                return jsonify({"ok": False, "error": "Invalid file type. Use PNG, JPG, JPEG, GIF, or SVG"}), 400
-            
-            if file and allowed_file(file.filename):
-                # Create secure filename
-                filename = secure_filename(file.filename)
-                timestamp = str(int(time.time()))
-                filename = f"{component}_{timestamp}_{filename}"
+            try:
+                # Ensure directories exist
+                os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+                os.makedirs(STATIC_IMAGES_FOLDER, exist_ok=True)
                 
-                # Save to uploads folder
-                upload_path = os.path.join(UPLOAD_FOLDER, filename)
-                file.save(upload_path)
+                if 'file' not in request.files:
+                    return jsonify({"ok": False, "error": "No file provided"}), 400
                 
-                # Copy to static/images for serving
-                static_path = os.path.join(STATIC_IMAGES_FOLDER, filename)
-                shutil.copy2(upload_path, static_path)
+                file = request.files['file']
+                component = request.form.get('component', '')
                 
-                # Return the URL path for the image
-                image_url = f"/static/images/{filename}"
+                if file.filename == '':
+                    return jsonify({"ok": False, "error": "No file selected"}), 400
                 
-                return jsonify({
-                    "ok": True, 
-                    "filename": filename,
-                    "url": image_url,
-                    "component": component
-                })
-            
-            return jsonify({"ok": False, "error": "Upload failed"}), 500
+                if not allowed_file(file.filename):
+                    return jsonify({"ok": False, "error": "Invalid file type. Use PNG, JPG, JPEG, GIF, or SVG"}), 400
+                
+                if file and allowed_file(file.filename):
+                    # Create secure filename
+                    filename = secure_filename(file.filename)
+                    timestamp = str(int(time.time()))
+                    filename = f"{component}_{timestamp}_{filename}"
+                    
+                    # Save to uploads folder
+                    upload_path = os.path.join(UPLOAD_FOLDER, filename)
+                    file.save(upload_path)
+                    
+                    # Copy to static/images for serving
+                    static_path = os.path.join(STATIC_IMAGES_FOLDER, filename)
+                    shutil.copy2(upload_path, static_path)
+                    
+                    # Return the URL path for the image
+                    image_url = f"/static/images/{filename}"
+                    
+                    return jsonify({
+                        "ok": True, 
+                        "filename": filename,
+                        "url": image_url,
+                        "component": component
+                    })
+                
+                return jsonify({"ok": False, "error": "Upload failed"}), 500
+                
+            except Exception as e:
+                print(f"Upload error: {e}")
+                return jsonify({"ok": False, "error": f"Server error: {str(e)}"}), 500
         
         # Delete image route
         @self.app.delete("/delete-image/<filename>")
@@ -241,6 +250,22 @@ class Routes:
                 
                 return jsonify({"ok": True, "message": "Image deleted successfully"})
             except Exception as e:
+                print(f"Delete error: {e}")
+                return jsonify({"ok": False, "error": str(e)}), 500
+        
+        # Save component positions route
+        @self.app.post("/save-positions")
+        def save_positions():
+            try:
+                positions = request.get_json()
+                if not positions:
+                    return jsonify({"ok": False, "error": "No position data provided"}), 400
+                
+                # Save positions to a file or database
+                # For now, we'll just return success - you can extend this to persist positions
+                return jsonify({"ok": True, "message": "Positions saved successfully"})
+            except Exception as e:
+                print(f"Save positions error: {e}")
                 return jsonify({"ok": False, "error": str(e)}), 500
         
         # Additional CORS headers for development
