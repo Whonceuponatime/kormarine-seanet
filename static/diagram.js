@@ -1084,7 +1084,7 @@ class NetworkDiagram {
             const svgRect = svg.getBoundingClientRect();
             
             // Convert mouse coordinates to SVG coordinates
-                    const svgX = ((e.clientX - svgRect.left) / svgRect.width) * 1200;
+                    const svgX = ((e.clientX - svgRect.left) / svgRect.width) * 1400;
         const svgY = ((e.clientY - svgRect.top) / svgRect.height) * 700;
             
             this.dragOffset.x = svgX - currentX;
@@ -1105,11 +1105,11 @@ class NetworkDiagram {
         const svg = document.getElementById('network-svg');
         const rect = svg.getBoundingClientRect();
         
-        const svgX = ((e.clientX - rect.left) / rect.width) * 1200;
+        const svgX = ((e.clientX - rect.left) / rect.width) * 1400;
         const svgY = ((e.clientY - rect.top) / rect.height) * 700;
         
         // Calculate new position
-        const newX = Math.max(0, Math.min(1100, svgX - this.dragOffset.x));
+        const newX = Math.max(0, Math.min(1300, svgX - this.dragOffset.x));
         const newY = Math.max(0, Math.min(580, svgY - this.dragOffset.y));
         
         // Update transform

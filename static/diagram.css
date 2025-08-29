@@ -16,7 +16,7 @@ body {
 .diagram-container {
     max-width: 100%;
     margin: 0;
-    padding: 10px;
+    padding: 5px;
 }
 
 /* Header Styles */
@@ -254,10 +254,11 @@ body {
 .network-diagram {
     background: rgba(236, 240, 241, 0.95);
     border-radius: 15px;
-    padding: 20px;
+    padding: 5px;
     margin-bottom: 20px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
     overflow: hidden;
+    width: 100%;
 }
 
 #network-svg {
