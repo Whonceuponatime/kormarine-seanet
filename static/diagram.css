@@ -27,19 +27,23 @@ body {
     padding: 15px 20px;
     margin-bottom: 15px;
     box-shadow: 0 4px 12px rgba(220, 53, 69, 0.15);
+    position: relative;
+}
+
+.header-content {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
 }
 
 .logo-section {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 20px;
 }
 
 .header-logo {
-    height: 90px;
+    height: 110px;
     width: auto;
 }
 
@@ -63,7 +67,9 @@ body {
 
 /* Navigation Container */
 .nav-container {
-    position: relative;
+    position: absolute;
+    top: 15px;
+    right: 20px;
 }
 
 /* Hamburger Menu */
@@ -94,7 +100,7 @@ body {
 /* Navigation Menu */
 .nav-menu {
     position: absolute;
-    top: 40px;
+    top: 45px;
     right: 0;
     background: #ffffff;
     border: 2px solid #007bff;

@@ -10,22 +10,22 @@
 <body>
     <div class="diagram-container">
         <header class="diagram-header">
+            <div class="nav-container">
+                <button class="hamburger-menu" id="hamburger-menu">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
+                <div class="nav-menu" id="nav-menu">
+                    <a href="/" class="nav-link active">Network Topology</a>
+                    <a href="/settings" class="nav-link">Settings & Testing</a>
+                    <a href="/admin" class="nav-link">Admin Panel</a>
+                </div>
+            </div>
             <div class="header-content">
                 <div class="logo-section">
                     <img src="/static/images/seacure-logo.png" alt="SEACURE Logo" class="header-logo">
                     <h1>Attack Simulator</h1>
-                </div>
-                <div class="nav-container">
-                    <button class="hamburger-menu" id="hamburger-menu">
-                        <span class="hamburger-line"></span>
-                        <span class="hamburger-line"></span>
-                        <span class="hamburger-line"></span>
-                    </button>
-                    <div class="nav-menu" id="nav-menu">
-                        <a href="/" class="nav-link active">Network Topology</a>
-                        <a href="/settings" class="nav-link">Settings & Testing</a>
-                        <a href="/admin" class="nav-link">Admin Panel</a>
-                    </div>
                 </div>
             </div>
         </header>
@@ -267,6 +267,49 @@
                     <text x="600" y="365" text-anchor="middle" class="attack-text">SNMP ATTACK</text>
                 </g>
             </svg>
+        </div>
+
+        <div class="control-panel">
+            <div class="target-config">
+                <label>Target IP:</label>
+                <input type="text" id="target-ip" value="192.168.1.100" placeholder="192.168.1.100">
+                <label>Community:</label>
+                <div class="community-buttons">
+                    <button class="community-btn active" data-community="public">Public (Read)</button>
+                    <button class="community-btn" data-community="private">Private (Write)</button>
+                </div>
+            </div>
+
+            <div class="discovery-actions">
+                <button id="discover-btn" class="action-btn discovery-btn">
+                    <i class="fas fa-search"></i> Discover Network
+                </button>
+                <button id="snmp-walk-btn" class="action-btn discovery-btn">
+                    <i class="fas fa-walking"></i> SNMP Walk
+                </button>
+            </div>
+
+            <div class="attack-actions">
+                <button id="demo-packet-btn" class="action-btn led-btn">
+                    <i class="fas fa-bolt"></i> Demo Packet
+                </button>
+                <button id="start-chaser-btn" class="action-btn led-btn">
+                    <i class="fas fa-play"></i> Start Chaser
+                </button>
+                <button id="stop-animation-btn" class="action-btn led-btn">
+                    <i class="fas fa-stop"></i> Stop
+                </button>
+                <button id="all-off-btn" class="action-btn led-btn">
+                    <i class="fas fa-power-off"></i> All Off
+                </button>
+            </div>
+
+            <div class="status-display">
+                <div class="interaction-hint">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Drag components to reposition • Click Raspberry Pi for LED demo</span>
+                </div>
+            </div>
         </div>
 
         <div class="interaction-panel">
