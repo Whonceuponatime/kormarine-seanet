@@ -57,6 +57,15 @@ class NetworkDiagram {
             this.clearLog();
         });
         
+        // Target port selection
+        document.getElementById('target-port').addEventListener('change', (e) => {
+            this.selectedPort = e.target.value;
+            this.highlightTargetPort(e.target.value);
+            if (e.target.value) {
+                this.addLog(`Target port selected: Port ${e.target.value}`, 'info');
+            }
+        });
+        
         // Connected devices toggle moved to admin panel
         
         // Raspberry Pi click functionality removed
@@ -639,6 +648,36 @@ class NetworkDiagram {
                 }
             } catch (error) {
                 console.error('Error loading device visibility settings:', error);
+            }
+        }
+    }
+    
+    // Target port highlighting
+    highlightTargetPort(portNum) {
+        // Remove previous highlights
+        document.querySelectorAll('.port-label').forEach(label => {
+            label.style.fill = '#2c3e50';
+            label.style.fontWeight = 'bold';
+        });
+        
+        document.querySelectorAll('.device-connection').forEach(line => {
+            line.style.stroke = '#27ae60';
+            line.style.strokeWidth = '3';
+        });
+        
+        // Highlight selected port
+        if (portNum) {
+            const portLabel = document.getElementById(`switch-port-${portNum}`);
+            const connectionLine = document.getElementById(`connection-device-${portNum}`);
+            
+            if (portLabel) {
+                portLabel.style.fill = '#dc3545';
+                portLabel.style.fontWeight = 'bold';
+            }
+            
+            if (connectionLine) {
+                connectionLine.style.stroke = '#dc3545';
+                connectionLine.style.strokeWidth = '4';
             }
         }
     }

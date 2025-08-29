@@ -31,6 +31,12 @@
         </header>
 
         <div class="network-diagram" style="padding: 2px; width: 100%;">
+            <div class="diagram-overlay">
+                <div class="interaction-hint-overlay">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Drag components to reposition • Use Admin panel to show/hide devices</span>
+                </div>
+            </div>
             <svg id="network-svg" viewBox="0 0 1400 300" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;">
                 <defs>
                     <!-- Gradients for modern styling -->
@@ -250,9 +256,15 @@
 
 
             <div class="status-display">
-                <div class="interaction-hint">
-                    <i class="fas fa-info-circle"></i>
-                    <span>Drag components to reposition • Use Admin panel to show/hide devices</span>
+                <div class="target-port-section">
+                    <label>Target Port:</label>
+                    <select id="target-port" class="port-selector">
+                        <option value="">Select Port</option>
+                        <option value="1">Port 1</option>
+                        <option value="2">Port 2</option>
+                        <option value="3">Port 3</option>
+                        <option value="4">Port 4</option>
+                    </select>
                 </div>
             </div>
         </div>

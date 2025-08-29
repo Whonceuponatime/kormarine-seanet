@@ -321,6 +321,30 @@ body {
     box-shadow: 0 6px 20px rgba(0, 123, 255, 0.15);
     overflow: hidden;
     width: 100%;
+    position: relative;
+}
+
+.diagram-overlay {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.interaction-hint-overlay {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    color: #6c757d;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.interaction-hint-overlay i {
+    color: #007bff;
+    margin-right: 5px;
 }
 
 #network-svg {
