@@ -7,8 +7,8 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-    color: #ecf0f1;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    color: #2c3e50;
     min-height: 100vh;
     overflow-x: hidden;
 }
@@ -21,30 +21,39 @@ body {
 
 /* Header Styles */
 .diagram-header {
-    background: rgba(52, 73, 93, 0.9);
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
     border-radius: 10px;
     padding: 15px;
     margin-bottom: 10px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.header-content h1 {
-    color: #ecf0f1;
-    font-size: 2rem;
+.logo-section {
     display: flex;
     align-items: center;
     gap: 15px;
 }
 
+.header-logo {
+    height: 60px;
+    width: auto;
+}
+
+.header-content h1 {
+    color: #ffffff;
+    font-size: 2rem;
+    margin: 0;
+}
+
 .header-content h1 i {
-    color: #3498db;
+    color: #ffffff;
 }
 
 .subtitle {
-    color: #bdc3c7;
+    color: #f8f9fa;
     font-size: 1.1rem;
     font-weight: 300;
     margin-top: 5px;
@@ -68,14 +77,14 @@ body {
 }
 
 .nav-link:hover {
-    background: rgba(52, 152, 219, 0.2);
+    background: rgba(255, 255, 255, 0.2);
     transform: translateY(-2px);
 }
 
 .nav-link.active {
-    background: #3498db;
-    color: white;
-    border-color: #2980b9;
+    background: #ffffff;
+    color: #dc3545;
+    border-color: #ffffff;
 }
 
 .led-row {
@@ -202,9 +211,9 @@ body {
 .community-btn {
     flex: 1;
     padding: 8px 10px;
-    border: 2px solid #34495e;
-    background: #2c3e50;
-    color: #ecf0f1;
+    border: 2px solid #dc3545;
+    background: #ffffff;
+    color: #dc3545;
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -213,13 +222,14 @@ body {
 }
 
 .community-btn.active {
-    background: #3498db;
-    border-color: #3498db;
+    background: #dc3545;
+    border-color: #dc3545;
+    color: #ffffff;
 }
 
 .community-btn:hover {
-    border-color: #3498db;
-    background: #34495e;
+    border-color: #dc3545;
+    background: #f8f9fa;
 }
 
 .community-btn.active:hover {
@@ -252,11 +262,12 @@ body {
 
 /* Network Diagram */
 .network-diagram {
-    background: rgba(236, 240, 241, 0.95);
+    background: #ffffff;
+    border: 2px solid #dc3545;
     border-radius: 15px;
     padding: 5px;
     margin-bottom: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 10px 30px rgba(220, 53, 69, 0.2);
     overflow: hidden;
     width: 100%;
 }
@@ -266,7 +277,7 @@ body {
     height: calc(100vh - 200px);
     min-height: 500px;
     border-radius: 10px;
-    background: linear-gradient(135deg, #ecf0f1 0%, #bdc3c7 100%);
+    background: #ffffff;
 }
 
 /* SVG Styles - Fixed flickering */

@@ -509,6 +509,29 @@ class NetworkDiagram {
     
     // Activity LED flash removed per user request
     
+    updatePortLabels(components) {
+        // Update port labels on the switch based on configuration
+        if (components && components.device1 && components.device1.port) {
+            const port1Label = document.getElementById('switch-port-1');
+            if (port1Label) port1Label.textContent = components.device1.port;
+        }
+        
+        if (components && components.device2 && components.device2.port) {
+            const port2Label = document.getElementById('switch-port-2');
+            if (port2Label) port2Label.textContent = components.device2.port;
+        }
+        
+        if (components && components.device3 && components.device3.port) {
+            const port3Label = document.getElementById('switch-port-3');
+            if (port3Label) port3Label.textContent = components.device3.port;
+        }
+        
+        if (components && components.device4 && components.device4.port) {
+            const port4Label = document.getElementById('switch-port-4');
+            if (port4Label) port4Label.textContent = components.device4.port;
+        }
+    }
+    
     setAttackMode(active) {
         const svg = document.getElementById('network-svg');
         if (active) {
@@ -666,6 +689,7 @@ class NetworkDiagram {
             try {
                 const config = JSON.parse(saved);
                 this.applyCustomizations(config);
+                this.updatePortLabels(config.components);
                 this.addLog('Applied saved customizations', 'info');
             } catch (error) {
                 console.error('Error loading customizations:', error);
@@ -940,7 +964,7 @@ class NetworkDiagram {
                 const portLabel = deviceGroup.querySelector(`#switch-port-${i}`);
                 if (portLabel) {
                     portLabel.setAttribute('x', width - 10);
-                    portLabel.setAttribute('y', 25 + (i * 15));
+                    portLabel.setAttribute('y', 10 + (i * 20)); // Increased spacing from 15 to 20
                 }
             }
         } else {
@@ -1029,14 +1053,14 @@ class NetworkDiagram {
             attackerConnection.setAttribute('y2', y + height / 2);
         }
         
-        // Update device connections (outgoing from switch)
-        for (let i = 1; i <= 4; i++) {
-            const deviceConnection = document.getElementById(`connection-device-${i}`);
-            if (deviceConnection) {
-                deviceConnection.setAttribute('x1', x + width);
-                deviceConnection.setAttribute('y1', y + height / 2 - 20 + (i * 10)); // Spread out connection points
-            }
-        }
+                        // Update device connections (outgoing from switch)
+                for (let i = 1; i <= 4; i++) {
+                    const deviceConnection = document.getElementById(`connection-device-${i}`);
+                    if (deviceConnection) {
+                        deviceConnection.setAttribute('x1', x + width);
+                        deviceConnection.setAttribute('y1', y + height / 2 - 30 + (i * 20)); // Increased spacing from 10 to 20
+                    }
+                }
     }
     
     // Drag and Drop Setup
