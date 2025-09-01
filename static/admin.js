@@ -3,17 +3,17 @@ class AdminController {
     constructor() {
         this.defaultConfig = {
             components: {
-                                        rpi: {
+                rpi: {
                 name: 'Raspberry Pi',
                 description: 'SNMP Attacker',
-                imageUrl: '/static/images/raspberry-pi-default.svg',
+                imageUrl: '/static/images/bd463120-b910-447d-82a5-571217c5db0e.jpg',
                 ip: 'Auto-detect'
             },
             switch: {
-                name: 'Network Switch',
+                name: 'MOXA Switch',
                 description: 'SNMP v1/v2c Enabled',
-                imageUrl: '/static/images/switch-default.svg',
-                model: 'Generic Switch',
+                imageUrl: '/static/images/moxa-edr-8010-series-datasheet-v1.jpg',
+                model: 'MOXA EDR-8010',
                 defaultIP: '192.168.1.100'
             },
             device1: {
