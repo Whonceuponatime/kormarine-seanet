@@ -165,6 +165,38 @@ class CommandExecutor:
             "confirm_stderr": gerr
         }
     
+    def snmp_get_port_status(self, target: str, ifindex: str, community: str = "public"):
+        """Get the operational status of a specific port"""
+        if not (target.strip() and ifindex.strip()):
+            return {"ok": False, "error": "target and ifindex required"}
+        
+        get_oid = f"1.3.6.1.2.1.2.2.1.8.{ifindex}"
+        get_cmd = f"snmpget -v2c -c {community} {target} {get_oid}"
+        code, out, err = self._run(get_cmd, timeout=5)
+        
+        status = None
+        if code == 0 and out:
+            # Extract status value from SNMP output
+            # Example output: "IF-MIB::ifOperStatus.7 = INTEGER: up(1)"
+            import re
+            match = re.search(r'INTEGER:\s*\w*\((\d+)\)', out)
+            if match:
+                status = match.group(1)
+            else:
+                # Fallback: look for just the number
+                match = re.search(r'INTEGER:\s*(\d+)', out)
+                if match:
+                    status = match.group(1)
+        
+        return {
+            "ok": (code == 0),
+            "cmd": get_cmd,
+            "code": code,
+            "stdout": out,
+            "stderr": err,
+            "status": status
+        }
+    
     def snmp_get_interfaces(self, target: str, community: str = "public"):
         """Get list of network interfaces with their status"""
         if not target.strip():

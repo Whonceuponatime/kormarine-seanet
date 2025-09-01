@@ -155,6 +155,17 @@ class Routes:
                 return jsonify(**result), 400
             return jsonify(**result)
         
+        @self.app.get("/snmp/portstatus")
+        def snmp_portstatus():
+            target = request.args.get("target", "").strip()
+            community = request.args.get("community", "public").strip()
+            ifindex = request.args.get("ifindex", "").strip()
+            
+            result = self.cmd.snmp_get_port_status(target, ifindex, community)
+            if not result["ok"] and "error" in result:
+                return jsonify(**result), 400
+            return jsonify(**result)
+        
         @self.app.get("/snmp/interfaces")
         def snmp_interfaces():
             target = request.args.get("target", "").strip()

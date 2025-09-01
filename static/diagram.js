@@ -32,20 +32,23 @@ class NetworkDiagram {
             this.updateTargetIP();
         });
         
-        // Community string buttons
-        document.querySelectorAll('.community-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                this.selectCommunity(btn.dataset.community);
-            });
-        });
+        // Community string is now hardcoded: public for read, private for write
         
-        // Discovery buttons
+        // Port control buttons
         document.getElementById('discover-btn').addEventListener('click', () => {
-            this.discoverNetwork();
+            this.performSNMPWalk();
         });
         
-        document.getElementById('snmp-walk-btn').addEventListener('click', () => {
-            this.performSNMPWalk();
+        document.getElementById('port-down-btn').addEventListener('click', () => {
+            this.portDown();
+        });
+        
+        document.getElementById('port-up-btn').addEventListener('click', () => {
+            this.portUp();
+        });
+        
+        document.getElementById('check-status-btn').addEventListener('click', () => {
+            this.checkPortStatus();
         });
         
         // LED control buttons removed - available on settings page
@@ -146,42 +149,98 @@ class NetworkDiagram {
         }
     }
     
-    // Community string selection
-    selectCommunity(community) {
-        this.currentCommunity = community;
-        document.getElementById('community-string').value = community;
-        
-        // Update button states
-        document.querySelectorAll('.community-btn').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        document.querySelector(`[data-community="${community}"]`).classList.add('active');
-        
-        this.addLog(`Community string changed to: ${community}`, 'info');
-    }
+    // Community strings are now hardcoded: public for read, private for write
     
-    // Network Discovery
-    async discoverNetwork() {
+    // Port Control Functions
+    async portDown() {
         if (!this.targetIP) {
             this.addLog('Please enter a target IP address', 'error');
             return;
         }
         
-        this.setDiscovering(true);
-        this.addLog(`Starting network discovery on ${this.targetIP}`, 'info');
-        
-        try {
-            // First, do SNMP walk
-            await this.performSNMPWalk();
-            
-            // Then get interfaces
-            await this.getInterfaces();
-            
-        } catch (error) {
-            this.addLog(`Discovery failed: ${error.message}`, 'error');
+        const selectedPort = document.getElementById('target-port').value;
+        if (!selectedPort) {
+            this.addLog('Please select a target port number', 'error');
+            return;
         }
         
-        this.setDiscovering(false);
+        this.addLog(`Setting port ${selectedPort} DOWN on ${this.targetIP}`, 'attack');
+        
+        try {
+            const response = await fetch(`/snmp/portdown?target=${encodeURIComponent(this.targetIP)}&ifindex=${selectedPort}&community=private`);
+            const data = await response.json();
+            
+            if (data.ok) {
+                this.addLog(`Port ${selectedPort} set to DOWN successfully`, 'success');
+                if (data.confirm_stdout) {
+                    this.addLog(`Status confirmation: ${data.confirm_stdout}`, 'info');
+                }
+            } else {
+                this.addLog(`Port DOWN failed: ${data.error || 'Unknown error'}`, 'error');
+            }
+        } catch (error) {
+            this.addLog(`Port DOWN error: ${error.message}`, 'error');
+        }
+    }
+    
+    async portUp() {
+        if (!this.targetIP) {
+            this.addLog('Please enter a target IP address', 'error');
+            return;
+        }
+        
+        const selectedPort = document.getElementById('target-port').value;
+        if (!selectedPort) {
+            this.addLog('Please select a target port number', 'error');
+            return;
+        }
+        
+        this.addLog(`Setting port ${selectedPort} UP on ${this.targetIP}`, 'success');
+        
+        try {
+            const response = await fetch(`/snmp/portup?target=${encodeURIComponent(this.targetIP)}&ifindex=${selectedPort}&community=private`);
+            const data = await response.json();
+            
+            if (data.ok) {
+                this.addLog(`Port ${selectedPort} set to UP successfully`, 'success');
+                if (data.confirm_stdout) {
+                    this.addLog(`Status confirmation: ${data.confirm_stdout}`, 'info');
+                }
+            } else {
+                this.addLog(`Port UP failed: ${data.error || 'Unknown error'}`, 'error');
+            }
+        } catch (error) {
+            this.addLog(`Port UP error: ${error.message}`, 'error');
+        }
+    }
+    
+    async checkPortStatus() {
+        if (!this.targetIP) {
+            this.addLog('Please enter a target IP address', 'error');
+            return;
+        }
+        
+        const selectedPort = document.getElementById('target-port').value;
+        if (!selectedPort) {
+            this.addLog('Please select a target port number', 'error');
+            return;
+        }
+        
+        this.addLog(`Checking status of port ${selectedPort} on ${this.targetIP}`, 'info');
+        
+        try {
+            const response = await fetch(`/snmp/portstatus?target=${encodeURIComponent(this.targetIP)}&ifindex=${selectedPort}&community=public`);
+            const data = await response.json();
+            
+            if (data.ok) {
+                const status = data.status === '1' ? 'UP' : data.status === '2' ? 'DOWN' : `Unknown (${data.status})`;
+                this.addLog(`Port ${selectedPort} status: ${status}`, 'info');
+            } else {
+                this.addLog(`Status check failed: ${data.error || 'Unknown error'}`, 'error');
+            }
+        } catch (error) {
+            this.addLog(`Status check error: ${error.message}`, 'error');
+        }
     }
     
     async performSNMPWalk() {
@@ -190,31 +249,31 @@ class NetworkDiagram {
             return;
         }
 
-        // Use selected port for targeted SNMP attack
-        if (this.selectedPort) {
-            this.addLog(`Performing SNMP walk on ${this.targetIP} targeting port ${this.selectedPort}`, 'info');
-        } else {
-            this.addLog(`Performing SNMP walk on ${this.targetIP}`, 'info');
-        }
+        this.addLog(`Performing SNMP walk on ${this.targetIP} to discover ports`, 'info');
         
         this.animatePacket('snmp-walk');
         
         try {
-            // Build URL with port parameter for targeted attacks
-            let url = `/snmp/walk?target=${encodeURIComponent(this.targetIP)}&community=${this.communityString}`;
-            if (this.selectedPort) {
-                url += `&port=${this.selectedPort}`;
-            }
-            
-            const response = await fetch(url);
+            const response = await fetch(`/snmp/walk?target=${encodeURIComponent(this.targetIP)}&community=public`);
             const data = await response.json();
             
             if (data.ok) {
-                const portMsg = this.selectedPort ? ` on port ${this.selectedPort}` : '';
-                this.addLog(`SNMP walk completed successfully${portMsg}`, 'success');
-                // Activity LED flash removed
+                this.addLog(`SNMP walk completed successfully - ports discovered`, 'success');
+                this.addLog(`Command: ${data.cmd}`, 'info');
+                if (data.stdout) {
+                    // Parse and display port information
+                    const lines = data.stdout.split('\n').slice(0, 10); // Show first 10 lines
+                    lines.forEach(line => {
+                        if (line.trim()) {
+                            this.addLog(`Found: ${line.trim()}`, 'info');
+                        }
+                    });
+                }
             } else {
                 this.addLog(`SNMP walk failed: ${data.error || 'Unknown error'}`, 'error');
+                if (data.stderr) {
+                    this.addLog(`Error: ${data.stderr}`, 'error');
+                }
             }
         } catch (error) {
             this.addLog(`SNMP walk error: ${error.message}`, 'error');
