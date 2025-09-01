@@ -272,11 +272,62 @@ class Routes:
                 if not positions:
                     return jsonify({"ok": False, "error": "No position data provided"}), 400
                 
-                # Save positions to a file or database
-                # For now, we'll just return success - you can extend this to persist positions
+                # Save positions to a file
+                positions_file = os.path.join(os.path.dirname(__file__), 'component_positions.json')
+                with open(positions_file, 'w') as f:
+                    json.dump(positions, f, indent=2)
+                
                 return jsonify({"ok": True, "message": "Positions saved successfully"})
             except Exception as e:
                 print(f"Save positions error: {e}")
+                return jsonify({"ok": False, "error": str(e)}), 500
+        
+        # Load component positions route
+        @self.app.get("/load-positions")
+        def load_positions():
+            try:
+                positions_file = os.path.join(os.path.dirname(__file__), 'component_positions.json')
+                if os.path.exists(positions_file):
+                    with open(positions_file, 'r') as f:
+                        positions = json.load(f)
+                    return jsonify({"ok": True, "positions": positions})
+                else:
+                    return jsonify({"ok": True, "positions": {}})
+            except Exception as e:
+                print(f"Load positions error: {e}")
+                return jsonify({"ok": False, "error": str(e)}), 500
+        
+        # Save configuration route
+        @self.app.post("/save-config")
+        def save_config():
+            try:
+                config = request.get_json()
+                if not config:
+                    return jsonify({"ok": False, "error": "No configuration data provided"}), 400
+                
+                # Save configuration to a file
+                config_file = os.path.join(os.path.dirname(__file__), 'app_config.json')
+                with open(config_file, 'w') as f:
+                    json.dump(config, f, indent=2)
+                
+                return jsonify({"ok": True, "message": "Configuration saved successfully"})
+            except Exception as e:
+                print(f"Save config error: {e}")
+                return jsonify({"ok": False, "error": str(e)}), 500
+        
+        # Load configuration route
+        @self.app.get("/load-config")
+        def load_config():
+            try:
+                config_file = os.path.join(os.path.dirname(__file__), 'app_config.json')
+                if os.path.exists(config_file):
+                    with open(config_file, 'r') as f:
+                        config = json.load(f)
+                    return jsonify({"ok": True, "config": config})
+                else:
+                    return jsonify({"ok": True, "config": {}})
+            except Exception as e:
+                print(f"Load config error: {e}")
                 return jsonify({"ok": False, "error": str(e)}), 500
         
         # Serve images from static/images directory

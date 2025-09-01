@@ -260,14 +260,10 @@ class NetworkDiagram {
             if (data.ok) {
                 this.addLog(`SNMP walk completed successfully - ports discovered`, 'success');
                 this.addLog(`Command: ${data.cmd}`, 'info');
+                
+                // Parse SNMP walk output and populate discovered ports
                 if (data.stdout) {
-                    // Parse and display port information
-                    const lines = data.stdout.split('\n').slice(0, 10); // Show first 10 lines
-                    lines.forEach(line => {
-                        if (line.trim()) {
-                            this.addLog(`Found: ${line.trim()}`, 'info');
-                        }
-                    });
+                    this.parseSNMPWalkResults(data.stdout);
                 }
             } else {
                 this.addLog(`SNMP walk failed: ${data.error || 'Unknown error'}`, 'error');
@@ -278,6 +274,43 @@ class NetworkDiagram {
         } catch (error) {
             this.addLog(`SNMP walk error: ${error.message}`, 'error');
         }
+    }
+    
+    parseSNMPWalkResults(output) {
+        const lines = output.split('\n');
+        const ports = [];
+        
+        lines.forEach(line => {
+            if (line.trim()) {
+                // Parse SNMP output: "IF-MIB::ifName.7 = STRING: Ethernet Port 7"
+                const match = line.match(/ifName\.(\d+)\s*=\s*STRING:\s*(.+)/);
+                if (match) {
+                    const ifIndex = match[1];
+                    const portName = match[2].trim().replace(/"/g, '');
+                    
+                    // Filter out non-physical ports
+                    if (!portName.toLowerCase().includes('loopback') && 
+                        !portName.toLowerCase().includes('null') &&
+                        !portName.toLowerCase().includes('vlan')) {
+                        ports.push({
+                            ifIndex: ifIndex,
+                            name: portName,
+                            adminStatus: 'unknown',
+                            operStatus: 'unknown'
+                        });
+                    }
+                }
+            }
+        });
+        
+        this.interfaces = ports;
+        this.addLog(`Found ${ports.length} network interfaces`, 'success');
+        this.displayPorts();
+        
+        // Log discovered ports
+        ports.forEach(port => {
+            this.addLog(`Port ${port.ifIndex}: ${port.name}`, 'info');
+        });
     }
     
     async getInterfaces() {
@@ -712,20 +745,36 @@ class NetworkDiagram {
     }
 
     // Load device visibility settings on page load
-    loadDeviceVisibilitySettings() {
-        const saved = localStorage.getItem('kormarineSeaNetConfig');
-        if (saved) {
-            try {
-                const config = JSON.parse(saved);
-                if (config.display) {
-                    this.toggleSingleDevice('device-1', config.display.showDevice1 !== false);
-                    this.toggleSingleDevice('device-2', config.display.showDevice2 !== false);
-                    this.toggleSingleDevice('device-3', config.display.showDevice3 !== false);
-                    this.toggleSingleDevice('device-4', config.display.showDevice4 !== false);
+    async loadDeviceVisibilitySettings() {
+        try {
+            const response = await fetch('/load-config');
+            const data = await response.json();
+            
+            if (data.ok && data.config && data.config.display) {
+                const config = data.config;
+                this.toggleSingleDevice('device-1', config.display.showDevice1 !== false);
+                this.toggleSingleDevice('device-2', config.display.showDevice2 !== false);
+                this.toggleSingleDevice('device-3', config.display.showDevice3 !== false);
+                this.toggleSingleDevice('device-4', config.display.showDevice4 !== false);
+            } else {
+                // Fallback to localStorage
+                const saved = localStorage.getItem('kormarineSeaNetConfig');
+                if (saved) {
+                    try {
+                        const config = JSON.parse(saved);
+                        if (config.display) {
+                            this.toggleSingleDevice('device-1', config.display.showDevice1 !== false);
+                            this.toggleSingleDevice('device-2', config.display.showDevice2 !== false);
+                            this.toggleSingleDevice('device-3', config.display.showDevice3 !== false);
+                            this.toggleSingleDevice('device-4', config.display.showDevice4 !== false);
+                        }
+                    } catch (error) {
+                        console.error('Error loading local device visibility settings:', error);
+                    }
                 }
-            } catch (error) {
-                console.error('Error loading device visibility settings:', error);
             }
+        } catch (error) {
+            console.error('Error loading server device visibility settings:', error);
         }
     }
     
@@ -779,17 +828,45 @@ class NetworkDiagram {
         }
     }
     
-    // Load customizations from localStorage
-    loadCustomizations() {
-        const saved = localStorage.getItem('kormarineSeaNetConfig');
-        if (saved) {
-            try {
-                const config = JSON.parse(saved);
-                this.applyCustomizations(config);
-                this.updatePortLabels(config.components);
-                this.addLog('Applied saved customizations', 'info');
-            } catch (error) {
-                console.error('Error loading customizations:', error);
+    // Load customizations from server
+    async loadCustomizations() {
+        try {
+            const response = await fetch('/load-config');
+            const data = await response.json();
+            
+            if (data.ok && data.config && Object.keys(data.config).length > 0) {
+                this.applyCustomizations(data.config);
+                if (data.config.components) {
+                    this.updatePortLabels(data.config.components);
+                }
+                this.addLog('Applied server-side customizations', 'info');
+            } else {
+                // Fallback to localStorage for backward compatibility
+                const saved = localStorage.getItem('kormarineSeaNetConfig');
+                if (saved) {
+                    try {
+                        const config = JSON.parse(saved);
+                        this.applyCustomizations(config);
+                        this.updatePortLabels(config.components);
+                        this.addLog('Applied local customizations', 'info');
+                    } catch (error) {
+                        console.error('Error loading local customizations:', error);
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error loading server customizations:', error);
+            // Fallback to localStorage
+            const saved = localStorage.getItem('kormarineSeaNetConfig');
+            if (saved) {
+                try {
+                    const config = JSON.parse(saved);
+                    this.applyCustomizations(config);
+                    this.updatePortLabels(config.components);
+                    this.addLog('Applied local customizations (fallback)', 'info');
+                } catch (error) {
+                    console.error('Error loading local customizations:', error);
+                }
             }
         }
     }
@@ -1340,23 +1417,57 @@ class NetworkDiagram {
         });
     }
     
-    loadComponentPositions() {
-        const saved = localStorage.getItem('componentPositions');
-        if (saved) {
-            try {
-                const positions = JSON.parse(saved);
-                
-                Object.entries(positions).forEach(([elementId, pos]) => {
+    async loadComponentPositions() {
+        try {
+            const response = await fetch('/load-positions');
+            const data = await response.json();
+            
+            if (data.ok && data.positions && Object.keys(data.positions).length > 0) {
+                Object.entries(data.positions).forEach(([elementId, pos]) => {
                     const element = document.getElementById(elementId);
                     if (element) {
                         element.setAttribute('transform', `translate(${pos.x}, ${pos.y})`);
                         this.updateConnectionsForDevice(elementId, pos.x, pos.y);
                     }
                 });
-                
-                this.addLog('Loaded saved component positions', 'info');
-            } catch (error) {
-                console.error('Error loading positions:', error);
+                this.addLog('Loaded server-side component positions', 'info');
+            } else {
+                // Fallback to localStorage
+                const saved = localStorage.getItem('componentPositions');
+                if (saved) {
+                    try {
+                        const positions = JSON.parse(saved);
+                        Object.entries(positions).forEach(([elementId, pos]) => {
+                            const element = document.getElementById(elementId);
+                            if (element) {
+                                element.setAttribute('transform', `translate(${pos.x}, ${pos.y})`);
+                                this.updateConnectionsForDevice(elementId, pos.x, pos.y);
+                            }
+                        });
+                        this.addLog('Loaded local component positions', 'info');
+                    } catch (error) {
+                        console.error('Error loading local positions:', error);
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error loading server positions:', error);
+            // Fallback to localStorage
+            const saved = localStorage.getItem('componentPositions');
+            if (saved) {
+                try {
+                    const positions = JSON.parse(saved);
+                    Object.entries(positions).forEach(([elementId, pos]) => {
+                        const element = document.getElementById(elementId);
+                        if (element) {
+                            element.setAttribute('transform', `translate(${pos.x}, ${pos.y})`);
+                            this.updateConnectionsForDevice(elementId, pos.x, pos.y);
+                        }
+                    });
+                    this.addLog('Loaded local component positions (fallback)', 'info');
+                } catch (error) {
+                    console.error('Error loading local positions:', error);
+                }
             }
         }
     }

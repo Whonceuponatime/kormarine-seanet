@@ -216,8 +216,23 @@ class AdminController {
         }));
     }
     
-    loadConfiguration() {
-        // Load configuration from localStorage
+    async loadConfiguration() {
+        try {
+            // Try to load from server first
+            const response = await fetch('/load-config');
+            const data = await response.json();
+            
+            if (data.ok && data.config && Object.keys(data.config).length > 0) {
+                this.currentConfig = data.config;
+                this.populateForm();
+                this.addAdminLog('Configuration loaded from server', 'success');
+                return;
+            }
+        } catch (error) {
+            this.addAdminLog('Failed to load from server, trying local storage', 'warning');
+        }
+        
+        // Fallback to localStorage
         const saved = localStorage.getItem('kormarineSeaNetConfig');
         if (saved) {
             try {
@@ -227,9 +242,12 @@ class AdminController {
             } catch (error) {
                 this.addAdminLog('Error loading saved configuration, using defaults', 'warning');
                 this.currentConfig = { ...this.defaultConfig };
+                this.populateForm();
             }
         } else {
+            this.currentConfig = { ...this.defaultConfig };
             this.populateForm();
+            this.addAdminLog('Using default configuration', 'info');
         }
     }
     
@@ -342,22 +360,47 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Configuration Management Functions
-function saveConfiguration() {
+async function saveConfiguration() {
     try {
         adminController.updateConfigFromForm();
         
-        localStorage.setItem('kormarineSeaNetConfig', JSON.stringify(adminController.currentConfig));
-        adminController.addAdminLog('Configuration saved successfully', 'success');
+        // Save to server first
+        const response = await fetch('/save-config', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(adminController.currentConfig)
+        });
         
-        // Update the main topology diagram if it's loaded
-        if (window.networkDiagram) {
-            window.networkDiagram.loadCustomizations();
-            adminController.addAdminLog('Topology diagram updated with new configuration', 'success');
+        const result = await response.json();
+        
+        if (result.ok) {
+            adminController.addAdminLog('Configuration saved to server successfully', 'success');
+            
+            // Also save to localStorage as backup
+            localStorage.setItem('kormarineSeaNetConfig', JSON.stringify(adminController.currentConfig));
+            
+            // Update the main topology diagram if it's loaded
+            if (window.networkDiagram) {
+                await window.networkDiagram.loadCustomizations();
+                adminController.addAdminLog('Topology diagram updated with new configuration', 'success');
+            }
+        } else {
+            throw new Error(result.error || 'Failed to save to server');
         }
         
     } catch (error) {
         adminController.addAdminLog(`Error saving configuration: ${error.message}`, 'error');
         console.error('Save config error:', error);
+        
+        // Fallback to localStorage only
+        try {
+            localStorage.setItem('kormarineSeaNetConfig', JSON.stringify(adminController.currentConfig));
+            adminController.addAdminLog('Configuration saved locally as fallback', 'warning');
+        } catch (localError) {
+            adminController.addAdminLog(`Failed to save locally: ${localError.message}`, 'error');
+        }
     }
 }
 
