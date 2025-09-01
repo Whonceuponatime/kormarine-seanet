@@ -359,6 +359,57 @@ document.addEventListener('DOMContentLoaded', function() {
     adminController = new AdminController();
 });
 
+// Image Management Functions
+async function fixImagePaths() {
+    try {
+        adminController.addAdminLog('Checking and fixing image paths...', 'info');
+        
+        // Get list of available images from server
+        const response = await fetch('/list-images');
+        const data = await response.json();
+        
+        if (!data.ok) {
+            throw new Error('Failed to get image list from server');
+        }
+        
+        const serverImages = data.images;
+        let pathsFixed = 0;
+        
+        // Check each component's image URL
+        Object.keys(adminController.currentConfig.components).forEach(componentKey => {
+            const component = adminController.currentConfig.components[componentKey];
+            if (component.imageUrl) {
+                // Check if it's a local path (contains drive letters or local file paths)
+                if (component.imageUrl.includes(':\\') || component.imageUrl.includes('file://') || 
+                    !component.imageUrl.startsWith('/static/images/')) {
+                    
+                    // Try to find matching image on server
+                    const filename = component.imageUrl.split('\\').pop().split('/').pop();
+                    const serverImage = serverImages.find(img => img.filename === filename);
+                    
+                    if (serverImage) {
+                        component.imageUrl = serverImage.url;
+                        pathsFixed++;
+                        adminController.addAdminLog(`Fixed path for ${componentKey}: ${filename}`, 'success');
+                    } else {
+                        adminController.addAdminLog(`Image not found on server for ${componentKey}: ${filename}`, 'warning');
+                    }
+                }
+            }
+        });
+        
+        if (pathsFixed > 0) {
+            adminController.populateForm();
+            adminController.addAdminLog(`Fixed ${pathsFixed} image paths. Click Save Configuration to apply changes.`, 'success');
+        } else {
+            adminController.addAdminLog('All image paths are already correct', 'info');
+        }
+        
+    } catch (error) {
+        adminController.addAdminLog(`Error fixing image paths: ${error.message}`, 'error');
+    }
+}
+
 // Configuration Management Functions
 async function saveConfiguration() {
     try {

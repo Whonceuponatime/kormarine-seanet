@@ -330,6 +330,52 @@ class Routes:
                 print(f"Load config error: {e}")
                 return jsonify({"ok": False, "error": str(e)}), 500
         
+        # List available images route
+        @self.app.get("/list-images")
+        def list_images():
+            try:
+                images_dir = os.path.join(os.path.dirname(__file__), 'static', 'images')
+                if not os.path.exists(images_dir):
+                    return jsonify({"ok": True, "images": []})
+                
+                images = []
+                for filename in os.listdir(images_dir):
+                    if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.svg')):
+                        images.append({
+                            'filename': filename,
+                            'url': f'/static/images/{filename}'
+                        })
+                
+                return jsonify({"ok": True, "images": images})
+            except Exception as e:
+                print(f"List images error: {e}")
+                return jsonify({"ok": False, "error": str(e)}), 500
+        
+        # Debug image serving route
+        @self.app.get("/debug-images")
+        def debug_images():
+            try:
+                images_dir = os.path.join(os.path.dirname(__file__), 'static', 'images')
+                debug_info = {
+                    'images_dir': images_dir,
+                    'dir_exists': os.path.exists(images_dir),
+                    'files': []
+                }
+                
+                if os.path.exists(images_dir):
+                    for filename in os.listdir(images_dir):
+                        file_path = os.path.join(images_dir, filename)
+                        debug_info['files'].append({
+                            'filename': filename,
+                            'exists': os.path.exists(file_path),
+                            'size': os.path.getsize(file_path) if os.path.exists(file_path) else 0,
+                            'url': f'/static/images/{filename}'
+                        })
+                
+                return jsonify({"ok": True, "debug": debug_info})
+            except Exception as e:
+                return jsonify({"ok": False, "error": str(e)}), 500
+        
         # Serve images from static/images directory
         @self.app.route('/static/images/<path:filename>')
         def serve_image(filename):
