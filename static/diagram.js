@@ -153,7 +153,9 @@ class NetworkDiagram {
     
     // Port Control Functions
     async portDown() {
-        if (!this.targetIP) {
+        // Get current target IP from input field
+        const targetIP = document.getElementById('target-ip').value.trim();
+        if (!targetIP) {
             this.addLog('Please enter a target IP address', 'error');
             return;
         }
@@ -164,7 +166,8 @@ class NetworkDiagram {
             return;
         }
         
-        this.addLog(`Setting port ${selectedPort} DOWN on ${this.targetIP}`, 'attack');
+        this.targetIP = targetIP; // Update stored value
+        this.addLog(`Setting port ${selectedPort} DOWN on ${targetIP}`, 'attack');
         
         try {
             const response = await fetch(`/snmp/portdown?target=${encodeURIComponent(this.targetIP)}&ifindex=${selectedPort}&community=private`);
@@ -191,7 +194,9 @@ class NetworkDiagram {
     }
     
     async portUp() {
-        if (!this.targetIP) {
+        // Get current target IP from input field
+        const targetIP = document.getElementById('target-ip').value.trim();
+        if (!targetIP) {
             this.addLog('Please enter a target IP address', 'error');
             return;
         }
@@ -202,7 +207,8 @@ class NetworkDiagram {
             return;
         }
         
-        this.addLog(`Setting port ${selectedPort} UP on ${this.targetIP}`, 'info');
+        this.targetIP = targetIP; // Update stored value
+        this.addLog(`Setting port ${selectedPort} UP on ${targetIP}`, 'info');
         
         try {
             const response = await fetch(`/snmp/portup?target=${encodeURIComponent(this.targetIP)}&ifindex=${selectedPort}&community=private`);
@@ -229,7 +235,9 @@ class NetworkDiagram {
     }
     
     async checkPortStatus() {
-        if (!this.targetIP) {
+        // Get current target IP from input field
+        const targetIP = document.getElementById('target-ip').value.trim();
+        if (!targetIP) {
             this.addLog('Please enter a target IP address', 'error');
             return;
         }
@@ -240,7 +248,8 @@ class NetworkDiagram {
             return;
         }
         
-        this.addLog(`Checking status of port ${selectedPort} on ${this.targetIP}`, 'info');
+        this.targetIP = targetIP; // Update stored value
+        this.addLog(`Checking status of port ${selectedPort} on ${targetIP}`, 'info');
         
         try {
             const response = await fetch(`/snmp/portstatus?target=${encodeURIComponent(this.targetIP)}&ifindex=${selectedPort}&community=public`);
@@ -258,12 +267,15 @@ class NetworkDiagram {
     }
     
     async performSNMPWalk() {
-        if (!this.targetIP) {
+        // Get current target IP from input field
+        const targetIP = document.getElementById('target-ip').value.trim();
+        if (!targetIP) {
             this.addLog('Please enter a target IP address', 'error');
             return;
         }
-
-        this.addLog(`Performing SNMP walk on ${this.targetIP} to discover ports`, 'info');
+        
+        this.targetIP = targetIP; // Update stored value
+        this.addLog(`Performing SNMP walk on ${targetIP} to discover ports`, 'info');
         
         this.animatePacket('snmp-walk');
         
