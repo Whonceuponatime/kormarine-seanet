@@ -171,9 +171,16 @@ class NetworkDiagram {
             const data = await response.json();
             
             if (data.ok) {
-                this.addLog(`Port ${selectedPort} set to DOWN successfully`, 'success');
+                // Check the actual status from confirmation
                 if (data.confirm_stdout) {
+                    const statusMatch = data.confirm_stdout.match(/INTEGER:\s*(\d+)/);
+                    const actualStatus = statusMatch ? statusMatch[1] : 'unknown';
+                    const statusText = actualStatus === '1' ? 'UP' : actualStatus === '2' ? 'DOWN' : `Unknown (${actualStatus})`;
+                    
+                    this.addLog(`Port ${selectedPort} command executed - Current status: ${statusText}`, actualStatus === '2' ? 'success' : 'warning');
                     this.addLog(`Status confirmation: ${data.confirm_stdout}`, 'info');
+                } else {
+                    this.addLog(`Port ${selectedPort} DOWN command sent`, 'success');
                 }
             } else {
                 this.addLog(`Port DOWN failed: ${data.error || 'Unknown error'}`, 'error');
@@ -195,16 +202,23 @@ class NetworkDiagram {
             return;
         }
         
-        this.addLog(`Setting port ${selectedPort} UP on ${this.targetIP}`, 'success');
+        this.addLog(`Setting port ${selectedPort} UP on ${this.targetIP}`, 'info');
         
         try {
             const response = await fetch(`/snmp/portup?target=${encodeURIComponent(this.targetIP)}&ifindex=${selectedPort}&community=private`);
             const data = await response.json();
             
             if (data.ok) {
-                this.addLog(`Port ${selectedPort} set to UP successfully`, 'success');
+                // Check the actual status from confirmation
                 if (data.confirm_stdout) {
+                    const statusMatch = data.confirm_stdout.match(/INTEGER:\s*(\d+)/);
+                    const actualStatus = statusMatch ? statusMatch[1] : 'unknown';
+                    const statusText = actualStatus === '1' ? 'UP' : actualStatus === '2' ? 'DOWN' : `Unknown (${actualStatus})`;
+                    
+                    this.addLog(`Port ${selectedPort} command executed - Current status: ${statusText}`, actualStatus === '1' ? 'success' : 'warning');
                     this.addLog(`Status confirmation: ${data.confirm_stdout}`, 'info');
+                } else {
+                    this.addLog(`Port ${selectedPort} UP command sent`, 'success');
                 }
             } else {
                 this.addLog(`Port UP failed: ${data.error || 'Unknown error'}`, 'error');
@@ -282,8 +296,19 @@ class NetworkDiagram {
         
         lines.forEach(line => {
             if (line.trim()) {
-                // Parse SNMP output: "IF-MIB::ifName.7 = STRING: Ethernet Port 7"
-                const match = line.match(/ifName\.(\d+)\s*=\s*STRING:\s*(.+)/);
+                // Parse SNMP output - handle multiple formats:
+                // "IF-MIB::ifName.7 = STRING: Ethernet Port 7"
+                // "iso.3.6.1.2.1.31.1.1.1.1.7 = STRING: Ethernet Port 7"
+                let match = line.match(/ifName\.(\d+)\s*=\s*STRING:\s*(.+)/);
+                if (!match) {
+                    // Try OID format: iso.3.6.1.2.1.31.1.1.1.1.X = STRING: name
+                    match = line.match(/iso\.3\.6\.1\.2\.1\.31\.1\.1\.1\.1\.(\d+)\s*=\s*STRING:\s*(.+)/);
+                }
+                if (!match) {
+                    // Try numeric OID format: 1.3.6.1.2.1.31.1.1.1.1.X = STRING: name
+                    match = line.match(/1\.3\.6\.1\.2\.1\.31\.1\.1\.1\.1\.(\d+)\s*=\s*STRING:\s*(.+)/);
+                }
+                
                 if (match) {
                     const ifIndex = match[1];
                     const portName = match[2].trim().replace(/"/g, '');
@@ -291,7 +316,9 @@ class NetworkDiagram {
                     // Filter out non-physical ports
                     if (!portName.toLowerCase().includes('loopback') && 
                         !portName.toLowerCase().includes('null') &&
-                        !portName.toLowerCase().includes('vlan')) {
+                        !portName.toLowerCase().includes('vlan') &&
+                        !portName.toLowerCase().includes('management') &&
+                        portName.trim() !== '') {
                         ports.push({
                             ifIndex: ifIndex,
                             name: portName,
@@ -299,18 +326,25 @@ class NetworkDiagram {
                             operStatus: 'unknown'
                         });
                     }
+                } else {
+                    // Log unmatched lines for debugging
+                    this.addLog(`Debug - Unmatched line: ${line.trim()}`, 'info');
                 }
             }
         });
         
         this.interfaces = ports;
-        this.addLog(`Found ${ports.length} network interfaces`, 'success');
+        this.addLog(`Found ${ports.length} network interfaces`, ports.length > 0 ? 'success' : 'warning');
         this.displayPorts();
         
         // Log discovered ports
-        ports.forEach(port => {
-            this.addLog(`Port ${port.ifIndex}: ${port.name}`, 'info');
-        });
+        if (ports.length > 0) {
+            ports.forEach(port => {
+                this.addLog(`Port ${port.ifIndex}: ${port.name}`, 'info');
+            });
+        } else {
+            this.addLog('No valid network interfaces found - check SNMP output format', 'warning');
+        }
     }
     
     async getInterfaces() {
