@@ -76,6 +76,45 @@
         .clickable-target:hover {
             filter: drop-shadow(0 0 8px #3498db) !important;
         }
+        
+        .attack-type-selector {
+            padding: 10px 0;
+        }
+        
+        .attack-type-header {
+            font-weight: bold;
+            color: #e74c3c;
+            padding: 8px 15px;
+            border-bottom: 1px solid #34495e;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .attack-type-link {
+            display: block;
+            padding: 10px 15px;
+            color: #ecf0f1;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .attack-type-link:hover {
+            background: rgba(52, 152, 219, 0.2);
+            border-left-color: #3498db;
+        }
+        
+        .attack-type-link.active {
+            background: rgba(231, 76, 60, 0.2);
+            border-left-color: #e74c3c;
+            color: #e74c3c;
+        }
+        
+        .divider {
+            height: 1px;
+            background: #34495e;
+            margin: 10px 0;
+        }
     </style>
 </head>
 <body class="network-topology">
@@ -88,10 +127,24 @@
                     <span class="hamburger-line"></span>
                 </button>
                 <div class="nav-menu" id="nav-menu">
-                    <a href="/" class="nav-link">Network Topology</a>
-                    <a href="/settings" class="nav-link">Settings & Testing</a>
-                    <a href="/malicious-packet" class="nav-link active">Malicious Packets</a>
-                    <a href="/admin" class="nav-link">Admin Panel</a>
+                    <div class="attack-type-selector">
+                        <div class="attack-type-header">
+                            <i class="fas fa-bug"></i> Attack Types
+                        </div>
+                        <a href="/" class="attack-type-link">
+                            <i class="fas fa-network-wired"></i> SNMP Attack
+                        </a>
+                        <a href="/malicious-packet" class="attack-type-link active">
+                            <i class="fas fa-hammer"></i> Packet Crafting
+                        </a>
+                        <div class="divider"></div>
+                        <a href="/settings" class="nav-link">
+                            <i class="fas fa-cogs"></i> Settings & Testing
+                        </a>
+                        <a href="/admin" class="nav-link">
+                            <i class="fas fa-tools"></i> Admin Panel
+                        </a>
+                    </div>
                 </div>
             </div>
             <div class="header-content">
@@ -308,60 +361,52 @@
                 <!-- Target Configuration -->
                 <div class="control-group">
                     <label><i class="fas fa-crosshairs"></i> Target Configuration:</label>
-                    <input type="text" id="target-ip" value="192.168.1.100" placeholder="Target IP" class="control-input" style="margin-bottom: 8px;">
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 8px; margin-bottom: 8px;">
+                        <input type="text" id="target-ip" value="192.168.1.100" placeholder="Target IP" class="control-input">
+                        <input type="text" id="target-mac" placeholder="Target MAC" class="control-input" style="font-size: 11px;">
+                    </div>
                     <input type="number" id="target-port" min="1" max="65535" placeholder="Target Port" class="control-input" value="80">
                 </div>
                 
                 <!-- Source Configuration -->
                 <div class="control-group">
                     <label><i class="fas fa-home"></i> Source Configuration:</label>
-                    <input type="text" id="source-ip" placeholder="Source IP (Auto)" class="control-input" style="margin-bottom: 8px;">
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 8px; margin-bottom: 8px;">
+                        <input type="text" id="source-ip" placeholder="Source IP (Auto)" class="control-input">
+                        <input type="text" id="source-mac" placeholder="Source MAC" class="control-input" style="font-size: 11px;">
+                    </div>
                     <input type="number" id="source-port" min="1" max="65535" placeholder="Source Port" value="12345" class="control-input">
                 </div>
                 
-                <!-- Protocol & MAC -->
+                <!-- Payload Configuration -->
                 <div class="control-group">
-                    <label><i class="fas fa-cog"></i> Protocol & MAC:</label>
-                    <div class="protocol-selector" style="margin-bottom: 8px;">
-                        <button class="protocol-btn active" data-protocol="tcp">TCP</button>
-                        <button class="protocol-btn" data-protocol="udp">UDP</button>
-                        <button class="protocol-btn" data-protocol="raw">RAW</button>
+                    <label><i class="fas fa-file-code"></i> Payload Configuration:</label>
+                    <div class="preset-payloads" style="margin-bottom: 8px;">
+                        <button class="preset-btn" data-payload="Hello World!">Hello World</button>
+                        <button class="preset-btn" data-payload="EICAR">EICAR Test</button>
+                        <button class="preset-btn" data-payload="48656c6c6f20576f726c6421">Hex: Hello</button>
+                        <button class="preset-btn" data-payload="3c7363726970743e616c65727428274861636b656427293c2f7363726970743e">XSS</button>
                     </div>
-                    <input type="text" id="source-mac" placeholder="Source MAC (Optional)" class="control-input" style="margin-bottom: 4px; font-size: 11px;">
-                    <input type="text" id="target-mac" placeholder="Target MAC (Optional)" class="control-input" style="font-size: 11px;">
+                    <textarea id="payload" placeholder="Enter payload..." class="control-input" style="min-height: 50px; font-family: 'Courier New', monospace; font-size: 11px;"></textarea>
+                    <div class="payload-stats" id="payload-stats" style="font-size: 10px; color: #666; margin-top: 4px;">
+                        Length: 0 bytes
+                    </div>
                 </div>
             </div>
             
-            <!-- Payload Section (Full Width) -->
+            <!-- Action Buttons (Full Width) -->
             <div class="control-group" style="margin-top: 15px;">
-                <label><i class="fas fa-file-code"></i> Payload Configuration:</label>
-                <div class="preset-payloads" style="margin-bottom: 8px;">
-                    <button class="preset-btn" data-payload="Hello World!">Hello World</button>
-                    <button class="preset-btn" data-payload="EICAR">EICAR Test</button>
-                    <button class="preset-btn" data-payload="48656c6c6f20576f726c6421">Hex: Hello</button>
-                    <button class="preset-btn" data-payload="3c7363726970743e616c65727428274861636b656427293c2f7363726970743e">XSS</button>
-                </div>
-                <div style="display: flex; gap: 10px; align-items: flex-start;">
-                    <textarea id="payload" placeholder="Enter your payload here..." class="control-input" style="flex: 1; min-height: 60px; font-family: 'Courier New', monospace; resize: vertical;"></textarea>
-                    <div style="min-width: 120px;">
-                        <div class="payload-stats" id="payload-stats" style="font-size: 11px; color: #666; margin-bottom: 8px; padding: 4px 8px;">
-                            Length: 0 bytes
-                        </div>
-                        <div class="attack-buttons" style="display: flex; flex-direction: column; gap: 5px;">
-                            <button id="craft-btn" class="control-btn port-down" style="padding: 8px 12px; font-size: 12px;">
-                                <i class="fas fa-hammer"></i> Craft & Send
-                            </button>
-                            <button id="eicar-btn" class="control-btn port-up" style="padding: 8px 12px; font-size: 12px;">
-                                <i class="fas fa-virus"></i> Send EICAR
-                            </button>
-                            <button id="raw-btn" class="control-btn primary" style="display: none; padding: 8px 12px; font-size: 12px;">
-                                <i class="fas fa-code"></i> Send Raw
-                            </button>
-                            <button id="clear-btn" class="control-btn secondary" style="padding: 8px 12px; font-size: 12px;">
-                                <i class="fas fa-eraser"></i> Clear
-                            </button>
-                        </div>
-                    </div>
+                <label><i class="fas fa-rocket"></i> Packet Actions:</label>
+                <div class="attack-buttons" style="display: flex; gap: 10px; justify-content: center;">
+                    <button id="craft-btn" class="control-btn port-down" style="flex: 1; padding: 12px 20px;">
+                        <i class="fas fa-hammer"></i> Craft & Send TCP Packet
+                    </button>
+                    <button id="eicar-btn" class="control-btn port-up" style="flex: 1; padding: 12px 20px;">
+                        <i class="fas fa-virus"></i> Send EICAR Test
+                    </button>
+                    <button id="clear-btn" class="control-btn secondary" style="flex: 0.5; padding: 12px 20px;">
+                        <i class="fas fa-eraser"></i> Clear All
+                    </button>
                 </div>
             </div>
         </div>

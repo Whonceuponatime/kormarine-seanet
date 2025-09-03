@@ -1,7 +1,6 @@
 // Malicious Packet Builder JavaScript
 class MaliciousPacketBuilder {
     constructor() {
-        this.currentProtocol = 'tcp';
         this.ledStatuses = {
             '17': false, '27': false, '22': false, '10': false,
             '9': false, '5': false, '6': false
@@ -17,11 +16,6 @@ class MaliciousPacketBuilder {
     }
 
     setupEventListeners() {
-        // Protocol selector
-        document.querySelectorAll('.protocol-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => this.selectProtocol(e.target.dataset.protocol));
-        });
-
         // Form inputs
         document.getElementById('target-ip').addEventListener('input', () => this.updateTargetDisplay());
         document.getElementById('target-port').addEventListener('input', () => this.updateTargetDisplay());
@@ -45,49 +39,11 @@ class MaliciousPacketBuilder {
         // Action buttons
         document.getElementById('craft-btn').addEventListener('click', () => this.craftAndSendPacket());
         document.getElementById('eicar-btn').addEventListener('click', () => this.sendEicarPacket());
-        document.getElementById('raw-btn').addEventListener('click', () => this.sendRawPacket());
         document.getElementById('clear-btn').addEventListener('click', () => this.clearAll());
         document.getElementById('clear-log').addEventListener('click', () => this.clearLog());
     }
 
-    selectProtocol(protocol) {
-        this.currentProtocol = protocol;
-        
-        // Update UI
-        document.querySelectorAll('.protocol-btn').forEach(btn => btn.classList.remove('active'));
-        document.querySelector(`[data-protocol="${protocol}"]`).classList.add('active');
 
-        // Show/hide fields based on protocol
-        const sourceFields = document.getElementById('source-fields');
-        const sourcePortField = document.getElementById('source-port-field');
-        const macFields = document.getElementById('mac-fields');
-        const targetMacField = document.getElementById('target-mac-field');
-        const craftBtn = document.getElementById('craft-btn');
-        const rawBtn = document.getElementById('raw-btn');
-        const payloadTextarea = document.getElementById('payload');
-
-        if (protocol === 'raw') {
-            sourceFields.style.display = 'none';
-            sourcePortField.style.display = 'none';
-            macFields.style.display = 'block';
-            targetMacField.style.display = 'block';
-            craftBtn.style.display = 'none';
-            rawBtn.style.display = 'block';
-            payloadTextarea.placeholder = 'Enter hex bytes (e.g., 48656c6c6f576f726c64)';
-            payloadTextarea.classList.add('hex-input');
-        } else {
-            sourceFields.style.display = 'block';
-            sourcePortField.style.display = 'block';
-            macFields.style.display = 'block';
-            targetMacField.style.display = 'block';
-            craftBtn.style.display = 'block';
-            rawBtn.style.display = 'none';
-            payloadTextarea.placeholder = 'Enter your payload here...';
-            payloadTextarea.classList.remove('hex-input');
-        }
-
-        this.log(`Protocol switched to ${protocol.toUpperCase()}`, 'info');
-    }
 
     loadPresetPayload(preset) {
         const payloadTextarea = document.getElementById('payload');
@@ -216,11 +172,11 @@ class MaliciousPacketBuilder {
             source_port: sourcePort || 12345,
             source_mac: sourceMac,
             target_mac: targetMac,
-            protocol: this.currentProtocol,
+            protocol: 'tcp',
             payload: payload
         };
 
-        this.log(`Crafting ${this.currentProtocol.toUpperCase()} packet to ${targetIP}:${targetPort}...`, 'info');
+        this.log(`Crafting TCP packet to ${targetIP}:${targetPort}...`, 'info');
         this.animatePacketSend();
 
         try {
@@ -245,53 +201,7 @@ class MaliciousPacketBuilder {
         }
     }
 
-    async sendRawPacket() {
-        const targetIP = document.getElementById('target-ip').value.trim();
-        const targetPort = parseInt(document.getElementById('target-port').value);
-        const hexPayload = document.getElementById('payload').value.trim();
 
-        if (!targetIP || !targetPort || !hexPayload) {
-            this.log('ERROR: Target IP, port, and hex payload are required', 'error');
-            return;
-        }
-
-        // Validate hex payload
-        const cleanHex = hexPayload.replace(/[^0-9a-fA-F]/g, '');
-        if (cleanHex.length % 2 !== 0) {
-            this.log('ERROR: Hex payload must have even number of characters', 'error');
-            return;
-        }
-
-        const packetData = {
-            target_ip: targetIP,
-            target_port: targetPort,
-            payload: cleanHex
-        };
-
-        this.log(`Sending raw packet to ${targetIP}:${targetPort}...`, 'info');
-        this.animatePacketSend();
-
-        try {
-            const response = await fetch('/packet/send-raw', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(packetData)
-            });
-
-            const result = await response.json();
-            
-            if (result.ok) {
-                this.log(`SUCCESS: ${result.message}`, 'success');
-                this.log(`Payload Size: ${result.payload_size} bytes`, 'info');
-            } else {
-                this.log(`ERROR: ${result.error}`, 'error');
-            }
-        } catch (error) {
-            this.log(`ERROR: Failed to send raw packet - ${error.message}`, 'error');
-        }
-    }
 
     async sendEicarPacket() {
         const targetIP = document.getElementById('target-ip').value.trim();
@@ -305,7 +215,7 @@ class MaliciousPacketBuilder {
         const packetData = {
             target_ip: targetIP,
             target_port: targetPort,
-            protocol: this.currentProtocol === 'raw' ? 'udp' : this.currentProtocol
+            protocol: 'tcp'
         };
 
         this.log(`Sending EICAR test packet to ${targetIP}:${targetPort}...`, 'warning');
