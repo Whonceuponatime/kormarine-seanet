@@ -302,7 +302,7 @@ class CommandExecutor:
         try:
             # Use regular TCP socket instead of raw socket to avoid permission issues
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.settimeout(5)  # 5 second timeout
+            sock.settimeout(3)  # 3 second timeout (reduced for faster feedback)
             
             # Bind to specific source if provided
             if src_ip and src_port:
@@ -332,6 +332,12 @@ class CommandExecutor:
                 "note": "Using standard TCP socket (no raw socket privileges required)"
             }
             
+        except socket.timeout:
+            return {"ok": False, "error": f"Connection timeout - No service responding on {dst_ip}:{dst_port}. Try port 22 (SSH), 443 (HTTPS), or 80 on a web server."}
+        except ConnectionRefusedError:
+            return {"ok": False, "error": f"Connection refused - Port {dst_port} closed on {dst_ip}. The target is reachable but not accepting connections on this port."}
+        except socket.gaierror as e:
+            return {"ok": False, "error": f"DNS/Address error: {str(e)}"}
         except Exception as e:
             return {"ok": False, "error": f"TCP packet send failed: {str(e)}"}
     
@@ -339,7 +345,7 @@ class CommandExecutor:
         """Send a UDP packet with custom payload"""
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            sock.settimeout(5)  # 5 second timeout
+            sock.settimeout(3)  # 3 second timeout
             
             # Bind to specific source if provided
             if src_ip and src_port:
@@ -365,6 +371,10 @@ class CommandExecutor:
                 "protocol": "UDP"
             }
             
+        except socket.timeout:
+            return {"ok": False, "error": f"UDP send timeout to {dst_ip}:{dst_port}"}
+        except socket.gaierror as e:
+            return {"ok": False, "error": f"DNS/Address error: {str(e)}"}
         except Exception as e:
             return {"ok": False, "error": f"UDP packet send failed: {str(e)}"}
     
