@@ -11,7 +11,6 @@ class MaliciousPacketBuilder {
 
     init() {
         this.setupEventListeners();
-        this.updatePayloadStats();
         this.updateTargetDisplay();
     }
 
@@ -20,7 +19,6 @@ class MaliciousPacketBuilder {
         document.getElementById('target-ip').addEventListener('input', () => this.updateTargetDisplay());
         document.getElementById('target-port').addEventListener('input', () => this.updateTargetDisplay());
         document.getElementById('source-ip').addEventListener('input', () => this.updateSourceDisplay());
-        document.getElementById('payload').addEventListener('input', () => this.updatePayloadStats());
         
         // MAC address validation
         document.getElementById('source-mac').addEventListener('input', (e) => this.validateMacAddress(e.target));
@@ -49,40 +47,36 @@ class MaliciousPacketBuilder {
         const payloadTextarea = document.getElementById('payload');
         
         switch (preset) {
-            case 'EICAR':
-                payloadTextarea.value = 'X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*';
-                break;
             case 'Hello World!':
                 payloadTextarea.value = 'Hello World!';
                 break;
+            case 'EICAR':
+                payloadTextarea.value = 'X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*';
+                break;
+            case '48656c6c6f20576f726c6421':
+                // Convert hex to ASCII: "Hello World!"
+                payloadTextarea.value = this.hexToAscii(preset);
+                break;
+            case '3c7363726970743e616c65727428274861636b656427293c2f7363726970743e':
+                // Convert hex to ASCII: "<script>alert('Hacked')</script>"
+                payloadTextarea.value = this.hexToAscii(preset);
+                break;
             default:
-                // For hex payloads, check if it's hex and convert if needed
-                if (preset.match(/^[0-9a-fA-F]+$/)) {
-                    payloadTextarea.value = preset;
-                } else {
-                    payloadTextarea.value = preset;
-                }
+                payloadTextarea.value = preset;
         }
         
-        this.updatePayloadStats();
         this.log(`Loaded preset payload: ${preset}`, 'info');
     }
-
-    updatePayloadStats() {
-        const payload = document.getElementById('payload').value;
-        const statsDiv = document.getElementById('payload-stats');
-        
-        if (this.currentProtocol === 'raw') {
-            // For raw packets, count hex bytes
-            const cleanHex = payload.replace(/[^0-9a-fA-F]/g, '');
-            const byteCount = Math.floor(cleanHex.length / 2);
-            statsDiv.innerHTML = `Length: ${byteCount} bytes (${cleanHex.length} hex chars)`;
-        } else {
-            // For regular packets, count UTF-8 bytes
-            const byteLength = new TextEncoder().encode(payload).length;
-            statsDiv.innerHTML = `Length: ${byteLength} bytes (${payload.length} chars)`;
+    
+    hexToAscii(hex) {
+        let str = '';
+        for (let i = 0; i < hex.length; i += 2) {
+            str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
         }
+        return str;
     }
+
+
 
     updateTargetDisplay() {
         // No need to update display elements in the new layout
