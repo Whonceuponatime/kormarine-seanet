@@ -3,83 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Malicious Packet Builder - KORMARINE SeaNet</title>
+    <title>Malicious Packet Builder</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='diagram.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        .packet-builder-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            padding: 20px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-        
-        .packet-form-panel {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .packet-form-group {
-            margin-bottom: 20px;
-        }
-        
-        .packet-form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #2c3e50;
-            font-size: 14px;
-        }
-        
-        .packet-form-group input,
-        .packet-form-group select,
-        .packet-form-group textarea {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e1e8ed;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.9);
-        }
-        
-        .packet-form-group input:focus,
-        .packet-form-group select:focus,
-        .packet-form-group textarea:focus {
-            outline: none;
-            border-color: #3498db;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
-        }
-        
-        .packet-form-group textarea {
-            min-height: 120px;
-            resize: vertical;
-            font-family: 'Courier New', monospace;
-        }
-        
         .protocol-selector {
             display: flex;
             gap: 10px;
-            margin-bottom: 15px;
+            margin-top: 5px;
         }
         
         .protocol-btn {
             flex: 1;
-            padding: 10px;
+            padding: 8px 12px;
             border: 2px solid #e1e8ed;
-            border-radius: 8px;
+            border-radius: 5px;
             background: white;
             cursor: pointer;
             transition: all 0.3s ease;
             text-align: center;
             font-weight: 600;
+            font-size: 12px;
         }
         
         .protocol-btn.active {
@@ -88,70 +32,27 @@
             border-color: #3498db;
         }
         
-        .packet-action-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-top: 25px;
+        .protocol-btn:hover {
+            background: #ecf0f1;
         }
         
-        .packet-btn {
-            padding: 15px 25px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        .packet-btn.craft {
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-            color: white;
-        }
-        
-        .packet-btn.raw {
-            background: linear-gradient(135deg, #9b59b6, #8e44ad);
-            color: white;
-        }
-        
-        .packet-btn.eicar {
-            background: linear-gradient(135deg, #f39c12, #d68910);
-            color: white;
-        }
-        
-        .packet-btn.clear {
-            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
-            color: white;
-        }
-        
-        .packet-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
-        
-        .packet-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
+        .protocol-btn.active:hover {
+            background: #2980b9;
         }
         
         .preset-payloads {
-            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
         }
         
         .preset-btn {
-            margin: 5px;
-            padding: 8px 15px;
+            padding: 4px 8px;
             background: #ecf0f1;
             border: 1px solid #bdc3c7;
-            border-radius: 5px;
+            border-radius: 3px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 11px;
             transition: all 0.3s ease;
         }
         
@@ -160,157 +61,26 @@
             color: white;
         }
         
-        .hex-input {
-            font-family: 'Courier New', monospace;
-            font-size: 13px;
-            letter-spacing: 1px;
-        }
-        
         .payload-stats {
             background: #f8f9fa;
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 10px;
-            font-size: 12px;
+            padding: 5px 8px;
+            border-radius: 3px;
+            font-size: 11px;
             color: #666;
         }
         
-        .visual-panel {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        .clickable-target {
+            cursor: pointer;
         }
         
-        .network-visualization {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .packet-flow {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: white;
-            position: relative;
-            z-index: 2;
-        }
-        
-        .node {
-            text-align: center;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            backdrop-filter: blur(5px);
-        }
-        
-        .node i {
-            font-size: 24px;
-            margin-bottom: 5px;
-            display: block;
-        }
-        
-        .flow-arrow {
-            font-size: 20px;
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
-        }
-        
-        .packet-animation {
-            position: absolute;
-            top: 50%;
-            left: 10%;
-            width: 10px;
-            height: 10px;
-            background: #e74c3c;
-            border-radius: 50%;
-            opacity: 0;
-            z-index: 3;
-        }
-        
-        .packet-animation.active {
-            animation: packetFlow 2s ease-in-out;
-        }
-        
-        @keyframes packetFlow {
-            0% { left: 10%; opacity: 1; }
-            100% { left: 85%; opacity: 0; }
-        }
-        
-        .led-status-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 10px;
-            margin: 20px 0;
-        }
-        
-        .led-indicator {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: #34495e;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 12px;
-            transition: all 0.3s ease;
-            border: 3px solid #2c3e50;
-        }
-        
-        .led-indicator.active {
-            background: #e74c3c;
-            border-color: #c0392b;
-            box-shadow: 0 0 20px rgba(231, 76, 60, 0.6);
-        }
-        
-        .response-panel {
-            background: #2c3e50;
-            color: #ecf0f1;
-            border-radius: 10px;
-            padding: 15px;
-            font-family: 'Courier New', monospace;
-            font-size: 13px;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-        
-        .response-header {
-            color: #3498db;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        
-        .success { color: #2ecc71; }
-        .error { color: #e74c3c; }
-        .warning { color: #f39c12; }
-        
-        @media (max-width: 768px) {
-            .packet-builder-container {
-                grid-template-columns: 1fr;
-                padding: 10px;
-            }
-            
-            .packet-action-buttons {
-                grid-template-columns: 1fr;
-            }
+        .clickable-target:hover {
+            filter: drop-shadow(0 0 8px #3498db) !important;
         }
     </style>
 </head>
-<body>
+<body class="network-topology">
     <div class="diagram-container">
-        <header class="diagram-header" style="z-index: 1000; position: relative;">
+        <header class="diagram-header">
             <div class="nav-container">
                 <button class="hamburger-menu" id="hamburger-menu">
                     <span class="hamburger-line"></span>
@@ -325,244 +95,301 @@
                 </div>
             </div>
             <div class="header-content">
-                <div class="logo-section" style="z-index: 1001; position: relative;">
+                <div class="logo-section">
                     <img src="/static/images/seacure-logo.png" alt="SEACURE Logo" class="header-logo">
                     <h1>Malicious Packet Builder</h1>
                 </div>
             </div>
         </header>
 
-        <div class="packet-builder-container">
-            <div class="packet-form-panel">
-                <h3><i class="fas fa-hammer"></i> Packet Configuration</h3>
-                
-                <div class="protocol-selector">
-                    <div class="protocol-btn active" data-protocol="tcp">
-                        <i class="fas fa-exchange-alt"></i> TCP
-                    </div>
-                    <div class="protocol-btn" data-protocol="udp">
-                        <i class="fas fa-paper-plane"></i> UDP
-                    </div>
-                    <div class="protocol-btn" data-protocol="raw">
-                        <i class="fas fa-code"></i> RAW
-                    </div>
-                </div>
-
-                <div id="packet-form">
-                    <div class="packet-form-group">
-                        <label><i class="fas fa-crosshairs"></i> Target IP Address:</label>
-                        <input type="text" id="target-ip" placeholder="192.168.1.100" value="192.168.1.100">
-                    </div>
-
-                    <div class="packet-form-group">
-                        <label><i class="fas fa-ethernet"></i> Target Port:</label>
-                        <input type="number" id="target-port" placeholder="80" value="80" min="1" max="65535">
-                    </div>
-
-                    <div class="packet-form-group" id="source-fields">
-                        <label><i class="fas fa-home"></i> Source IP (Optional):</label>
-                        <input type="text" id="source-ip" placeholder="Auto-detect">
-                    </div>
-
-                    <div class="packet-form-group" id="source-port-field">
-                        <label><i class="fas fa-door-open"></i> Source Port:</label>
-                        <input type="number" id="source-port" placeholder="12345" value="12345" min="1" max="65535">
-                    </div>
-
-                    <div class="packet-form-group" id="mac-fields">
-                        <label><i class="fas fa-network-wired"></i> Source MAC (Optional):</label>
-                        <input type="text" id="source-mac" placeholder="aa:bb:cc:dd:ee:ff" pattern="^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$">
-                    </div>
-
-                    <div class="packet-form-group" id="target-mac-field">
-                        <label><i class="fas fa-bullseye"></i> Target MAC (Optional):</label>
-                        <input type="text" id="target-mac" placeholder="ff:ff:ff:ff:ff:ff" pattern="^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$">
-                    </div>
-
-                    <div class="packet-form-group">
-                        <label><i class="fas fa-file-code"></i> Payload:</label>
-                        <div class="preset-payloads">
-                            <button class="preset-btn" data-payload="Hello World!">Hello World</button>
-                            <button class="preset-btn" data-payload="EICAR">EICAR Test</button>
-                            <button class="preset-btn" data-payload="48656c6c6f20576f726c6421">Hex: Hello World</button>
-                            <button class="preset-btn" data-payload="3c7363726970743e616c65727428274861636b656427293c2f7363726970743e">XSS Payload</button>
-                        </div>
-                        <textarea id="payload" placeholder="Enter your payload here...&#10;For RAW mode: Enter hex bytes (e.g., 48656c6c6f)"></textarea>
-                        <div class="payload-stats" id="payload-stats">
-                            Length: 0 bytes
-                        </div>
-                    </div>
-                </div>
-
-                <div class="packet-action-buttons">
-                    <button class="packet-btn craft" id="craft-btn">
-                        <i class="fas fa-rocket"></i> Craft & Send
-                    </button>
-                    <button class="packet-btn eicar" id="eicar-btn">
-                        <i class="fas fa-virus"></i> Send EICAR
-                    </button>
-                    <button class="packet-btn raw" id="raw-btn" style="display: none;">
-                        <i class="fas fa-code"></i> Send Raw
-                    </button>
-                    <button class="packet-btn clear" id="clear-btn">
-                        <i class="fas fa-eraser"></i> Clear All
-                    </button>
+        <div class="network-diagram" style="padding: 2px; width: 100%;">
+            <div class="diagram-overlay">
+                <div class="interaction-hint-overlay">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Click target devices to select • Craft custom malicious packets</span>
                 </div>
             </div>
+            <svg id="network-svg" viewBox="0 0 1400 300" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;">
+                <defs>
+                    <!-- Gradients for modern styling -->
+                    <linearGradient id="attackerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#e74c3c;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#c0392b;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="switchGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#3498db;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#2980b9;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="deviceGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#27ae60;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#229954;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="rpGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#9b59b6;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#8e44ad;stop-opacity:1" />
+                    </linearGradient>
+                    
 
-            <div class="visual-panel">
-                <h3><i class="fas fa-eye"></i> Visual Feedback</h3>
+                    <!-- Animation definitions -->
+                    <marker id="arrowhead" markerWidth="10" markerHeight="7" 
+                            refX="0" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#e74c3c" />
+                    </marker>
+
+                    <!-- Packet animation -->
+                    <circle id="packet-template" r="6" fill="#f39c12" opacity="0">
+                        <animate attributeName="opacity" values="0;1;1;0" dur="2s" repeatCount="indefinite"/>
+                    </circle>
+                </defs>
+
+                <!-- Background -->
+                <rect width="100%" height="100%" fill="#ffffff"/>
                 
-                <div class="network-diagram" style="padding: 2px; width: 100%; height: 400px;">
-                    <div class="diagram-overlay">
-                        <div class="interaction-hint-overlay">
-                            <i class="fas fa-info-circle"></i>
-                            <span>Select target devices for packet attacks</span>
-                        </div>
-                    </div>
-                    <svg id="network-svg" viewBox="0 0 1400 600" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;">
-                        <defs>
-                            <!-- Gradients for modern styling -->
-                            <linearGradient id="attackerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#e74c3c;stop-opacity:1" />
-                                <stop offset="100%" style="stop-color:#c0392b;stop-opacity:1" />
-                            </linearGradient>
-                            <linearGradient id="switchGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#3498db;stop-opacity:1" />
-                                <stop offset="100%" style="stop-color:#2980b9;stop-opacity:1" />
-                            </linearGradient>
-                            <linearGradient id="deviceGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#27ae60;stop-opacity:1" />
-                                <stop offset="100%" style="stop-color:#229954;stop-opacity:1" />
-                            </linearGradient>
-                            <linearGradient id="rpGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#9b59b6;stop-opacity:1" />
-                                <stop offset="100%" style="stop-color:#8e44ad;stop-opacity:1" />
-                            </linearGradient>
-                            
-                            <!-- Animation definitions -->
-                            <marker id="arrowhead" markerWidth="10" markerHeight="7" 
-                                    refX="0" refY="3.5" orient="auto">
-                                <polygon points="0 0, 10 3.5, 0 7" fill="#e74c3c" />
-                            </marker>
 
-                            <!-- Packet animation -->
-                            <circle id="packet-template" r="6" fill="#f39c12" opacity="0">
-                                <animate attributeName="opacity" values="0;1;1;0" dur="2s" repeatCount="indefinite"/>
-                            </circle>
-                        </defs>
+                <!-- Raspberry Pi (Attacker) -->
+                <g id="raspberry-pi" class="device clickable" transform="translate(50, 250)">
+                    <!-- Main device image (replaces the colored box) -->
+                    <image id="rpi-main-image" x="0" y="0" width="120" height="80" href="/static/images/bd463120-b910-447d-82a5-571217c5db0e.jpg" 
+                           preserveAspectRatio="xMidYMid meet" style="border-radius: 10px;"/>
+                    
+                    <!-- Fallback colored box (shown if image fails to load) -->
+                    <rect x="0" y="0" width="120" height="80" rx="10" fill="url(#rpGradient)" stroke="#7d3c98" stroke-width="2" 
+                          style="display: none;" id="rpi-fallback-box"/>
+                    
+                    <!-- Resize handle -->
+                    <circle class="resize-handle" cx="115" cy="5" r="5" data-device="rpi"/>
+                    
+                    <!-- Text positioned below the image -->
+                    <text x="60" y="95" text-anchor="middle" class="device-text-below" id="rpi-device-name">Packet Crafter</text>
+                    <text x="60" y="108" text-anchor="middle" class="device-subtext-below" id="rpi-device-desc">Malicious Payload Source</text>
+                </g>
 
-                        <!-- Background -->
-                        <rect width="100%" height="100%" fill="#ffffff"/>
+                <!-- Network Switch (Target) -->
+                <g id="network-switch" class="device" transform="translate(500, 200)">
+                    <!-- Main device image (replaces the colored box) -->
+                    <image id="switch-main-image" x="0" y="0" width="200" height="120" href="/static/images/moxa-edr-8010-series-datasheet-v1.jpg" 
+                           preserveAspectRatio="xMidYMid meet" style="border-radius: 8px;"/>
+                    
+                    <!-- Fallback colored box (shown if image fails to load) -->
+                    <rect x="0" y="0" width="200" height="120" rx="8" fill="url(#switchGradient)" stroke="#2980b9" stroke-width="3" 
+                          style="display: none;" id="switch-fallback-box"/>
+                    
+                    <!-- Switch Ports -->
+                    <g class="switch-ports">
+                        <!-- Port labels on the switch (relative to switch position) -->
+                        <text x="190" y="20" text-anchor="middle" class="port-label" id="switch-port-1">Port 1</text>
+                        <text x="190" y="50" text-anchor="middle" class="port-label" id="switch-port-2">Port 2</text>
+                        <text x="190" y="80" text-anchor="middle" class="port-label" id="switch-port-3">Port 3</text>
+                        <text x="190" y="110" text-anchor="middle" class="port-label" id="switch-port-4">Port 4</text>
+                    </g>
+                    
+                    <!-- Resize handle -->
+                    <circle class="resize-handle" cx="195" cy="5" r="5" data-device="switch"/>
+                    
+                    <!-- Text positioned below the image -->
+                    <text x="100" y="140" text-anchor="middle" class="device-text-below" id="switch-device-name">Network Switch</text>
+                    <text x="100" y="153" text-anchor="middle" class="device-subtext-below" id="switch-device-desc">Target Infrastructure</text>
+                </g>
 
-                        <!-- Raspberry Pi (Attacker) -->
-                        <g id="raspberry-pi" class="device clickable" transform="translate(50, 250)">
-                            <image id="rpi-main-image" x="0" y="0" width="120" height="80" href="/static/images/bd463120-b910-447d-82a5-571217c5db0e.jpg" 
-                                   preserveAspectRatio="xMidYMid meet" style="border-radius: 10px;"/>
-                            <rect x="0" y="0" width="120" height="80" rx="10" fill="url(#rpGradient)" stroke="#7d3c98" stroke-width="2" 
-                                  style="display: none;" id="rpi-fallback-box"/>
-                            <text x="60" y="95" text-anchor="middle" class="device-text-below" id="rpi-device-name">Packet Crafter</text>
-                            <text x="60" y="108" text-anchor="middle" class="device-subtext-below" id="rpi-device-desc">Malicious Payload Source</text>
-                        </g>
+                <!-- Target Devices -->
+                <g id="device-1" class="device clickable-target" transform="translate(900, 150)" data-device="workstation">
+                    <!-- Main device image (replaces the colored box) -->
+                    <image id="device1-main-image" x="0" y="0" width="100" height="70" href="/static/images/workstation-default.svg" 
+                           preserveAspectRatio="xMidYMid meet" style="border-radius: 5px;"/>
+                    
+                    <!-- Fallback colored box -->
+                    <rect x="0" y="0" width="100" height="70" rx="5" fill="url(#deviceGradient)" stroke="#229954" stroke-width="2" 
+                          style="display: none;" id="device1-fallback-box"/>
+                    
+                    <!-- Status indicator on image -->
+                    <circle cx="85" cy="10" r="4" fill="#27ae60" class="connection-status" id="device-1-status"/>
+                    
+                    <!-- Resize handle -->
+                    <circle class="resize-handle" cx="95" cy="5" r="4" data-device="device1"/>
+                    
+                    <!-- Text positioned below the image -->
+                    <text x="50" y="85" text-anchor="middle" class="device-text-below" id="device1-device-name">Workstation</text>
+                </g>
 
-                        <!-- Network Switch (Target) -->
-                        <g id="network-switch" class="device" transform="translate(500, 200)">
-                            <image id="switch-main-image" x="0" y="0" width="200" height="120" href="/static/images/moxa-edr-8010-series-datasheet-v1.jpg" 
-                                   preserveAspectRatio="xMidYMid meet" style="border-radius: 8px;"/>
-                            <rect x="0" y="0" width="200" height="120" rx="8" fill="url(#switchGradient)" stroke="#2980b9" stroke-width="3" 
-                                  style="display: none;" id="switch-fallback-box"/>
-                            <g class="switch-ports">
-                                <text x="190" y="20" text-anchor="middle" class="port-label" id="switch-port-1">Port 1</text>
-                                <text x="190" y="50" text-anchor="middle" class="port-label" id="switch-port-2">Port 2</text>
-                                <text x="190" y="80" text-anchor="middle" class="port-label" id="switch-port-3">Port 3</text>
-                                <text x="190" y="110" text-anchor="middle" class="port-label" id="switch-port-4">Port 4</text>
-                            </g>
-                            <text x="100" y="140" text-anchor="middle" class="device-text-below" id="switch-device-name">Network Switch</text>
-                            <text x="100" y="153" text-anchor="middle" class="device-subtext-below" id="switch-device-desc">Target Infrastructure</text>
-                        </g>
+                <g id="device-2" class="device clickable-target" transform="translate(900, 270)" data-device="printer">
+                    <!-- Main device image (replaces the colored box) -->
+                    <image id="device2-main-image" x="0" y="0" width="100" height="70" href="/static/images/printer-default.svg" 
+                           preserveAspectRatio="xMidYMid meet" style="border-radius: 5px;"/>
+                    
+                    <!-- Fallback colored box -->
+                    <rect x="0" y="0" width="100" height="70" rx="5" fill="url(#deviceGradient)" stroke="#229954" stroke-width="2" 
+                          style="display: none;" id="device2-fallback-box"/>
+                    
+                    <!-- Status indicator on image -->
+                    <circle cx="85" cy="10" r="4" fill="#27ae60" class="connection-status" id="device-2-status"/>
+                    
+                    <!-- Resize handle -->
+                    <circle class="resize-handle" cx="95" cy="5" r="4" data-device="device2"/>
+                    
+                    <!-- Text positioned below the image -->
+                    <text x="50" y="85" text-anchor="middle" class="device-text-below" id="device2-device-name">Printer</text>
+                </g>
 
-                        <!-- Target Devices -->
-                        <g id="device-1" class="device clickable-target" transform="translate(900, 150)" data-device="workstation">
-                            <image id="device1-main-image" x="0" y="0" width="100" height="70" href="/static/images/workstation-default.svg" 
-                                   preserveAspectRatio="xMidYMid meet" style="border-radius: 5px;"/>
-                            <rect x="0" y="0" width="100" height="70" rx="5" fill="url(#deviceGradient)" stroke="#229954" stroke-width="2" 
-                                  style="display: none;" id="device1-fallback-box"/>
-                            <circle cx="85" cy="10" r="4" fill="#27ae60" class="connection-status" id="device-1-status"/>
-                            <text x="50" y="85" text-anchor="middle" class="device-text-below" id="device1-device-name">Workstation</text>
-                        </g>
+                <g id="device-3" class="device clickable-target" transform="translate(900, 390)" data-device="iot">
+                    <!-- Main device image (replaces the colored box) -->
+                    <image id="device3-main-image" x="0" y="0" width="100" height="70" href="/static/images/iot-default.svg" 
+                           preserveAspectRatio="xMidYMid meet" style="border-radius: 5px;"/>
+                    
+                    <!-- Fallback colored box -->
+                    <rect x="0" y="0" width="100" height="70" rx="5" fill="url(#deviceGradient)" stroke="#229954" stroke-width="2" 
+                          style="display: none;" id="device3-fallback-box"/>
+                    
+                    <!-- Status indicator on image -->
+                    <circle cx="85" cy="10" r="4" fill="#27ae60" class="connection-status" id="device-3-status"/>
+                    
+                    <!-- Resize handle -->
+                    <circle class="resize-handle" cx="95" cy="5" r="4" data-device="device3"/>
+                    
+                    <!-- Text positioned below the image -->
+                    <text x="50" y="85" text-anchor="middle" class="device-text-below" id="device3-device-name">IoT Device</text>
+                </g>
 
-                        <g id="device-2" class="device clickable-target" transform="translate(900, 270)" data-device="printer">
-                            <image id="device2-main-image" x="0" y="0" width="100" height="70" href="/static/images/printer-default.svg" 
-                                   preserveAspectRatio="xMidYMid meet" style="border-radius: 5px;"/>
-                            <rect x="0" y="0" width="100" height="70" rx="5" fill="url(#deviceGradient)" stroke="#229954" stroke-width="2" 
-                                  style="display: none;" id="device2-fallback-box"/>
-                            <circle cx="85" cy="10" r="4" fill="#27ae60" class="connection-status" id="device-2-status"/>
-                            <text x="50" y="85" text-anchor="middle" class="device-text-below" id="device2-device-name">Printer</text>
-                        </g>
+                <g id="device-4" class="device clickable-target" transform="translate(900, 510)" data-device="camera">
+                    <!-- Main device image (replaces the colored box) -->
+                    <image id="device4-main-image" x="0" y="0" width="100" height="70" href="/static/images/camera-default.svg" 
+                           preserveAspectRatio="xMidYMid meet" style="border-radius: 5px;"/>
+                    
+                    <!-- Fallback colored box -->
+                    <rect x="0" y="0" width="100" height="70" rx="5" fill="url(#deviceGradient)" stroke="#229954" stroke-width="2" 
+                          style="display: none;" id="device4-fallback-box"/>
+                    
+                    <!-- Status indicator on image -->
+                    <circle cx="85" cy="10" r="4" fill="#27ae60" class="connection-status" id="device-4-status"/>
+                    
+                    <!-- Resize handle -->
+                    <circle class="resize-handle" cx="95" cy="5" r="4" data-device="device4"/>
+                    
+                    <!-- Text positioned below the image -->
+                    <text x="50" y="85" text-anchor="middle" class="device-text-below" id="device4-device-name">IP Camera</text>
+                </g>
 
-                        <g id="device-3" class="device clickable-target" transform="translate(900, 390)" data-device="iot">
-                            <image id="device3-main-image" x="0" y="0" width="100" height="70" href="/static/images/iot-default.svg" 
-                                   preserveAspectRatio="xMidYMid meet" style="border-radius: 5px;"/>
-                            <rect x="0" y="0" width="100" height="70" rx="5" fill="url(#deviceGradient)" stroke="#229954" stroke-width="2" 
-                                  style="display: none;" id="device3-fallback-box"/>
-                            <circle cx="85" cy="10" r="4" fill="#27ae60" class="connection-status" id="device-3-status"/>
-                            <text x="50" y="85" text-anchor="middle" class="device-text-below" id="device3-device-name">IoT Device</text>
-                        </g>
+                <!-- Network Connections -->
+                <g class="connections">
+                    <!-- Attacker to Switch -->
+                    <line id="connection-attacker" x1="170" y1="290" x2="500" y2="260" 
+                          stroke="#e74c3c" stroke-width="3" stroke-dasharray="5,5" opacity="0.7"/>
+                    
 
-                        <g id="device-4" class="device clickable-target" transform="translate(900, 510)" data-device="camera">
-                            <image id="device4-main-image" x="0" y="0" width="100" height="70" href="/static/images/camera-default.svg" 
-                                   preserveAspectRatio="xMidYMid meet" style="border-radius: 5px;"/>
-                            <rect x="0" y="0" width="100" height="70" rx="5" fill="url(#deviceGradient)" stroke="#229954" stroke-width="2" 
-                                  style="display: none;" id="device4-fallback-box"/>
-                            <circle cx="85" cy="10" r="4" fill="#27ae60" class="connection-status" id="device-4-status"/>
-                            <text x="50" y="85" text-anchor="middle" class="device-text-below" id="device4-device-name">IP Camera</text>
-                        </g>
+                    
+                    <!-- Switch to Devices -->
+                    <line id="connection-device-1" x1="700" y1="220" x2="900" y2="185" 
+                          stroke="#27ae60" stroke-width="3" class="device-connection" data-port="1"/>
+                    <line id="connection-device-2" x1="700" y1="250" x2="900" y2="305" 
+                          stroke="#27ae60" stroke-width="3" class="device-connection" data-port="2"/>
+                    <line id="connection-device-3" x1="700" y1="280" x2="900" y2="425" 
+                          stroke="#27ae60" stroke-width="3" class="device-connection" data-port="3"/>
+                    <line id="connection-device-4" x1="700" y1="310" x2="900" y2="545" 
+                          stroke="#27ae60" stroke-width="3" class="device-connection" data-port="4"/>
+                </g>
 
-                        <!-- Network Connections -->
-                        <g class="connections">
-                            <!-- Attacker to Switch -->
-                            <line id="connection-attacker" x1="170" y1="290" x2="500" y2="260" 
-                                  stroke="#e74c3c" stroke-width="3" stroke-dasharray="5,5" opacity="0.7"/>
-                            
-                            <!-- Switch to Devices -->
-                            <line id="connection-device-1" x1="700" y1="220" x2="900" y2="185" 
-                                  stroke="#27ae60" stroke-width="3" class="device-connection" data-port="1"/>
-                            <line id="connection-device-2" x1="700" y1="250" x2="900" y2="305" 
-                                  stroke="#27ae60" stroke-width="3" class="device-connection" data-port="2"/>
-                            <line id="connection-device-3" x1="700" y1="280" x2="900" y2="425" 
-                                  stroke="#27ae60" stroke-width="3" class="device-connection" data-port="3"/>
-                            <line id="connection-device-4" x1="700" y1="310" x2="900" y2="545" 
-                                  stroke="#27ae60" stroke-width="3" class="device-connection" data-port="4"/>
-                        </g>
+                <!-- Packet Animation Layer -->
+                <g id="packet-layer">
+                    <!-- Animated packets will be added here dynamically -->
+                </g>
 
-                        <!-- Packet Animation Layer -->
-                        <g id="packet-layer">
-                            <!-- Animated packets will be added here dynamically -->
-                        </g>
+                <!-- Attack Indicators -->
+                <g id="attack-indicators" opacity="0">
+                    <circle cx="600" cy="360" r="50" fill="none" stroke="#e74c3c" stroke-width="3" opacity="0.8">
+                        <animate attributeName="r" values="30;60;30" dur="1.5s" repeatCount="indefinite"/>
+                        <animate attributeName="opacity" values="0.8;0.3;0.8" dur="1.5s" repeatCount="indefinite"/>
+                    </circle>
+                    <text x="600" y="365" text-anchor="middle" class="attack-text">MALICIOUS PACKET</text>
+                </g>
+            </svg>
+        </div>
 
-                        <!-- Attack Indicators -->
-                        <g id="attack-indicators" opacity="0">
-                            <circle cx="600" cy="360" r="50" fill="none" stroke="#e74c3c" stroke-width="3" opacity="0.8">
-                                <animate attributeName="r" values="30;60;30" dur="1.5s" repeatCount="indefinite"/>
-                                <animate attributeName="opacity" values="0.8;0.3;0.8" dur="1.5s" repeatCount="indefinite"/>
-                            </circle>
-                            <text x="600" y="365" text-anchor="middle" class="attack-text">MALICIOUS PACKET</text>
-                        </g>
-                    </svg>
+        <div class="control-panel">
+            <div class="control-grid">
+                <div class="control-group">
+                    <label><i class="fas fa-crosshairs"></i> Target IP Address:</label>
+                    <input type="text" id="target-ip" value="192.168.1.100" placeholder="192.168.1.100" class="control-input">
+                </div>
+                
+                <div class="control-group">
+                    <label><i class="fas fa-ethernet"></i> Target Port:</label>
+                    <input type="number" id="target-port" min="1" max="65535" placeholder="Port #" class="control-input" value="80">
+                </div>
+                
+                <div class="control-group">
+                    <label><i class="fas fa-home"></i> Source IP (Optional):</label>
+                    <input type="text" id="source-ip" placeholder="Auto-detect" class="control-input">
                 </div>
 
-
-
-                <div class="interaction-panel">
-                    <h4><i class="fas fa-terminal"></i> Response & Log</h4>
-                    <div class="response-panel" id="response-log">
-                        <div class="response-header">[READY] Malicious Packet Builder initialized</div>
-                        <div>Ready to craft and send custom packets...</div>
-                    </div>
-                    <button id="clear-log" class="clear-btn" style="margin-top: 10px;">
-                        <i class="fas fa-trash"></i> Clear Log
-                    </button>
+                <div class="control-group">
+                    <label><i class="fas fa-door-open"></i> Source Port:</label>
+                    <input type="number" id="source-port" min="1" max="65535" placeholder="12345" value="12345" class="control-input">
                 </div>
+
+                <div class="control-group">
+                    <label><i class="fas fa-network-wired"></i> Source MAC (Optional):</label>
+                    <input type="text" id="source-mac" placeholder="aa:bb:cc:dd:ee:ff" class="control-input">
+                </div>
+
+                <div class="control-group">
+                    <label><i class="fas fa-bullseye"></i> Target MAC (Optional):</label>
+                    <input type="text" id="target-mac" placeholder="ff:ff:ff:ff:ff:ff" class="control-input">
+                </div>
+                
+                <div class="control-group">
+                    <label><i class="fas fa-cog"></i> Protocol:</label>
+                    <div class="protocol-selector">
+                        <button class="protocol-btn active" data-protocol="tcp">TCP</button>
+                        <button class="protocol-btn" data-protocol="udp">UDP</button>
+                        <button class="protocol-btn" data-protocol="raw">RAW</button>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label><i class="fas fa-file-code"></i> Payload:</label>
+                    <div class="preset-payloads" style="margin-bottom: 10px;">
+                        <button class="preset-btn" data-payload="Hello World!">Hello World</button>
+                        <button class="preset-btn" data-payload="EICAR">EICAR Test</button>
+                        <button class="preset-btn" data-payload="48656c6c6f20576f726c6421">Hex: Hello</button>
+                        <button class="preset-btn" data-payload="3c7363726970743e616c65727428274861636b656427293c2f7363726970743e">XSS</button>
+                    </div>
+                    <textarea id="payload" placeholder="Enter your payload here..." class="control-input" style="min-height: 80px; font-family: 'Courier New', monospace;"></textarea>
+                    <div class="payload-stats" id="payload-stats" style="font-size: 12px; color: #666; margin-top: 5px;">
+                        Length: 0 bytes
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <label><i class="fas fa-rocket"></i> Packet Actions:</label>
+                    <div class="attack-buttons">
+                        <button id="craft-btn" class="control-btn port-down">
+                            <i class="fas fa-hammer"></i> Craft & Send
+                        </button>
+                        <button id="eicar-btn" class="control-btn port-up">
+                            <i class="fas fa-virus"></i> Send EICAR
+                        </button>
+                        <button id="raw-btn" class="control-btn primary" style="display: none;">
+                            <i class="fas fa-code"></i> Send Raw
+                        </button>
+                        <button id="clear-btn" class="control-btn secondary">
+                            <i class="fas fa-eraser"></i> Clear All
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="interaction-panel">
+            <div class="interaction-content">
+                <h3><i class="fas fa-terminal"></i> Response & Attack Log</h3>
+                <div class="log-container" id="log-container">
+                    <div class="log-entry info">
+                        <span class="timestamp">[Ready]</span>
+                        <span class="message">Malicious Packet Builder initialized</span>
+                    </div>
+                </div>
+                <button id="clear-log" class="clear-btn">
+                    <i class="fas fa-trash"></i> Clear Log
+                </button>
             </div>
         </div>
     </div>
@@ -586,6 +413,5 @@
             });
         });
     </script>
-    </div>
 </body>
 </html>

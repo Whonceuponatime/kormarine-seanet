@@ -7,7 +7,6 @@ class MaliciousPacketBuilder {
             '9': false, '5': false, '6': false
         };
         this.init();
-        this.startLEDMonitoring();
     }
 
     init() {
@@ -129,14 +128,13 @@ class MaliciousPacketBuilder {
     }
 
     updateTargetDisplay() {
-        const ip = document.getElementById('target-ip').value || '192.168.1.100';
-        const port = document.getElementById('target-port').value || '80';
-        document.getElementById('target-display').textContent = `${ip}:${port}`;
+        // No need to update display elements in the new layout
+        // Target info is shown in the form inputs directly
     }
 
     updateSourceDisplay() {
-        const sourceIP = document.getElementById('source-ip').value || 'Auto-detect';
-        document.getElementById('source-display').textContent = sourceIP;
+        // No need to update display elements in the new layout  
+        // Source info is shown in the form inputs directly
     }
     
     validateMacAddress(input) {
@@ -371,72 +369,28 @@ class MaliciousPacketBuilder {
     }
 
     clearLog() {
-        const responseLog = document.getElementById('response-log');
-        responseLog.innerHTML = `
-            <div class="response-header">[READY] Malicious Packet Builder initialized</div>
-            <div>Ready to craft and send custom packets...</div>
+        const logContainer = document.getElementById('log-container');
+        logContainer.innerHTML = `
+            <div class="log-entry info">
+                <span class="timestamp">[Ready]</span>
+                <span class="message">Malicious Packet Builder initialized</span>
+            </div>
         `;
     }
 
     log(message, type = 'info') {
-        const responseLog = document.getElementById('response-log');
+        const logContainer = document.getElementById('log-container');
         const timestamp = new Date().toLocaleTimeString();
         const logEntry = document.createElement('div');
         
-        logEntry.className = type;
-        logEntry.innerHTML = `<span style="color: #7f8c8d;">[${timestamp}]</span> ${message}`;
+        logEntry.className = `log-entry ${type}`;
+        logEntry.innerHTML = `<span class="timestamp">[${timestamp}]</span><span class="message">${message}</span>`;
         
-        responseLog.appendChild(logEntry);
-        responseLog.scrollTop = responseLog.scrollHeight;
+        logContainer.appendChild(logEntry);
+        logContainer.scrollTop = logContainer.scrollHeight;
     }
 
-    startLEDMonitoring() {
-        // Connect to Server-Sent Events for real-time LED status
-        const eventSource = new EventSource('/events');
-        
-        eventSource.onmessage = (event) => {
-            try {
-                const data = JSON.parse(event.data);
-                this.updateLEDStatus(data);
-            } catch (error) {
-                console.error('Error parsing LED status:', error);
-            }
-        };
 
-        eventSource.onerror = (error) => {
-            console.error('LED monitoring connection error:', error);
-            // Try to reconnect after 5 seconds
-            setTimeout(() => {
-                if (eventSource.readyState === EventSource.CLOSED) {
-                    this.startLEDMonitoring();
-                }
-            }, 5000);
-        };
-    }
-
-    updateLEDStatus(status) {
-        // Update LED indicators based on GPIO status
-        const ledMapping = {
-            'pin17': '17', 'pin27': '27', 'pin22': '22', 'pin10': '10',
-            'pin9': '9', 'pin5': '5', 'pin6': '6'
-        };
-
-        Object.keys(ledMapping).forEach(pinKey => {
-            const pinNumber = ledMapping[pinKey];
-            const ledElement = document.querySelector(`[data-pin="${pinNumber}"]`);
-            const isActive = status[pinKey] === true;
-            
-            if (ledElement) {
-                if (isActive) {
-                    ledElement.classList.add('active');
-                } else {
-                    ledElement.classList.remove('active');
-                }
-            }
-            
-            this.ledStatuses[pinNumber] = isActive;
-        });
-    }
 
     // Utility function to convert string to hex
     stringToHex(str) {
