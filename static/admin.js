@@ -300,6 +300,20 @@ class AdminController {
         document.getElementById('show-ip-addresses').checked = config.display.showIPAddresses;
         document.getElementById('show-port-numbers').checked = config.display.showPortNumbers;
         document.getElementById('compact-mode').checked = config.display.compactMode;
+        
+        // Device visibility settings
+        if (config.display.showDevice1 !== undefined) {
+            document.getElementById('show-device-1').checked = config.display.showDevice1;
+        }
+        if (config.display.showDevice2 !== undefined) {
+            document.getElementById('show-device-2').checked = config.display.showDevice2;
+        }
+        if (config.display.showDevice3 !== undefined) {
+            document.getElementById('show-device-3').checked = config.display.showDevice3;
+        }
+        if (config.display.showDevice4 !== undefined) {
+            document.getElementById('show-device-4').checked = config.display.showDevice4;
+        }
     }
     
     // Admin Log Functions
@@ -412,7 +426,16 @@ async function fixImagePaths() {
 
 // Configuration Management Functions
 async function saveConfiguration() {
+    const saveBtn = document.querySelector('[onclick="saveConfiguration()"]');
+    const originalText = saveBtn ? saveBtn.innerHTML : '';
+    
     try {
+        // Show saving state
+        if (saveBtn) {
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            saveBtn.disabled = true;
+        }
+        
         adminController.updateConfigFromForm();
         
         // Save to server first
@@ -437,6 +460,15 @@ async function saveConfiguration() {
                 await window.networkDiagram.loadCustomizations();
                 adminController.addAdminLog('Topology diagram updated with new configuration', 'success');
             }
+            
+            // Show success state
+            if (saveBtn) {
+                saveBtn.innerHTML = '<i class="fas fa-check"></i> Saved!';
+                setTimeout(() => {
+                    saveBtn.innerHTML = originalText;
+                    saveBtn.disabled = false;
+                }, 2000);
+            }
         } else {
             throw new Error(result.error || 'Failed to save to server');
         }
@@ -449,8 +481,26 @@ async function saveConfiguration() {
         try {
             localStorage.setItem('kormarineSeaNetConfig', JSON.stringify(adminController.currentConfig));
             adminController.addAdminLog('Configuration saved locally as fallback', 'warning');
+            
+            // Show warning state
+            if (saveBtn) {
+                saveBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Saved Locally';
+                setTimeout(() => {
+                    saveBtn.innerHTML = originalText;
+                    saveBtn.disabled = false;
+                }, 2000);
+            }
         } catch (localError) {
             adminController.addAdminLog(`Failed to save locally: ${localError.message}`, 'error');
+            
+            // Show error state
+            if (saveBtn) {
+                saveBtn.innerHTML = '<i class="fas fa-times"></i> Save Failed';
+                setTimeout(() => {
+                    saveBtn.innerHTML = originalText;
+                    saveBtn.disabled = false;
+                }, 2000);
+            }
         }
     }
 }

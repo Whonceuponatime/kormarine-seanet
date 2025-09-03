@@ -394,10 +394,17 @@
         </div>
     </div>
 
+    <script src="{{ url_for('static', filename='diagram.js') }}"></script>
     <script src="{{ url_for('static', filename='malicious_packet.js') }}"></script>
     <script>
-        // Hamburger menu functionality
+        // Initialize network diagram with same configuration as attack simulator
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize the network diagram to share configurations
+            if (typeof NetworkDiagram !== 'undefined') {
+                window.networkDiagram = new NetworkDiagram();
+            }
+            
+            // Hamburger menu functionality
             const hamburgerMenu = document.getElementById('hamburger-menu');
             const navMenu = document.getElementById('nav-menu');
             
