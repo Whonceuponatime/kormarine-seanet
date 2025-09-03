@@ -702,18 +702,18 @@ body.admin-page {
     fill: #27ae60;
 }
 
-/* Professional Interaction Panel - Minimal size for more diagram space */
+/* Professional Interaction Panel - Single log section */
 .interaction-panel {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
+    grid-template-columns: 1fr;
+    gap: 0;
     flex-shrink: 0;
     min-height: 0;
-    height: 180px;
+    height: 200px;
 }
 
 /* Unified Panel Styling - Minimal size for more diagram space */
-.discovered-ports, .attack-log {
+.attack-log {
     background: linear-gradient(135deg, rgba(52, 73, 93, 0.95) 0%, rgba(44, 62, 80, 0.95) 100%);
     border: 2px solid rgba(52, 152, 219, 0.3);
     border-radius: 10px;
@@ -727,7 +727,7 @@ body.admin-page {
     flex-direction: column;
 }
 
-.discovered-ports:hover, .attack-log:hover {
+.attack-log:hover {
     border-color: rgba(52, 152, 219, 0.5);
     transform: translateY(-2px);
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.15);
@@ -736,7 +736,7 @@ body.admin-page {
 /* Manual LED control styles removed */
 
 /* Panel Headers - Minimal size */
-.discovered-ports h3, .attack-log h3 {
+.attack-log h3 {
     color: #ecf0f1;
     font-size: 0.9rem;
     font-weight: 700;
@@ -750,7 +750,7 @@ body.admin-page {
     flex-shrink: 0;
 }
 
-.discovered-ports h3::after, .attack-log h3::after {
+.attack-log h3::after {
     content: '';
     position: absolute;
     bottom: -1px;
@@ -761,7 +761,7 @@ body.admin-page {
     border-radius: 1px;
 }
 
-.discovered-ports h3 i, .attack-log h3 i {
+.attack-log h3 i {
     color: #3498db;
     font-size: 1rem;
     padding: 4px;
@@ -770,119 +770,17 @@ body.admin-page {
     border: 1px solid rgba(52, 152, 219, 0.3);
 }
 
-/* Ports Grid - Minimal size for more diagram space */
-.ports-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 6px;
-    flex: 1;
-    overflow-y: auto;
-    min-height: 0;
-}
+/* Discovered ports styles removed - section eliminated */
 
-.port-placeholder {
-    color: #7f8c8d;
-    font-style: italic;
-    text-align: center;
-    padding: 12px;
-    border: 1px dashed #34495e;
-    border-radius: 6px;
-    font-size: 0.8rem;
-}
-
-.port-item {
-    background: #34495e;
-    border: 1px solid #2c3e50;
-    border-radius: 6px;
-    padding: 8px;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    font-size: 0.8rem;
-}
-
-.port-item:hover {
-    border-color: #3498db;
-    background: #3f5671;
-}
-
-.port-item.attacking {
-    border-color: #f39c12;
-    background: #6b4f1a;
-    animation: portPulse 1s infinite;
-}
-
-@keyframes portPulse {
-    0%, 100% { background: #6b4f1a; }
-    50% { background: #8e6324; }
-}
-
-.port-name {
-    color: #ecf0f1;
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-
-.port-status {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
-    font-size: 0.9rem;
-}
-
-.status-up {
-    color: #27ae60;
-}
-
-.status-down {
-    color: #e74c3c;
-}
-
-.port-actions {
-    display: flex;
-    gap: 8px;
-}
-
-.port-btn {
-    flex: 1;
-    padding: 6px 10px;
-    border: none;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.port-btn.attack {
-    background: linear-gradient(135deg, #e74c3c, #c0392b);
-    color: white;
-}
-
-.port-btn.restore {
-    background: linear-gradient(135deg, #27ae60, #229954);
-    color: white;
-}
-
-.port-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
-}
-
-.port-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-}
-
-/* Attack Log - Minimal size for more diagram space */
+/* Attack Log - Expanded to fill entire bottom area */
 .log-container {
     flex: 1;
     overflow-y: auto;
     background: #2c3e50;
-    border-radius: 6px;
-    padding: 8px;
+    border-radius: 8px;
+    padding: 12px;
     font-family: 'Courier New', monospace;
-    font-size: 0.7rem;
+    font-size: 0.8rem;
     border: 1px solid #34495e;
     min-height: 0;
 }
@@ -1006,11 +904,11 @@ body.admin-page {
     /* Community button styles removed */
     
     .interaction-panel {
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 18px;
+        grid-template-columns: 1fr;
+        height: 220px;
     }
     
-    .control-panel, .discovered-ports, .attack-log {
+    .control-panel, .attack-log {
         padding: 20px;
     }
 }
@@ -1023,7 +921,7 @@ body.admin-page {
     
     .interaction-panel {
         grid-template-columns: 1fr;
-        gap: 20px;
+        height: 200px;
     }
     
     .control-group {
@@ -1046,7 +944,7 @@ body.admin-page {
         height: 100px;
     }
     
-    .control-panel, .discovered-ports, .attack-log {
+    .control-panel, .attack-log {
         padding: 18px;
         margin-bottom: 18px;
     }
@@ -1060,19 +958,16 @@ body.admin-page {
         height: 300px;
     }
     
-    .ports-grid {
-        grid-template-columns: 1fr;
-        gap: 12px;
-    }
+    /* Ports grid styles removed */
     
-    .discovered-ports h3, .attack-log h3 {
+    .attack-log h3 {
         font-size: 1.1rem;
         margin-bottom: 15px;
     }
 }
 
 @media (max-width: 480px) {
-    .control-panel, .discovered-ports, .attack-log {
+    .control-panel, .attack-log {
         padding: 15px;
         border-radius: 12px;
     }

@@ -347,9 +347,8 @@ class NetworkDiagram {
         
         this.interfaces = ports;
         this.addLog(`Found ${ports.length} network interfaces`, ports.length > 0 ? 'success' : 'warning');
-        this.displayPorts();
         
-        // Log discovered ports
+        // Log discovered ports directly in the log
         if (ports.length > 0) {
             ports.forEach(port => {
                 this.addLog(`Port ${port.ifIndex}: ${port.name}`, 'info');
@@ -446,106 +445,11 @@ class NetworkDiagram {
         return results;
     }
     
-    displayPorts() {
-        const container = document.getElementById('ports-container');
-        
-        if (this.interfaces.length === 0) {
-            container.innerHTML = '<div class="port-placeholder">No network interfaces found</div>';
-            return;
-        }
-        
-        let html = '';
-        this.interfaces.forEach((iface, index) => {
-            const statusClass = iface.operStatus === 'up' ? 'status-up' : 'status-down';
-            const adminClass = iface.adminStatus === 'up' ? 'status-up' : 'status-down';
-            
-            html += `
-                <div class="port-item" data-ifindex="${iface.ifIndex}" data-port="${index + 1}">
-                    <div class="port-name">${iface.name}</div>
-                    <div class="port-status">
-                        <span>Admin: <span class="${adminClass}">${iface.adminStatus.toUpperCase()}</span></span>
-                        <span>Oper: <span class="${statusClass}">${iface.operStatus.toUpperCase()}</span></span>
-                    </div>
-                    <div class="port-actions">
-                        <button class="port-btn attack" onclick="networkDiagram.attackPort('${iface.ifIndex}', 'down', ${index + 1})">
-                            <i class="fas fa-arrow-down"></i> Attack
-                        </button>
-                        <button class="port-btn restore" onclick="networkDiagram.attackPort('${iface.ifIndex}', 'up', ${index + 1})">
-                            <i class="fas fa-arrow-up"></i> Restore
-                        </button>
-                    </div>
-                </div>
-            `;
-        });
-        
-        container.innerHTML = html;
-    }
+    // displayPorts function removed - discovered ports section eliminated
     
-    // Attack Port Function
-    async attackPort(ifIndex, action, portNumber) {
-        if (this.isAttacking) {
-            this.addLog('Attack already in progress, please wait...', 'warning');
-            return;
-        }
-        
-        this.isAttacking = true;
-        this.currentAttackPort = portNumber;
-        
-        const actionText = action === 'down' ? 'ATTACK' : 'RESTORE';
-        const community = 'private'; // Use write community
-        
-        this.addLog(`${actionText}: Targeting port ${ifIndex} (${action.toUpperCase()})`, 'attack');
-        this.setAttackMode(true);
-        this.highlightTargetDevice(portNumber, true);
-        
-        try {
-            // Animate attack packet
-            this.animateAttackPacket(portNumber, action);
-            
-            // Execute SNMP command
-            const endpoint = action === 'down' ? 'portdown' : 'portup';
-            const response = await fetch(`/snmp/${endpoint}?target=${encodeURIComponent(this.targetIP)}&ifindex=${encodeURIComponent(ifIndex)}&community=${encodeURIComponent(community)}`);
-            const data = await response.json();
-            
-            if (data.ok) {
-                this.addLog(`${actionText} successful on port ${ifIndex}`, 'success');
-                this.updatePortStatus(ifIndex, action);
-                this.updateDeviceStatus(portNumber, action);
-                // Activity LED flash removed
-            } else {
-                this.addLog(`${actionText} failed: ${data.error || 'Unknown error'}`, 'error');
-            }
-            
-        } catch (error) {
-            this.addLog(`${actionText} error: ${error.message}`, 'error');
-        }
-        
-        // Clean up attack state
-        setTimeout(() => {
-            this.setAttackMode(false);
-            this.highlightTargetDevice(portNumber, false);
-            this.isAttacking = false;
-            this.currentAttackPort = null;
-        }, 2000);
-    }
+    // Old attackPort function removed - using direct port control buttons now
     
-    updatePortStatus(ifIndex, action) {
-        // Update the port display
-        const portElement = document.querySelector(`[data-ifindex="${ifIndex}"]`);
-        if (portElement) {
-            const adminSpan = portElement.querySelector('.port-status span:first-child span');
-            if (adminSpan) {
-                adminSpan.textContent = action.toUpperCase();
-                adminSpan.className = action === 'up' ? 'status-up' : 'status-down';
-            }
-        }
-        
-        // Update interface data
-        const iface = this.interfaces.find(i => i.ifIndex === ifIndex);
-        if (iface) {
-            iface.adminStatus = action;
-        }
-    }
+    // updatePortStatus function removed - no longer needed without discovered ports panel
     
     updateDeviceStatus(portNumber, action) {
         const deviceStatus = document.getElementById(`device-${portNumber}-status`);

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Startup script for Raspberry Pi LED Server
+# Startup script for Raspberry Pi LED Servers
 
 echo "Starting Raspberry Pi LED Server..."
 
