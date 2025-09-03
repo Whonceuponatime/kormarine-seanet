@@ -7,6 +7,7 @@ class MaliciousPacketBuilder {
             '9': false, '5': false, '6': false
         };
         this.init();
+        this.loadAndApplyAdminSettings();
     }
 
     init() {
@@ -410,7 +411,134 @@ class MaliciousPacketBuilder {
     }
 }
 
-// Packet builder will be initialized from the HTML page to prevent conflicts
+    async loadAndApplyAdminSettings() {
+        try {
+            // Try to load from server first
+            const response = await fetch('/load-config');
+            const data = await response.json();
+            
+            if (data.ok && data.config && Object.keys(data.config).length > 0) {
+                this.applyAdminSettings(data.config);
+                this.log('Applied server-side admin settings', 'info');
+                return;
+            }
+        } catch (error) {
+            console.log('Failed to load from server, trying local storage');
+        }
+        
+        // Fallback to localStorage
+        const saved = localStorage.getItem('kormarineSeaNetConfig');
+        if (saved) {
+            try {
+                const config = JSON.parse(saved);
+                this.applyAdminSettings(config);
+                this.log('Applied local admin settings', 'info');
+            } catch (error) {
+                console.log('Error loading saved configuration');
+            }
+        }
+    }
+    
+    applyAdminSettings(config) {
+        if (!config) return;
+        
+        // Apply device visibility settings
+        if (config.display) {
+            this.applyDeviceVisibility(config.display);
+        }
+        
+        // Apply component customizations
+        if (config.components) {
+            this.updateDeviceLabels(config.components);
+            this.updateDeviceImages(config.components);
+        }
+    }
+    
+    applyDeviceVisibility(displayConfig) {
+        // Apply device visibility settings
+        const devices = [
+            { id: 'device-1', show: displayConfig.showDevice1 },
+            { id: 'device-2', show: displayConfig.showDevice2 },
+            { id: 'device-3', show: displayConfig.showDevice3 },
+            { id: 'device-4', show: displayConfig.showDevice4 }
+        ];
+        
+        devices.forEach(device => {
+            const deviceElement = document.getElementById(device.id);
+            const connectionElement = document.getElementById(`connection-${device.id}`);
+            
+            if (deviceElement) {
+                deviceElement.style.display = (device.show === false) ? 'none' : 'block';
+            }
+            if (connectionElement) {
+                connectionElement.style.display = (device.show === false) ? 'none' : 'block';
+            }
+        });
+    }
+    
+    updateDeviceLabels(components) {
+        // Update device names and descriptions
+        if (components.rpi) {
+            const rpiName = document.getElementById('rpi-device-name');
+            const rpiDesc = document.getElementById('rpi-device-desc');
+            if (rpiName) rpiName.textContent = components.rpi.name;
+            if (rpiDesc) rpiDesc.textContent = components.rpi.description;
+        }
+        
+        if (components.switch) {
+            const switchName = document.getElementById('switch-device-name');
+            const switchDesc = document.getElementById('switch-device-desc');
+            if (switchName) switchName.textContent = components.switch.name;
+            if (switchDesc) switchDesc.textContent = components.switch.description;
+        }
+        
+        if (components.device1) {
+            const device1Name = document.getElementById('device1-device-name');
+            if (device1Name) device1Name.textContent = components.device1.name;
+        }
+        
+        if (components.device2) {
+            const device2Name = document.getElementById('device2-device-name');
+            if (device2Name) device2Name.textContent = components.device2.name;
+        }
+        
+        if (components.device3) {
+            const device3Name = document.getElementById('device3-device-name');
+            if (device3Name) device3Name.textContent = components.device3.name;
+        }
+        
+        if (components.device4) {
+            const device4Name = document.getElementById('device4-device-name');
+            if (device4Name) device4Name.textContent = components.device4.name;
+        }
+    }
+    
+    updateDeviceImages(components) {
+        // Update device images
+        const imageUpdates = [
+            { component: components.rpi, imageId: 'rpi-main-image', fallbackId: 'rpi-fallback-box' },
+            { component: components.switch, imageId: 'switch-main-image', fallbackId: 'switch-fallback-box' },
+            { component: components.device1, imageId: 'device1-main-image', fallbackId: 'device1-fallback-box' },
+            { component: components.device2, imageId: 'device2-main-image', fallbackId: 'device2-fallback-box' },
+            { component: components.device3, imageId: 'device3-main-image', fallbackId: 'device3-fallback-box' },
+            { component: components.device4, imageId: 'device4-main-image', fallbackId: 'device4-fallback-box' }
+        ];
+        
+        imageUpdates.forEach(update => {
+            if (update.component && update.component.imageUrl) {
+                const imageElement = document.getElementById(update.imageId);
+                const fallbackElement = document.getElementById(update.fallbackId);
+                
+                if (imageElement && fallbackElement) {
+                    imageElement.setAttribute('href', update.component.imageUrl);
+                    imageElement.style.display = 'block';
+                    fallbackElement.style.display = 'none';
+                }
+            }
+        });
+    }
+
+    // Packet builder will be initialized from the HTML page to prevent conflicts
 
 // Add some helper functions for advanced users
 window.packetUtils = {
