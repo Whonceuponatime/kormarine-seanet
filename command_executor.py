@@ -298,95 +298,77 @@ class CommandExecutor:
             return {"ok": False, "error": f"Packet crafting failed: {str(e)}"}
     
     def _send_tcp_packet(self, src_ip, src_port, dst_ip, dst_port, payload, src_mac='', dst_mac=''):
-        """Send a TCP packet with custom payload and optional MAC addresses"""
+        """Send a TCP packet with custom payload (using regular socket, no admin privileges required)"""
         try:
-            # Create a raw socket
-            sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_TCP)
-            sock.setsockopt(socket.IPPROTO_IP, socket.IP_HDRINCL, 1)
+            # Use regular TCP socket instead of raw socket to avoid permission issues
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(5)  # 5 second timeout
             
-            # Create IP header
-            ip_header = self._create_ip_header(src_ip or '192.168.1.10', dst_ip, len(payload) + 20)
+            # Bind to specific source if provided
+            if src_ip and src_port:
+                try:
+                    sock.bind((src_ip, src_port))
+                except:
+                    # If binding fails, let system choose source
+                    pass
             
-            # Create TCP header
-            tcp_header = self._create_tcp_header(src_port, dst_port, payload)
+            # Connect and send payload
+            sock.connect((dst_ip, dst_port))
             
-            # Combine headers and payload
-            packet = ip_header + tcp_header + payload
-            
-            # Send packet
-            sock.sendto(packet, (dst_ip, dst_port))
+            # Convert payload to bytes if it's a string
+            if isinstance(payload, str):
+                payload_bytes = payload.encode('utf-8')
+            else:
+                payload_bytes = payload
+                
+            sock.send(payload_bytes)
             sock.close()
             
             return {
                 "ok": True,
                 "message": f"TCP packet sent to {dst_ip}:{dst_port}",
-                "payload_size": len(payload),
-                "protocol": "TCP"
+                "payload_size": len(payload_bytes),
+                "protocol": "TCP",
+                "note": "Using standard TCP socket (no raw socket privileges required)"
             }
             
         except Exception as e:
             return {"ok": False, "error": f"TCP packet send failed: {str(e)}"}
     
     def _send_udp_packet(self, src_ip, src_port, dst_ip, dst_port, payload, src_mac='', dst_mac=''):
-        """Send a UDP packet with custom payload and optional MAC addresses"""
+        """Send a UDP packet with custom payload"""
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            if src_ip:
-                sock.bind((src_ip, src_port))
+            sock.settimeout(5)  # 5 second timeout
             
-            sock.sendto(payload, (dst_ip, dst_port))
+            # Bind to specific source if provided
+            if src_ip and src_port:
+                try:
+                    sock.bind((src_ip, src_port))
+                except:
+                    # If binding fails, let system choose source
+                    pass
+            
+            # Convert payload to bytes if it's a string
+            if isinstance(payload, str):
+                payload_bytes = payload.encode('utf-8')
+            else:
+                payload_bytes = payload
+            
+            sock.sendto(payload_bytes, (dst_ip, dst_port))
             sock.close()
             
             return {
                 "ok": True,
                 "message": f"UDP packet sent to {dst_ip}:{dst_port}",
-                "payload_size": len(payload),
+                "payload_size": len(payload_bytes),
                 "protocol": "UDP"
             }
             
         except Exception as e:
             return {"ok": False, "error": f"UDP packet send failed: {str(e)}"}
     
-    def _create_ip_header(self, src_ip, dst_ip, payload_len):
-        """Create IP header for raw socket"""
-        version = 4
-        ihl = 5
-        type_of_service = 0
-        total_length = 20 + payload_len  # IP header + payload
-        identification = 54321
-        flags = 0
-        fragment_offset = 0
-        ttl = 64
-        protocol = socket.IPPROTO_TCP
-        checksum = 0  # Will be calculated by kernel
-        source_address = socket.inet_aton(src_ip)
-        dest_address = socket.inet_aton(dst_ip)
-        
-        ver_ihl = (version << 4) + ihl
-        flags_frag = (flags << 13) + fragment_offset
-        
-        ip_header = struct.pack('!BBHHHBBH4s4s',
-                               ver_ihl, type_of_service, total_length,
-                               identification, flags_frag, ttl, protocol, checksum,
-                               source_address, dest_address)
-        return ip_header
-    
-    def _create_tcp_header(self, src_port, dst_port, payload):
-        """Create TCP header"""
-        sequence = 0
-        acknowledgment = 0
-        data_offset = 5  # TCP header size
-        reserved = 0
-        flags = 0x18  # PSH + ACK
-        window = socket.htons(5840)
-        checksum = 0
-        urgent_pointer = 0
-        
-        offset_res = (data_offset << 4) + reserved
-        tcp_header = struct.pack('!HHLLBBHHH',
-                                src_port, dst_port, sequence, acknowledgment,
-                                offset_res, flags, window, checksum, urgent_pointer)
-        return tcp_header
+
     
     def send_raw_packet(self, packet_data):
         """Send a raw packet from hex string"""
@@ -455,17 +437,9 @@ class CommandExecutor:
             time.sleep(0.1)
             
             if protocol == 'tcp':
-                result = self._send_tcp_packet('', 12345, target_ip, target_port, eicar_string.encode('utf-8'))
+                result = self._send_tcp_packet('', 12345, target_ip, target_port, eicar_string)
             else:
-                sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-                sock.sendto(eicar_string.encode('utf-8'), (target_ip, target_port))
-                sock.close()
-                result = {
-                    "ok": True,
-                    "message": f"EICAR test packet sent to {target_ip}:{target_port}",
-                    "payload_size": len(eicar_string),
-                    "protocol": protocol.upper()
-                }
+                result = self._send_udp_packet('', 12345, target_ip, target_port, eicar_string)
             
             # Success animation with special EICAR pattern
             if result["ok"]:
