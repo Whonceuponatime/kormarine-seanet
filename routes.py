@@ -181,14 +181,23 @@ class Routes:
         def craft_packet():
             try:
                 data = request.get_json()
+                print(f"Received packet craft request: {data}")  # Debug logging
+                
                 if not data:
                     return jsonify({"ok": False, "error": "No packet data provided"}), 400
                 
                 result = self.cmd.craft_and_send_packet(data)
-                if not result["ok"]:
-                    return jsonify(**result), 400
-                return jsonify(**result)
+                print(f"Packet craft result: {result}")  # Debug logging
+                
+                # Return result with appropriate status code
+                if result["ok"]:
+                    return jsonify(**result), 200
+                else:
+                    return jsonify(**result), 200  # Changed from 400 to 200 so frontend can handle error
+                    
             except Exception as e:
+                error_msg = f"Exception in craft_packet: {str(e)}"
+                print(error_msg)  # Debug logging
                 return jsonify({"ok": False, "error": str(e)}), 500
         
         @self.app.post("/packet/send-raw")
@@ -209,14 +218,23 @@ class Routes:
         def send_eicar_packet():
             try:
                 data = request.get_json()
+                print(f"Received EICAR test request: {data}")  # Debug logging
+                
                 if not data:
                     return jsonify({"ok": False, "error": "No target data provided"}), 400
                 
                 result = self.cmd.send_eicar_packet(data)
-                if not result["ok"]:
-                    return jsonify(**result), 400
-                return jsonify(**result)
+                print(f"EICAR test result: {result}")  # Debug logging
+                
+                # Return result with appropriate status code
+                if result["ok"]:
+                    return jsonify(**result), 200
+                else:
+                    return jsonify(**result), 200  # Changed from 400 to 200 so frontend can handle error
+                    
             except Exception as e:
+                error_msg = f"Exception in send_eicar_packet: {str(e)}"
+                print(error_msg)  # Debug logging
                 return jsonify({"ok": False, "error": str(e)}), 500
         
         # Main page route - Interactive Network Diagram

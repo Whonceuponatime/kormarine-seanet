@@ -254,7 +254,7 @@ class CommandExecutor:
             target_ip = packet_data.get('target_ip', '').strip()
             target_port = int(packet_data.get('target_port', 80))
             protocol = packet_data.get('protocol', 'tcp').lower()
-            payload = packet_data.get('payload', '').encode('utf-8')
+            payload = packet_data.get('payload', '')
             source_ip = packet_data.get('source_ip', '')
             source_port = int(packet_data.get('source_port', 12345))
             source_mac = packet_data.get('source_mac', '').strip()
