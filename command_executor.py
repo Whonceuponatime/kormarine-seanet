@@ -268,7 +268,7 @@ class CommandExecutor:
             
             # LED animation for packet crafting
             self.gpio._set(PIN_R, R_ACTIVE_LOW, True)  # Red LED for crafting
-            time.sleep(0.1)
+            time.sleep(0.3)  # Slower timing for malicious packet builder
             
             if protocol == 'tcp':
                 result = self._send_tcp_packet(source_ip, source_port, target_ip, target_port, payload, source_mac, target_mac)
@@ -282,7 +282,7 @@ class CommandExecutor:
                 # Green LED for success (using PIN_Y)
                 self.gpio._set(PIN_R, R_ACTIVE_LOW, False)
                 self.gpio._set(PIN_Y, Y_ACTIVE_LOW, True)
-                time.sleep(0.2)
+                time.sleep(0.5)  # Slower timing for success indication
                 self.gpio._set(PIN_Y, Y_ACTIVE_LOW, False)
                 # Start wave animation
                 threading.Thread(target=self.gpio.wave_once, kwargs={"step_period": 0.16}, daemon=True).start()
@@ -401,7 +401,7 @@ class CommandExecutor:
             
             # LED animation for raw packet
             self.gpio._set(PIN_B, B_ACTIVE_LOW, True)  # Blue LED for raw packet
-            time.sleep(0.1)
+            time.sleep(0.3)  # Slower timing for malicious packet builder
             
             # Send raw packet via UDP
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -411,7 +411,7 @@ class CommandExecutor:
             # Success animation
             self.gpio._set(PIN_B, B_ACTIVE_LOW, False)
             self.gpio._set(PIN_Y, Y_ACTIVE_LOW, True)
-            time.sleep(0.2)
+            time.sleep(0.5)  # Slower timing for success indication
             self.gpio._set(PIN_Y, Y_ACTIVE_LOW, False)
             threading.Thread(target=self.gpio.wave_once, kwargs={"step_period": 0.16}, daemon=True).start()
             
@@ -444,7 +444,7 @@ class CommandExecutor:
             
             # LED animation for EICAR test
             self.gpio._set(PIN_Y, Y_ACTIVE_LOW, True)  # Yellow LED for EICAR
-            time.sleep(0.1)
+            time.sleep(0.3)  # Slower timing for malicious packet builder
             
             if protocol == 'tcp':
                 result = self._send_tcp_packet('', 12345, target_ip, target_port, eicar_string)
@@ -458,9 +458,9 @@ class CommandExecutor:
                 def eicar_animation():
                     for _ in range(2):
                         self.gpio._apply_states(True, True, True, True, True, True, True)
-                        time.sleep(0.1)
+                        time.sleep(0.3)  # Slower flash timing
                         self.gpio._off_all()
-                        time.sleep(0.1)
+                        time.sleep(0.3)  # Slower flash timing
                 
                 threading.Thread(target=eicar_animation, daemon=True).start()
             else:
