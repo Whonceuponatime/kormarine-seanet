@@ -1,5 +1,5 @@
 #!/bin/bash
-# Startup script for Raspberry Pi LED Servers
+# Startup script for Raspberry Pi LED Server
 
 echo "Starting Raspberry Pi LED Server..."
 
@@ -10,12 +10,22 @@ if ! pgrep -x "pigpiod" > /dev/null; then
     sleep 2
 fi
 
-# Check if Python dependencies are installed
-if ! python3 -c "import flask, pigpio" 2>/dev/null; then
-    echo "Installing Python dependencies..."
-    pip3 install -r requirements.txt
+# Create virtual environment if it doesn't exist
+if [ ! -d "venv" ]; then
+    echo "Creating virtual environment..."
+    python3 -m venv venv
 fi
 
-# Start the server
+# Activate virtual environment
+echo "Activating virtual environment..."
+source venv/bin/activate
+
+# Check if dependencies are installed in venv
+if ! python -c "import flask, pigpio, psutil, netifaces" 2>/dev/null; then
+    echo "Installing Python dependencies in virtual environment..."
+    pip install -r requirements.txt
+fi
+
+# Start the server with virtual environment
 echo "Starting LED server..."
-python3 app.py
+python app.py
