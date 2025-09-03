@@ -257,6 +257,8 @@ class CommandExecutor:
             payload = packet_data.get('payload', '').encode('utf-8')
             source_ip = packet_data.get('source_ip', '')
             source_port = int(packet_data.get('source_port', 12345))
+            source_mac = packet_data.get('source_mac', '').strip()
+            target_mac = packet_data.get('target_mac', '').strip()
             
             if not target_ip:
                 return {"ok": False, "error": "Target IP is required"}
@@ -269,9 +271,9 @@ class CommandExecutor:
             time.sleep(0.1)
             
             if protocol == 'tcp':
-                result = self._send_tcp_packet(source_ip, source_port, target_ip, target_port, payload)
+                result = self._send_tcp_packet(source_ip, source_port, target_ip, target_port, payload, source_mac, target_mac)
             elif protocol == 'udp':
-                result = self._send_udp_packet(source_ip, source_port, target_ip, target_port, payload)
+                result = self._send_udp_packet(source_ip, source_port, target_ip, target_port, payload, source_mac, target_mac)
             else:
                 return {"ok": False, "error": f"Unsupported protocol: {protocol}"}
             
@@ -295,8 +297,8 @@ class CommandExecutor:
             self.gpio.strobe_error()
             return {"ok": False, "error": f"Packet crafting failed: {str(e)}"}
     
-    def _send_tcp_packet(self, src_ip, src_port, dst_ip, dst_port, payload):
-        """Send a TCP packet with custom payload"""
+    def _send_tcp_packet(self, src_ip, src_port, dst_ip, dst_port, payload, src_mac='', dst_mac=''):
+        """Send a TCP packet with custom payload and optional MAC addresses"""
         try:
             # Create a raw socket
             sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_TCP)
@@ -325,8 +327,8 @@ class CommandExecutor:
         except Exception as e:
             return {"ok": False, "error": f"TCP packet send failed: {str(e)}"}
     
-    def _send_udp_packet(self, src_ip, src_port, dst_ip, dst_port, payload):
-        """Send a UDP packet with custom payload"""
+    def _send_udp_packet(self, src_ip, src_port, dst_ip, dst_port, payload, src_mac='', dst_mac=''):
+        """Send a UDP packet with custom payload and optional MAC addresses"""
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             if src_ip:

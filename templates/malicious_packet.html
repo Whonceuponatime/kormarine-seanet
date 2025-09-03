@@ -309,31 +309,28 @@
     </style>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="nav-logo">
-                <img src="{{ url_for('static', filename='images/seacure-logo.png') }}" alt="SeaCure Logo" class="logo-img">
-                <span>KORMARINE SeaNet</span>
+    <div class="diagram-container">
+        <header class="diagram-header" style="z-index: 1000; position: relative;">
+            <div class="nav-container">
+                <button class="hamburger-menu" id="hamburger-menu">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
+                <div class="nav-menu" id="nav-menu">
+                    <a href="/" class="nav-link">Network Topology</a>
+                    <a href="/settings" class="nav-link">Settings & Testing</a>
+                    <a href="/malicious-packet" class="nav-link active">Malicious Packets</a>
+                    <a href="/admin" class="nav-link">Admin Panel</a>
+                </div>
             </div>
-            <div class="hamburger-menu" id="hamburger-menu">
-                <span></span>
-                <span></span>
-                <span></span>
+            <div class="header-content">
+                <div class="logo-section" style="z-index: 1001; position: relative;">
+                    <img src="/static/images/seacure-logo.png" alt="SEACURE Logo" class="header-logo">
+                    <h1>Malicious Packet Builder</h1>
+                </div>
             </div>
-            <ul class="nav-menu" id="nav-menu">
-                <li><a href="/" class="nav-link"><i class="fas fa-network-wired"></i> Network Diagram</a></li>
-                <li><a href="/settings" class="nav-link"><i class="fas fa-cogs"></i> GPIO Settings</a></li>
-                <li><a href="/malicious-packet" class="nav-link active"><i class="fas fa-bug"></i> Malicious Packets</a></li>
-                <li><a href="/admin" class="nav-link"><i class="fas fa-tools"></i> Admin Panel</a></li>
-            </ul>
-        </div>
-    </nav>
-
-    <div class="main-container">
-        <div class="page-header">
-            <h1><i class="fas fa-bug"></i> Malicious Packet Builder</h1>
-            <p>Craft and send custom packets with malicious payloads for security testing</p>
-        </div>
+        </header>
 
         <div class="packet-builder-container">
             <div class="packet-form-panel">
@@ -372,6 +369,16 @@
                         <input type="number" id="source-port" placeholder="12345" value="12345" min="1" max="65535">
                     </div>
 
+                    <div class="packet-form-group" id="mac-fields">
+                        <label><i class="fas fa-network-wired"></i> Source MAC (Optional):</label>
+                        <input type="text" id="source-mac" placeholder="aa:bb:cc:dd:ee:ff" pattern="^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$">
+                    </div>
+
+                    <div class="packet-form-group" id="target-mac-field">
+                        <label><i class="fas fa-bullseye"></i> Target MAC (Optional):</label>
+                        <input type="text" id="target-mac" placeholder="ff:ff:ff:ff:ff:ff" pattern="^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$">
+                    </div>
+
                     <div class="packet-form-group">
                         <label><i class="fas fa-file-code"></i> Payload:</label>
                         <div class="preset-payloads">
@@ -406,37 +413,145 @@
             <div class="visual-panel">
                 <h3><i class="fas fa-eye"></i> Visual Feedback</h3>
                 
-                <div class="network-visualization">
-                    <div class="packet-animation" id="packet-animation"></div>
-                    <div class="packet-flow">
-                        <div class="node">
-                            <i class="fas fa-laptop"></i>
-                            <div>Attacker</div>
-                            <small id="source-display">192.168.1.10</small>
-                        </div>
-                        <div class="flow-arrow">
-                            <i class="fas fa-arrow-right"></i>
-                        </div>
-                        <div class="node">
-                            <i class="fas fa-server"></i>
-                            <div>Target</div>
-                            <small id="target-display">192.168.1.100:80</small>
+                <div class="network-diagram" style="padding: 2px; width: 100%; height: 400px;">
+                    <div class="diagram-overlay">
+                        <div class="interaction-hint-overlay">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Select target devices for packet attacks</span>
                         </div>
                     </div>
+                    <svg id="network-svg" viewBox="0 0 1400 600" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;">
+                        <defs>
+                            <!-- Gradients for modern styling -->
+                            <linearGradient id="attackerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#e74c3c;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#c0392b;stop-opacity:1" />
+                            </linearGradient>
+                            <linearGradient id="switchGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#3498db;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#2980b9;stop-opacity:1" />
+                            </linearGradient>
+                            <linearGradient id="deviceGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#27ae60;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#229954;stop-opacity:1" />
+                            </linearGradient>
+                            <linearGradient id="rpGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#9b59b6;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#8e44ad;stop-opacity:1" />
+                            </linearGradient>
+                            
+                            <!-- Animation definitions -->
+                            <marker id="arrowhead" markerWidth="10" markerHeight="7" 
+                                    refX="0" refY="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7" fill="#e74c3c" />
+                            </marker>
+
+                            <!-- Packet animation -->
+                            <circle id="packet-template" r="6" fill="#f39c12" opacity="0">
+                                <animate attributeName="opacity" values="0;1;1;0" dur="2s" repeatCount="indefinite"/>
+                            </circle>
+                        </defs>
+
+                        <!-- Background -->
+                        <rect width="100%" height="100%" fill="#ffffff"/>
+
+                        <!-- Raspberry Pi (Attacker) -->
+                        <g id="raspberry-pi" class="device clickable" transform="translate(50, 250)">
+                            <image id="rpi-main-image" x="0" y="0" width="120" height="80" href="/static/images/bd463120-b910-447d-82a5-571217c5db0e.jpg" 
+                                   preserveAspectRatio="xMidYMid meet" style="border-radius: 10px;"/>
+                            <rect x="0" y="0" width="120" height="80" rx="10" fill="url(#rpGradient)" stroke="#7d3c98" stroke-width="2" 
+                                  style="display: none;" id="rpi-fallback-box"/>
+                            <text x="60" y="95" text-anchor="middle" class="device-text-below" id="rpi-device-name">Packet Crafter</text>
+                            <text x="60" y="108" text-anchor="middle" class="device-subtext-below" id="rpi-device-desc">Malicious Payload Source</text>
+                        </g>
+
+                        <!-- Network Switch (Target) -->
+                        <g id="network-switch" class="device" transform="translate(500, 200)">
+                            <image id="switch-main-image" x="0" y="0" width="200" height="120" href="/static/images/moxa-edr-8010-series-datasheet-v1.jpg" 
+                                   preserveAspectRatio="xMidYMid meet" style="border-radius: 8px;"/>
+                            <rect x="0" y="0" width="200" height="120" rx="8" fill="url(#switchGradient)" stroke="#2980b9" stroke-width="3" 
+                                  style="display: none;" id="switch-fallback-box"/>
+                            <g class="switch-ports">
+                                <text x="190" y="20" text-anchor="middle" class="port-label" id="switch-port-1">Port 1</text>
+                                <text x="190" y="50" text-anchor="middle" class="port-label" id="switch-port-2">Port 2</text>
+                                <text x="190" y="80" text-anchor="middle" class="port-label" id="switch-port-3">Port 3</text>
+                                <text x="190" y="110" text-anchor="middle" class="port-label" id="switch-port-4">Port 4</text>
+                            </g>
+                            <text x="100" y="140" text-anchor="middle" class="device-text-below" id="switch-device-name">Network Switch</text>
+                            <text x="100" y="153" text-anchor="middle" class="device-subtext-below" id="switch-device-desc">Target Infrastructure</text>
+                        </g>
+
+                        <!-- Target Devices -->
+                        <g id="device-1" class="device clickable-target" transform="translate(900, 150)" data-device="workstation">
+                            <image id="device1-main-image" x="0" y="0" width="100" height="70" href="/static/images/workstation-default.svg" 
+                                   preserveAspectRatio="xMidYMid meet" style="border-radius: 5px;"/>
+                            <rect x="0" y="0" width="100" height="70" rx="5" fill="url(#deviceGradient)" stroke="#229954" stroke-width="2" 
+                                  style="display: none;" id="device1-fallback-box"/>
+                            <circle cx="85" cy="10" r="4" fill="#27ae60" class="connection-status" id="device-1-status"/>
+                            <text x="50" y="85" text-anchor="middle" class="device-text-below" id="device1-device-name">Workstation</text>
+                        </g>
+
+                        <g id="device-2" class="device clickable-target" transform="translate(900, 270)" data-device="printer">
+                            <image id="device2-main-image" x="0" y="0" width="100" height="70" href="/static/images/printer-default.svg" 
+                                   preserveAspectRatio="xMidYMid meet" style="border-radius: 5px;"/>
+                            <rect x="0" y="0" width="100" height="70" rx="5" fill="url(#deviceGradient)" stroke="#229954" stroke-width="2" 
+                                  style="display: none;" id="device2-fallback-box"/>
+                            <circle cx="85" cy="10" r="4" fill="#27ae60" class="connection-status" id="device-2-status"/>
+                            <text x="50" y="85" text-anchor="middle" class="device-text-below" id="device2-device-name">Printer</text>
+                        </g>
+
+                        <g id="device-3" class="device clickable-target" transform="translate(900, 390)" data-device="iot">
+                            <image id="device3-main-image" x="0" y="0" width="100" height="70" href="/static/images/iot-default.svg" 
+                                   preserveAspectRatio="xMidYMid meet" style="border-radius: 5px;"/>
+                            <rect x="0" y="0" width="100" height="70" rx="5" fill="url(#deviceGradient)" stroke="#229954" stroke-width="2" 
+                                  style="display: none;" id="device3-fallback-box"/>
+                            <circle cx="85" cy="10" r="4" fill="#27ae60" class="connection-status" id="device-3-status"/>
+                            <text x="50" y="85" text-anchor="middle" class="device-text-below" id="device3-device-name">IoT Device</text>
+                        </g>
+
+                        <g id="device-4" class="device clickable-target" transform="translate(900, 510)" data-device="camera">
+                            <image id="device4-main-image" x="0" y="0" width="100" height="70" href="/static/images/camera-default.svg" 
+                                   preserveAspectRatio="xMidYMid meet" style="border-radius: 5px;"/>
+                            <rect x="0" y="0" width="100" height="70" rx="5" fill="url(#deviceGradient)" stroke="#229954" stroke-width="2" 
+                                  style="display: none;" id="device4-fallback-box"/>
+                            <circle cx="85" cy="10" r="4" fill="#27ae60" class="connection-status" id="device-4-status"/>
+                            <text x="50" y="85" text-anchor="middle" class="device-text-below" id="device4-device-name">IP Camera</text>
+                        </g>
+
+                        <!-- Network Connections -->
+                        <g class="connections">
+                            <!-- Attacker to Switch -->
+                            <line id="connection-attacker" x1="170" y1="290" x2="500" y2="260" 
+                                  stroke="#e74c3c" stroke-width="3" stroke-dasharray="5,5" opacity="0.7"/>
+                            
+                            <!-- Switch to Devices -->
+                            <line id="connection-device-1" x1="700" y1="220" x2="900" y2="185" 
+                                  stroke="#27ae60" stroke-width="3" class="device-connection" data-port="1"/>
+                            <line id="connection-device-2" x1="700" y1="250" x2="900" y2="305" 
+                                  stroke="#27ae60" stroke-width="3" class="device-connection" data-port="2"/>
+                            <line id="connection-device-3" x1="700" y1="280" x2="900" y2="425" 
+                                  stroke="#27ae60" stroke-width="3" class="device-connection" data-port="3"/>
+                            <line id="connection-device-4" x1="700" y1="310" x2="900" y2="545" 
+                                  stroke="#27ae60" stroke-width="3" class="device-connection" data-port="4"/>
+                        </g>
+
+                        <!-- Packet Animation Layer -->
+                        <g id="packet-layer">
+                            <!-- Animated packets will be added here dynamically -->
+                        </g>
+
+                        <!-- Attack Indicators -->
+                        <g id="attack-indicators" opacity="0">
+                            <circle cx="600" cy="360" r="50" fill="none" stroke="#e74c3c" stroke-width="3" opacity="0.8">
+                                <animate attributeName="r" values="30;60;30" dur="1.5s" repeatCount="indefinite"/>
+                                <animate attributeName="opacity" values="0.8;0.3;0.8" dur="1.5s" repeatCount="indefinite"/>
+                            </circle>
+                            <text x="600" y="365" text-anchor="middle" class="attack-text">MALICIOUS PACKET</text>
+                        </g>
+                    </svg>
                 </div>
 
-                <div class="led-status-section">
-                    <h4><i class="fas fa-lightbulb"></i> LED Status</h4>
-                    <div class="led-status-grid" id="led-grid">
-                        <div class="led-indicator" data-pin="17">1</div>
-                        <div class="led-indicator" data-pin="27">2</div>
-                        <div class="led-indicator" data-pin="22">3</div>
-                        <div class="led-indicator" data-pin="10">4</div>
-                        <div class="led-indicator" data-pin="9">5</div>
-                        <div class="led-indicator" data-pin="5">6</div>
-                        <div class="led-indicator" data-pin="6">7</div>
-                    </div>
-                </div>
+
 
                 <div class="interaction-panel">
                     <h4><i class="fas fa-terminal"></i> Response & Log</h4>
@@ -471,5 +586,6 @@
             });
         });
     </script>
+    </div>
 </body>
 </html>

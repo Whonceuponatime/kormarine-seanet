@@ -27,6 +27,15 @@ class MaliciousPacketBuilder {
         document.getElementById('target-port').addEventListener('input', () => this.updateTargetDisplay());
         document.getElementById('source-ip').addEventListener('input', () => this.updateSourceDisplay());
         document.getElementById('payload').addEventListener('input', () => this.updatePayloadStats());
+        
+        // MAC address validation
+        document.getElementById('source-mac').addEventListener('input', (e) => this.validateMacAddress(e.target));
+        document.getElementById('target-mac').addEventListener('input', (e) => this.validateMacAddress(e.target));
+        
+        // Target device selection from topology
+        document.querySelectorAll('.clickable-target').forEach(device => {
+            device.addEventListener('click', (e) => this.selectTargetDevice(e.currentTarget));
+        });
 
         // Preset payload buttons
         document.querySelectorAll('.preset-btn').forEach(btn => {
@@ -51,6 +60,8 @@ class MaliciousPacketBuilder {
         // Show/hide fields based on protocol
         const sourceFields = document.getElementById('source-fields');
         const sourcePortField = document.getElementById('source-port-field');
+        const macFields = document.getElementById('mac-fields');
+        const targetMacField = document.getElementById('target-mac-field');
         const craftBtn = document.getElementById('craft-btn');
         const rawBtn = document.getElementById('raw-btn');
         const payloadTextarea = document.getElementById('payload');
@@ -58,6 +69,8 @@ class MaliciousPacketBuilder {
         if (protocol === 'raw') {
             sourceFields.style.display = 'none';
             sourcePortField.style.display = 'none';
+            macFields.style.display = 'block';
+            targetMacField.style.display = 'block';
             craftBtn.style.display = 'none';
             rawBtn.style.display = 'block';
             payloadTextarea.placeholder = 'Enter hex bytes (e.g., 48656c6c6f576f726c64)';
@@ -65,6 +78,8 @@ class MaliciousPacketBuilder {
         } else {
             sourceFields.style.display = 'block';
             sourcePortField.style.display = 'block';
+            macFields.style.display = 'block';
+            targetMacField.style.display = 'block';
             craftBtn.style.display = 'block';
             rawBtn.style.display = 'none';
             payloadTextarea.placeholder = 'Enter your payload here...';
@@ -123,12 +138,71 @@ class MaliciousPacketBuilder {
         const sourceIP = document.getElementById('source-ip').value || 'Auto-detect';
         document.getElementById('source-display').textContent = sourceIP;
     }
+    
+    validateMacAddress(input) {
+        const macRegex = /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/;
+        const value = input.value.trim();
+        
+        if (value && !macRegex.test(value)) {
+            input.style.borderColor = '#e74c3c';
+            input.style.backgroundColor = '#fdf2f2';
+        } else {
+            input.style.borderColor = '#e1e8ed';
+            input.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+        }
+    }
+    
+    selectTargetDevice(deviceElement) {
+        const deviceType = deviceElement.dataset.device;
+        const deviceName = deviceElement.querySelector('.device-text-below').textContent;
+        
+        // Highlight selected device
+        document.querySelectorAll('.clickable-target').forEach(d => {
+            d.style.filter = 'none';
+        });
+        deviceElement.style.filter = 'drop-shadow(0 0 10px #e74c3c)';
+        
+        // Set common IPs based on device type
+        const deviceIPs = {
+            'workstation': '192.168.1.101',
+            'printer': '192.168.1.102', 
+            'iot': '192.168.1.103',
+            'camera': '192.168.1.104'
+        };
+        
+        const devicePorts = {
+            'workstation': 80,
+            'printer': 631,
+            'iot': 8080,
+            'camera': 554
+        };
+        
+        document.getElementById('target-ip').value = deviceIPs[deviceType] || '192.168.1.100';
+        document.getElementById('target-port').value = devicePorts[deviceType] || 80;
+        
+        this.updateTargetDisplay();
+        this.animatePacketToTarget(deviceElement);
+        this.log(`Selected target: ${deviceName} (${deviceIPs[deviceType]}:${devicePorts[deviceType]})`, 'info');
+    }
+    
+    animatePacketToTarget(targetElement) {
+        // Show attack indicators
+        const attackIndicators = document.getElementById('attack-indicators');
+        attackIndicators.style.opacity = '1';
+        
+        // Hide after 3 seconds
+        setTimeout(() => {
+            attackIndicators.style.opacity = '0';
+        }, 3000);
+    }
 
     async craftAndSendPacket() {
         const targetIP = document.getElementById('target-ip').value.trim();
         const targetPort = parseInt(document.getElementById('target-port').value);
         const sourceIP = document.getElementById('source-ip').value.trim();
         const sourcePort = parseInt(document.getElementById('source-port').value);
+        const sourceMac = document.getElementById('source-mac').value.trim();
+        const targetMac = document.getElementById('target-mac').value.trim();
         const payload = document.getElementById('payload').value;
 
         if (!targetIP || !targetPort) {
@@ -141,6 +215,8 @@ class MaliciousPacketBuilder {
             target_port: targetPort,
             source_ip: sourceIP,
             source_port: sourcePort || 12345,
+            source_mac: sourceMac,
+            target_mac: targetMac,
             protocol: this.currentProtocol,
             payload: payload
         };
@@ -279,7 +355,14 @@ class MaliciousPacketBuilder {
         document.getElementById('target-port').value = '80';
         document.getElementById('source-ip').value = '';
         document.getElementById('source-port').value = '12345';
+        document.getElementById('source-mac').value = '';
+        document.getElementById('target-mac').value = '';
         document.getElementById('payload').value = '';
+        
+        // Clear device selections
+        document.querySelectorAll('.clickable-target').forEach(d => {
+            d.style.filter = 'none';
+        });
         
         this.updatePayloadStats();
         this.updateTargetDisplay();
