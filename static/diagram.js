@@ -632,6 +632,28 @@ class NetworkDiagram {
     
     // LED demo function removed per user request
     
+    applyDeviceVisibility(displayConfig) {
+        // Apply device visibility settings
+        const devices = [
+            { id: 'device-1', show: displayConfig.showDevice1 },
+            { id: 'device-2', show: displayConfig.showDevice2 },
+            { id: 'device-3', show: displayConfig.showDevice3 },
+            { id: 'device-4', show: displayConfig.showDevice4 }
+        ];
+        
+        devices.forEach(device => {
+            const deviceElement = document.getElementById(device.id);
+            const connectionElement = document.getElementById(`connection-${device.id}`);
+            
+            if (deviceElement) {
+                deviceElement.style.display = (device.show === false) ? 'none' : 'block';
+            }
+            if (connectionElement) {
+                connectionElement.style.display = (device.show === false) ? 'none' : 'block';
+            }
+        });
+    }
+    
     // Logging Functions
     addLog(message, type = 'info') {
         const container = document.getElementById('log-container');
@@ -838,6 +860,11 @@ class NetworkDiagram {
         // Update device names, descriptions, and images in the SVG
         this.updateDeviceLabels(config.components);
         this.updateDeviceImages(config.components);
+        
+        // Apply device visibility settings
+        if (config.display) {
+            this.applyDeviceVisibility(config.display);
+        }
     }
     
     updateDeviceLabels(components) {

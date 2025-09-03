@@ -399,9 +399,22 @@
     <script>
         // Initialize network diagram with same configuration as attack simulator
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize the network diagram to share configurations
+            // Initialize the network diagram to share configurations but without SNMP functionality
             if (typeof NetworkDiagram !== 'undefined') {
                 window.networkDiagram = new NetworkDiagram();
+                // Disable SNMP-specific features for malicious packet page
+                if (window.networkDiagram) {
+                    // Override SNMP methods to prevent conflicts
+                    window.networkDiagram.executeSnmpWalk = function() {};
+                    window.networkDiagram.executePortDown = function() {};
+                    window.networkDiagram.executePortUp = function() {};
+                    window.networkDiagram.checkPortStatus = function() {};
+                }
+            }
+            
+            // Initialize malicious packet builder
+            if (typeof MaliciousPacketBuilder !== 'undefined') {
+                window.packetBuilder = new MaliciousPacketBuilder();
             }
             
             // Hamburger menu functionality

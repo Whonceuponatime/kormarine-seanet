@@ -410,10 +410,7 @@ class MaliciousPacketBuilder {
     }
 }
 
-// Initialize the packet builder when the page loads
-document.addEventListener('DOMContentLoaded', () => {
-    window.packetBuilder = new MaliciousPacketBuilder();
-});
+// Packet builder will be initialized from the HTML page to prevent conflicts
 
 // Add some helper functions for advanced users
 window.packetUtils = {
