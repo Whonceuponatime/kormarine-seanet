@@ -239,18 +239,15 @@ class MaliciousPacketBuilder {
     }
 
     animatePacketSend() {
-        const packetAnimation = document.getElementById('packet-animation');
-        packetAnimation.classList.remove('active');
-        
-        // Trigger animation
-        setTimeout(() => {
-            packetAnimation.classList.add('active');
-        }, 100);
-
-        // Remove animation class after completion
-        setTimeout(() => {
-            packetAnimation.classList.remove('active');
-        }, 2100);
+        // Simple packet animation using the SVG packet template
+        const packetTemplate = document.getElementById('packet-template');
+        if (packetTemplate) {
+            // Briefly show the packet animation
+            packetTemplate.style.opacity = '1';
+            setTimeout(() => {
+                packetTemplate.style.opacity = '0';
+            }, 1000);
+        }
     }
 
     clearAll() {
