@@ -102,7 +102,7 @@
             </div>
         </header>
 
-        <div class="network-diagram" style="padding: 2px; width: 100%;">
+        <div class="network-diagram" style="padding: 2px; width: 100%; height: 400px; min-height: 400px;">
             <div class="diagram-overlay">
                 <div class="interaction-hint-overlay">
                     <i class="fas fa-info-circle"></i>
@@ -380,45 +380,69 @@
                 </button>
             </div>
         </div>
+        
+        <!-- Hidden dummy elements for NetworkDiagram compatibility -->
+        <div style="display: none;">
+            <button id="discover-btn"></button>
+            <button id="port-down-btn"></button>
+            <button id="port-up-btn"></button>
+            <button id="check-status-btn"></button>
+        </div>
     </div>
 
     <script src="{{ url_for('static', filename='diagram.js') }}"></script>
     <script src="{{ url_for('static', filename='malicious_packet.js') }}"></script>
     <script>
-        // Initialize network diagram with same configuration as attack simulator
+        // Initialize everything when DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize the network diagram to share configurations but without SNMP functionality
-            if (typeof NetworkDiagram !== 'undefined') {
-                window.networkDiagram = new NetworkDiagram();
-                // Disable SNMP-specific features for malicious packet page
-                if (window.networkDiagram) {
-                    // Override SNMP methods to prevent conflicts
-                    window.networkDiagram.executeSnmpWalk = function() {};
-                    window.networkDiagram.executePortDown = function() {};
-                    window.networkDiagram.executePortUp = function() {};
-                    window.networkDiagram.checkPortStatus = function() {};
-                }
-            }
+            console.log('DOM loaded, initializing...');
             
-            // Initialize malicious packet builder
-            if (typeof MaliciousPacketBuilder !== 'undefined') {
-                window.packetBuilder = new MaliciousPacketBuilder();
-            }
-            
-            // Hamburger menu functionality
+            // Hamburger menu functionality - FIRST PRIORITY
             const hamburgerMenu = document.getElementById('hamburger-menu');
             const navMenu = document.getElementById('nav-menu');
             
-            hamburgerMenu.addEventListener('click', function() {
-                navMenu.classList.toggle('active');
-            });
+            if (hamburgerMenu && navMenu) {
+                console.log('Setting up hamburger menu...');
+                hamburgerMenu.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    navMenu.classList.toggle('active');
+                    console.log('Menu toggled, active:', navMenu.classList.contains('active'));
+                });
+                
+                // Close menu when clicking outside
+                document.addEventListener('click', function(event) {
+                    if (!hamburgerMenu.contains(event.target) && !navMenu.contains(event.target)) {
+                        navMenu.classList.remove('active');
+                    }
+                });
+            } else {
+                console.error('Hamburger menu elements not found');
+            }
             
-            // Close menu when clicking outside
-            document.addEventListener('click', function(event) {
-                if (!hamburgerMenu.contains(event.target) && !navMenu.contains(event.target)) {
-                    navMenu.classList.remove('active');
+            // Initialize malicious packet builder FIRST
+            if (typeof MaliciousPacketBuilder !== 'undefined') {
+                console.log('Initializing MaliciousPacketBuilder...');
+                window.packetBuilder = new MaliciousPacketBuilder();
+            }
+            
+            // Initialize network diagram AFTER packet builder
+            setTimeout(() => {
+                if (typeof NetworkDiagram !== 'undefined') {
+                    console.log('Initializing NetworkDiagram...');
+                    window.networkDiagram = new NetworkDiagram();
+                    // Disable SNMP-specific features for malicious packet page
+                    if (window.networkDiagram) {
+                        // Override SNMP methods to prevent conflicts
+                        window.networkDiagram.executeSnmpWalk = function() { console.log('SNMP Walk disabled on packet page'); };
+                        window.networkDiagram.executePortDown = function() { console.log('Port Down disabled on packet page'); };
+                        window.networkDiagram.executePortUp = function() { console.log('Port Up disabled on packet page'); };
+                        window.networkDiagram.checkPortStatus = function() { console.log('Port Status disabled on packet page'); };
+                    }
+                } else {
+                    console.error('NetworkDiagram class not found');
                 }
-            });
+            }, 100);
         });
     </script>
 </body>
