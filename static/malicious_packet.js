@@ -313,7 +313,6 @@ class MaliciousPacketBuilder {
         }
         return result;
     }
-}
 
     async loadAndApplyAdminSettings() {
         try {
@@ -441,8 +440,7 @@ class MaliciousPacketBuilder {
             }
         });
     }
-
-    // Packet builder will be initialized from the HTML page to prevent conflicts
+}
 
 // Add some helper functions for advanced users
 window.packetUtils = {
