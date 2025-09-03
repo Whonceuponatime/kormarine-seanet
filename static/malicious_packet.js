@@ -39,6 +39,10 @@ class MaliciousPacketBuilder {
         document.getElementById('eicar-btn').addEventListener('click', () => this.sendEicarPacket());
         document.getElementById('clear-btn').addEventListener('click', () => this.clearAll());
         document.getElementById('clear-log').addEventListener('click', () => this.clearLog());
+        
+        // MAC address fetch buttons
+        document.getElementById('fetch-target-mac-btn').addEventListener('click', () => this.fetchTargetMac());
+        document.getElementById('fetch-source-mac-btn').addEventListener('click', () => this.fetchSourceMac());
     }
 
 
@@ -150,8 +154,11 @@ class MaliciousPacketBuilder {
         const targetPort = parseInt(document.getElementById('target-port').value);
         const sourceIP = document.getElementById('source-ip').value.trim();
         const sourcePort = parseInt(document.getElementById('source-port').value);
-        const sourceMac = document.getElementById('source-mac').value.trim();
-        const targetMac = document.getElementById('target-mac').value.trim();
+        // Get full MAC addresses from dataset, fallback to display value
+        const sourceMacElement = document.getElementById('source-mac');
+        const targetMacElement = document.getElementById('target-mac');
+        const sourceMac = sourceMacElement.dataset.fullMac || sourceMacElement.value.trim();
+        const targetMac = targetMacElement.dataset.fullMac || targetMacElement.value.trim();
         const payload = document.getElementById('payload').value;
 
         if (!targetIP || !targetPort) {
@@ -249,12 +256,77 @@ class MaliciousPacketBuilder {
             }, 1000);
         }
     }
+    
+    async fetchTargetMac() {
+        const targetIP = document.getElementById('target-ip').value.trim();
+        if (!targetIP) {
+            this.log('ERROR: Enter target IP first', 'error');
+            return;
+        }
+        
+        const button = document.getElementById('fetch-target-mac-btn');
+        const originalHTML = button.innerHTML;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        button.disabled = true;
+        
+        try {
+            const response = await fetch('/packet/get-target-mac', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ target_ip: targetIP })
+            });
+            
+            const result = await response.json();
+            
+            if (result.ok) {
+                // Display masked MAC in input field
+                document.getElementById('target-mac').value = result.masked_mac;
+                // Store full MAC for actual packet sending
+                document.getElementById('target-mac').dataset.fullMac = result.full_mac;
+                this.log(`Target MAC resolved: ${result.masked_mac}`, 'success');
+            } else {
+                this.log(`Failed to get target MAC: ${result.error}`, 'error');
+            }
+        } catch (error) {
+            this.log(`Error fetching target MAC: ${error.message}`, 'error');
+        } finally {
+            button.innerHTML = originalHTML;
+            button.disabled = false;
+        }
+    }
+    
+    async fetchSourceMac() {
+        const button = document.getElementById('fetch-source-mac-btn');
+        const originalHTML = button.innerHTML;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        button.disabled = true;
+        
+        try {
+            const response = await fetch('/packet/get-source-mac');
+            const result = await response.json();
+            
+            if (result.ok) {
+                // Display masked MAC in input field
+                document.getElementById('source-mac').value = result.masked_mac;
+                // Store full MAC for actual packet sending
+                document.getElementById('source-mac').dataset.fullMac = result.full_mac;
+                this.log(`Source MAC resolved: ${result.masked_mac}`, 'success');
+            } else {
+                this.log(`Failed to get source MAC: ${result.error}`, 'error');
+            }
+        } catch (error) {
+            this.log(`Error fetching source MAC: ${error.message}`, 'error');
+        } finally {
+            button.innerHTML = originalHTML;
+            button.disabled = false;
+        }
+    }
 
     clearAll() {
         document.getElementById('target-ip').value = '192.168.1.100';
         document.getElementById('target-port').value = '80';
         document.getElementById('source-ip').value = '';
-        document.getElementById('source-port').value = '12345';
+        document.getElementById('source-port').value = '5566';
         document.getElementById('source-mac').value = '';
         document.getElementById('target-mac').value = '';
         document.getElementById('payload').value = '';

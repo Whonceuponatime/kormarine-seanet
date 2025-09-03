@@ -363,7 +363,12 @@
                     <label><i class="fas fa-crosshairs"></i> Target Configuration:</label>
                     <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 8px; margin-bottom: 8px;">
                         <input type="text" id="target-ip" value="192.168.1.100" placeholder="Target IP" class="control-input">
-                        <input type="text" id="target-mac" placeholder="Target MAC" class="control-input" style="font-size: 11px;">
+                        <div style="display: flex; gap: 4px;">
+                            <input type="text" id="target-mac" placeholder="Target MAC" class="control-input" style="font-size: 10px; flex: 1;">
+                            <button id="fetch-target-mac-btn" class="control-btn secondary" style="padding: 4px 8px; font-size: 10px;" title="Auto-fetch Target MAC">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
                     </div>
                     <input type="number" id="target-port" min="1" max="65535" placeholder="Target Port" class="control-input" value="80">
                 </div>
@@ -373,9 +378,14 @@
                     <label><i class="fas fa-home"></i> Source Configuration:</label>
                     <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 8px; margin-bottom: 8px;">
                         <input type="text" id="source-ip" placeholder="Source IP (Auto)" class="control-input">
-                        <input type="text" id="source-mac" placeholder="Source MAC" class="control-input" style="font-size: 11px;">
+                        <div style="display: flex; gap: 4px;">
+                            <input type="text" id="source-mac" placeholder="Source MAC" class="control-input" style="font-size: 10px; flex: 1;">
+                            <button id="fetch-source-mac-btn" class="control-btn secondary" style="padding: 4px 8px; font-size: 10px;" title="Auto-fetch Source MAC">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
                     </div>
-                    <input type="number" id="source-port" min="1" max="65535" placeholder="Source Port" value="12345" class="control-input">
+                    <input type="number" id="source-port" min="1" max="65535" placeholder="Source Port" value="5566" class="control-input">
                 </div>
                 
                 <!-- Payload Configuration -->

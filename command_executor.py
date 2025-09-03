@@ -12,6 +12,8 @@ import time
 import socket
 import struct
 import binascii
+import psutil
+import netifaces
 from config import *
 
 
@@ -266,9 +268,8 @@ class CommandExecutor:
             self.gpio.stop_anim()
             self.gpio._off_all()
             
-            # LED animation for packet crafting
+            # LED animation for packet crafting (no pause)
             self.gpio._set(PIN_R, R_ACTIVE_LOW, True)  # Red LED for crafting
-            time.sleep(0.3)  # Slower timing for malicious packet builder
             
             if protocol == 'tcp':
                 result = self._send_tcp_packet(source_ip, source_port, target_ip, target_port, payload, source_mac, target_mac)
@@ -296,6 +297,67 @@ class CommandExecutor:
         except Exception as e:
             self.gpio.strobe_error()
             return {"ok": False, "error": f"Packet crafting failed: {str(e)}"}
+    
+    def get_target_mac(self, target_ip):
+        """Get MAC address of target IP using ARP lookup"""
+        try:
+            # Try ARP lookup on Windows/Linux
+            if hasattr(socket, 'AF_PACKET') or hasattr(socket, 'AF_LINK'):
+                # Linux/Unix ARP lookup
+                arp_cmd = f"arp -n {target_ip}"
+            else:
+                # Windows ARP lookup
+                arp_cmd = f"arp -a {target_ip}"
+            
+            result = subprocess.run(arp_cmd, shell=True, capture_output=True, text=True, timeout=5)
+            
+            if result.returncode == 0:
+                # Parse ARP output to extract MAC address
+                lines = result.stdout.strip().split('\n')
+                for line in lines:
+                    if target_ip in line:
+                        # Look for MAC address pattern (xx:xx:xx:xx:xx:xx or xx-xx-xx-xx-xx-xx)
+                        import re
+                        mac_pattern = r'([0-9a-fA-F]{2}[:-]){5}[0-9a-fA-F]{2}'
+                        match = re.search(mac_pattern, line)
+                        if match:
+                            mac = match.group(0).replace('-', ':').upper()
+                            return {"ok": True, "mac": mac}
+            
+            return {"ok": False, "error": f"Could not resolve MAC for {target_ip}"}
+            
+        except Exception as e:
+            return {"ok": False, "error": f"ARP lookup failed: {str(e)}"}
+    
+    def get_source_mac(self):
+        """Get MAC address of the primary network interface"""
+        try:
+            # Get the default gateway interface
+            gateways = netifaces.gateways()
+            default_interface = gateways['default'][netifaces.AF_INET][1]
+            
+            # Get MAC address of the default interface
+            interface_info = netifaces.ifaddresses(default_interface)
+            if netifaces.AF_LINK in interface_info:
+                mac = interface_info[netifaces.AF_LINK][0]['addr'].upper()
+                return {"ok": True, "mac": mac}
+            
+            return {"ok": False, "error": "Could not get source MAC address"}
+            
+        except Exception as e:
+            # Fallback: try to get any available MAC
+            try:
+                for interface in netifaces.interfaces():
+                    if interface.startswith(('eth', 'wlan', 'en', 'wl')):
+                        interface_info = netifaces.ifaddresses(interface)
+                        if netifaces.AF_LINK in interface_info:
+                            mac = interface_info[netifaces.AF_LINK][0]['addr'].upper()
+                            if mac != '00:00:00:00:00:00':
+                                return {"ok": True, "mac": mac}
+                
+                return {"ok": False, "error": "No valid network interface found"}
+            except:
+                return {"ok": False, "error": f"MAC lookup failed: {str(e)}"}
     
     def _send_tcp_packet(self, src_ip, src_port, dst_ip, dst_port, payload, src_mac='', dst_mac=''):
         """Send a TCP packet with custom payload (using regular socket, no admin privileges required)"""

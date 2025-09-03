@@ -237,6 +237,49 @@ class Routes:
                 print(error_msg)  # Debug logging
                 return jsonify({"ok": False, "error": str(e)}), 500
         
+        # MAC address lookup routes
+        @self.app.post("/packet/get-target-mac")
+        def get_target_mac():
+            try:
+                data = request.get_json()
+                target_ip = data.get('target_ip', '').strip()
+                
+                if not target_ip:
+                    return jsonify({"ok": False, "error": "Target IP is required"}), 400
+                
+                result = self.cmd.get_target_mac(target_ip)
+                
+                # Mask MAC address for display
+                if result["ok"] and "mac" in result:
+                    mac_parts = result["mac"].split(':')
+                    if len(mac_parts) == 6:
+                        masked_mac = f"{mac_parts[0]}:{mac_parts[1]}:XX:XX:XX:XX"
+                        result["masked_mac"] = masked_mac
+                        result["full_mac"] = result["mac"]  # Keep full MAC for actual use
+                
+                return jsonify(**result), 200
+                
+            except Exception as e:
+                return jsonify({"ok": False, "error": str(e)}), 500
+        
+        @self.app.get("/packet/get-source-mac")
+        def get_source_mac():
+            try:
+                result = self.cmd.get_source_mac()
+                
+                # Mask MAC address for display
+                if result["ok"] and "mac" in result:
+                    mac_parts = result["mac"].split(':')
+                    if len(mac_parts) == 6:
+                        masked_mac = f"{mac_parts[0]}:{mac_parts[1]}:XX:XX:XX:XX"
+                        result["masked_mac"] = masked_mac
+                        result["full_mac"] = result["mac"]  # Keep full MAC for actual use
+                
+                return jsonify(**result), 200
+                
+            except Exception as e:
+                return jsonify({"ok": False, "error": str(e)}), 500
+        
         # Main page route - Interactive Network Diagram
         @self.app.get("/")
         def index():
