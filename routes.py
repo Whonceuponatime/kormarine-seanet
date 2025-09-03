@@ -176,6 +176,49 @@ class Routes:
                 return jsonify(**result), 400
             return jsonify(**result)
         
+        # Packet crafting routes
+        @self.app.post("/packet/craft")
+        def craft_packet():
+            try:
+                data = request.get_json()
+                if not data:
+                    return jsonify({"ok": False, "error": "No packet data provided"}), 400
+                
+                result = self.cmd.craft_and_send_packet(data)
+                if not result["ok"]:
+                    return jsonify(**result), 400
+                return jsonify(**result)
+            except Exception as e:
+                return jsonify({"ok": False, "error": str(e)}), 500
+        
+        @self.app.post("/packet/send-raw")
+        def send_raw_packet():
+            try:
+                data = request.get_json()
+                if not data or 'payload' not in data:
+                    return jsonify({"ok": False, "error": "No payload provided"}), 400
+                
+                result = self.cmd.send_raw_packet(data)
+                if not result["ok"]:
+                    return jsonify(**result), 400
+                return jsonify(**result)
+            except Exception as e:
+                return jsonify({"ok": False, "error": str(e)}), 500
+        
+        @self.app.post("/packet/eicar-test")
+        def send_eicar_packet():
+            try:
+                data = request.get_json()
+                if not data:
+                    return jsonify({"ok": False, "error": "No target data provided"}), 400
+                
+                result = self.cmd.send_eicar_packet(data)
+                if not result["ok"]:
+                    return jsonify(**result), 400
+                return jsonify(**result)
+            except Exception as e:
+                return jsonify({"ok": False, "error": str(e)}), 500
+        
         # Main page route - Interactive Network Diagram
         @self.app.get("/")
         def index():
@@ -195,6 +238,11 @@ class Routes:
         @self.app.get("/admin")
         def admin():
             return render_template('admin.html')
+        
+        # Malicious packet page route
+        @self.app.get("/malicious-packet")
+        def malicious_packet():
+            return render_template('malicious_packet.html')
         
         # Image upload route
         @self.app.post("/upload-image")

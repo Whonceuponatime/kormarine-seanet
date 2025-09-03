@@ -9,6 +9,9 @@ import subprocess
 import shlex
 import threading
 import time
+import socket
+import struct
+import binascii
 from config import *
 
 
@@ -243,3 +246,244 @@ class CommandExecutor:
                 "oper": oper_err
             }
         }
+    
+    def craft_and_send_packet(self, packet_data):
+        """Craft and send a custom packet with specified parameters"""
+        try:
+            # Extract packet parameters
+            target_ip = packet_data.get('target_ip', '').strip()
+            target_port = int(packet_data.get('target_port', 80))
+            protocol = packet_data.get('protocol', 'tcp').lower()
+            payload = packet_data.get('payload', '').encode('utf-8')
+            source_ip = packet_data.get('source_ip', '')
+            source_port = int(packet_data.get('source_port', 12345))
+            
+            if not target_ip:
+                return {"ok": False, "error": "Target IP is required"}
+            
+            self.gpio.stop_anim()
+            self.gpio._off_all()
+            
+            # LED animation for packet crafting
+            self.gpio._set(PIN_R, R_ACTIVE_LOW, True)  # Red LED for crafting
+            time.sleep(0.1)
+            
+            if protocol == 'tcp':
+                result = self._send_tcp_packet(source_ip, source_port, target_ip, target_port, payload)
+            elif protocol == 'udp':
+                result = self._send_udp_packet(source_ip, source_port, target_ip, target_port, payload)
+            else:
+                return {"ok": False, "error": f"Unsupported protocol: {protocol}"}
+            
+            # Success animation
+            if result["ok"]:
+                # Green LED for success (using PIN_Y)
+                self.gpio._set(PIN_R, R_ACTIVE_LOW, False)
+                self.gpio._set(PIN_Y, Y_ACTIVE_LOW, True)
+                time.sleep(0.2)
+                self.gpio._set(PIN_Y, Y_ACTIVE_LOW, False)
+                # Start wave animation
+                threading.Thread(target=self.gpio.wave_once, kwargs={"step_period": 0.16}, daemon=True).start()
+            else:
+                # Error animation
+                self.gpio._set(PIN_R, R_ACTIVE_LOW, False)
+                self.gpio.strobe_error()
+            
+            return result
+            
+        except Exception as e:
+            self.gpio.strobe_error()
+            return {"ok": False, "error": f"Packet crafting failed: {str(e)}"}
+    
+    def _send_tcp_packet(self, src_ip, src_port, dst_ip, dst_port, payload):
+        """Send a TCP packet with custom payload"""
+        try:
+            # Create a raw socket
+            sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_TCP)
+            sock.setsockopt(socket.IPPROTO_IP, socket.IP_HDRINCL, 1)
+            
+            # Create IP header
+            ip_header = self._create_ip_header(src_ip or '192.168.1.10', dst_ip, len(payload) + 20)
+            
+            # Create TCP header
+            tcp_header = self._create_tcp_header(src_port, dst_port, payload)
+            
+            # Combine headers and payload
+            packet = ip_header + tcp_header + payload
+            
+            # Send packet
+            sock.sendto(packet, (dst_ip, dst_port))
+            sock.close()
+            
+            return {
+                "ok": True,
+                "message": f"TCP packet sent to {dst_ip}:{dst_port}",
+                "payload_size": len(payload),
+                "protocol": "TCP"
+            }
+            
+        except Exception as e:
+            return {"ok": False, "error": f"TCP packet send failed: {str(e)}"}
+    
+    def _send_udp_packet(self, src_ip, src_port, dst_ip, dst_port, payload):
+        """Send a UDP packet with custom payload"""
+        try:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            if src_ip:
+                sock.bind((src_ip, src_port))
+            
+            sock.sendto(payload, (dst_ip, dst_port))
+            sock.close()
+            
+            return {
+                "ok": True,
+                "message": f"UDP packet sent to {dst_ip}:{dst_port}",
+                "payload_size": len(payload),
+                "protocol": "UDP"
+            }
+            
+        except Exception as e:
+            return {"ok": False, "error": f"UDP packet send failed: {str(e)}"}
+    
+    def _create_ip_header(self, src_ip, dst_ip, payload_len):
+        """Create IP header for raw socket"""
+        version = 4
+        ihl = 5
+        type_of_service = 0
+        total_length = 20 + payload_len  # IP header + payload
+        identification = 54321
+        flags = 0
+        fragment_offset = 0
+        ttl = 64
+        protocol = socket.IPPROTO_TCP
+        checksum = 0  # Will be calculated by kernel
+        source_address = socket.inet_aton(src_ip)
+        dest_address = socket.inet_aton(dst_ip)
+        
+        ver_ihl = (version << 4) + ihl
+        flags_frag = (flags << 13) + fragment_offset
+        
+        ip_header = struct.pack('!BBHHHBBH4s4s',
+                               ver_ihl, type_of_service, total_length,
+                               identification, flags_frag, ttl, protocol, checksum,
+                               source_address, dest_address)
+        return ip_header
+    
+    def _create_tcp_header(self, src_port, dst_port, payload):
+        """Create TCP header"""
+        sequence = 0
+        acknowledgment = 0
+        data_offset = 5  # TCP header size
+        reserved = 0
+        flags = 0x18  # PSH + ACK
+        window = socket.htons(5840)
+        checksum = 0
+        urgent_pointer = 0
+        
+        offset_res = (data_offset << 4) + reserved
+        tcp_header = struct.pack('!HHLLBBHHH',
+                                src_port, dst_port, sequence, acknowledgment,
+                                offset_res, flags, window, checksum, urgent_pointer)
+        return tcp_header
+    
+    def send_raw_packet(self, packet_data):
+        """Send a raw packet from hex string"""
+        try:
+            target_ip = packet_data.get('target_ip', '').strip()
+            target_port = int(packet_data.get('target_port', 80))
+            hex_payload = packet_data.get('payload', '').strip()
+            
+            if not target_ip or not hex_payload:
+                return {"ok": False, "error": "Target IP and hex payload are required"}
+            
+            # Convert hex string to bytes
+            try:
+                raw_bytes = binascii.unhexlify(hex_payload.replace(' ', '').replace(':', ''))
+            except (ValueError, binascii.Error) as e:
+                return {"ok": False, "error": f"Invalid hex payload: {str(e)}"}
+            
+            self.gpio.stop_anim()
+            self.gpio._off_all()
+            
+            # LED animation for raw packet
+            self.gpio._set(PIN_B, B_ACTIVE_LOW, True)  # Blue LED for raw packet
+            time.sleep(0.1)
+            
+            # Send raw packet via UDP
+            sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            sock.sendto(raw_bytes, (target_ip, target_port))
+            sock.close()
+            
+            # Success animation
+            self.gpio._set(PIN_B, B_ACTIVE_LOW, False)
+            self.gpio._set(PIN_Y, Y_ACTIVE_LOW, True)
+            time.sleep(0.2)
+            self.gpio._set(PIN_Y, Y_ACTIVE_LOW, False)
+            threading.Thread(target=self.gpio.wave_once, kwargs={"step_period": 0.16}, daemon=True).start()
+            
+            return {
+                "ok": True,
+                "message": f"Raw packet sent to {target_ip}:{target_port}",
+                "payload_size": len(raw_bytes),
+                "hex_payload": hex_payload
+            }
+            
+        except Exception as e:
+            self.gpio.strobe_error()
+            return {"ok": False, "error": f"Raw packet send failed: {str(e)}"}
+    
+    def send_eicar_packet(self, packet_data):
+        """Send EICAR test string as packet payload"""
+        try:
+            target_ip = packet_data.get('target_ip', '').strip()
+            target_port = int(packet_data.get('target_port', 80))
+            protocol = packet_data.get('protocol', 'tcp').lower()
+            
+            if not target_ip:
+                return {"ok": False, "error": "Target IP is required"}
+            
+            # EICAR test string
+            eicar_string = "X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*"
+            
+            self.gpio.stop_anim()
+            self.gpio._off_all()
+            
+            # LED animation for EICAR test
+            self.gpio._set(PIN_Y, Y_ACTIVE_LOW, True)  # Yellow LED for EICAR
+            time.sleep(0.1)
+            
+            if protocol == 'tcp':
+                result = self._send_tcp_packet('', 12345, target_ip, target_port, eicar_string.encode('utf-8'))
+            else:
+                sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                sock.sendto(eicar_string.encode('utf-8'), (target_ip, target_port))
+                sock.close()
+                result = {
+                    "ok": True,
+                    "message": f"EICAR test packet sent to {target_ip}:{target_port}",
+                    "payload_size": len(eicar_string),
+                    "protocol": protocol.upper()
+                }
+            
+            # Success animation with special EICAR pattern
+            if result["ok"]:
+                self.gpio._set(PIN_Y, Y_ACTIVE_LOW, False)
+                # Special EICAR LED pattern (all LEDs flash twice)
+                def eicar_animation():
+                    for _ in range(2):
+                        self.gpio._apply_states(True, True, True, True, True, True, True)
+                        time.sleep(0.1)
+                        self.gpio._off_all()
+                        time.sleep(0.1)
+                
+                threading.Thread(target=eicar_animation, daemon=True).start()
+            else:
+                self.gpio._set(PIN_Y, Y_ACTIVE_LOW, False)
+                self.gpio.strobe_error()
+            
+            result["eicar_payload"] = eicar_string
+            return result
+            
+        except Exception as e:
+            self.gpio.strobe_error()
+            return {"ok": False, "error": f"EICAR packet send failed: {str(e)}"}

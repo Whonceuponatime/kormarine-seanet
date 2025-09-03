@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Malicious Packet Builder - KORMARINE SeaNet</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='diagram.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .packet-builder-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .packet-form-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .packet-form-group {
+            margin-bottom: 20px;
+        }
+        
+        .packet-form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+        
+        .packet-form-group input,
+        .packet-form-group select,
+        .packet-form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        .packet-form-group input:focus,
+        .packet-form-group select:focus,
+        .packet-form-group textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+        
+        .packet-form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .protocol-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .protocol-btn {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .protocol-btn.active {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+        
+        .packet-action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        .packet-btn {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .packet-btn.craft {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+        
+        .packet-btn.raw {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            color: white;
+        }
+        
+        .packet-btn.eicar {
+            background: linear-gradient(135deg, #f39c12, #d68910);
+            color: white;
+        }
+        
+        .packet-btn.clear {
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+            color: white;
+        }
+        
+        .packet-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .packet-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .preset-payloads {
+            margin-bottom: 20px;
+        }
+        
+        .preset-btn {
+            margin: 5px;
+            padding: 8px 15px;
+            background: #ecf0f1;
+            border: 1px solid #bdc3c7;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .preset-btn:hover {
+            background: #3498db;
+            color: white;
+        }
+        
+        .hex-input {
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            letter-spacing: 1px;
+        }
+        
+        .payload-stats {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .visual-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .network-visualization {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .packet-flow {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .node {
+            text-align: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+        }
+        
+        .node i {
+            font-size: 24px;
+            margin-bottom: 5px;
+            display: block;
+        }
+        
+        .flow-arrow {
+            font-size: 20px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+        
+        .packet-animation {
+            position: absolute;
+            top: 50%;
+            left: 10%;
+            width: 10px;
+            height: 10px;
+            background: #e74c3c;
+            border-radius: 50%;
+            opacity: 0;
+            z-index: 3;
+        }
+        
+        .packet-animation.active {
+            animation: packetFlow 2s ease-in-out;
+        }
+        
+        @keyframes packetFlow {
+            0% { left: 10%; opacity: 1; }
+            100% { left: 85%; opacity: 0; }
+        }
+        
+        .led-status-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .led-indicator {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #34495e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+            transition: all 0.3s ease;
+            border: 3px solid #2c3e50;
+        }
+        
+        .led-indicator.active {
+            background: #e74c3c;
+            border-color: #c0392b;
+            box-shadow: 0 0 20px rgba(231, 76, 60, 0.6);
+        }
+        
+        .response-panel {
+            background: #2c3e50;
+            color: #ecf0f1;
+            border-radius: 10px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .response-header {
+            color: #3498db;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .success { color: #2ecc71; }
+        .error { color: #e74c3c; }
+        .warning { color: #f39c12; }
+        
+        @media (max-width: 768px) {
+            .packet-builder-container {
+                grid-template-columns: 1fr;
+                padding: 10px;
+            }
+            
+            .packet-action-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="{{ url_for('static', filename='images/seacure-logo.png') }}" alt="SeaCure Logo" class="logo-img">
+                <span>KORMARINE SeaNet</span>
+            </div>
+            <div class="hamburger-menu" id="hamburger-menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <ul class="nav-menu" id="nav-menu">
+                <li><a href="/" class="nav-link"><i class="fas fa-network-wired"></i> Network Diagram</a></li>
+                <li><a href="/settings" class="nav-link"><i class="fas fa-cogs"></i> GPIO Settings</a></li>
+                <li><a href="/malicious-packet" class="nav-link active"><i class="fas fa-bug"></i> Malicious Packets</a></li>
+                <li><a href="/admin" class="nav-link"><i class="fas fa-tools"></i> Admin Panel</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <div class="page-header">
+            <h1><i class="fas fa-bug"></i> Malicious Packet Builder</h1>
+            <p>Craft and send custom packets with malicious payloads for security testing</p>
+        </div>
+
+        <div class="packet-builder-container">
+            <div class="packet-form-panel">
+                <h3><i class="fas fa-hammer"></i> Packet Configuration</h3>
+                
+                <div class="protocol-selector">
+                    <div class="protocol-btn active" data-protocol="tcp">
+                        <i class="fas fa-exchange-alt"></i> TCP
+                    </div>
+                    <div class="protocol-btn" data-protocol="udp">
+                        <i class="fas fa-paper-plane"></i> UDP
+                    </div>
+                    <div class="protocol-btn" data-protocol="raw">
+                        <i class="fas fa-code"></i> RAW
+                    </div>
+                </div>
+
+                <div id="packet-form">
+                    <div class="packet-form-group">
+                        <label><i class="fas fa-crosshairs"></i> Target IP Address:</label>
+                        <input type="text" id="target-ip" placeholder="192.168.1.100" value="192.168.1.100">
+                    </div>
+
+                    <div class="packet-form-group">
+                        <label><i class="fas fa-ethernet"></i> Target Port:</label>
+                        <input type="number" id="target-port" placeholder="80" value="80" min="1" max="65535">
+                    </div>
+
+                    <div class="packet-form-group" id="source-fields">
+                        <label><i class="fas fa-home"></i> Source IP (Optional):</label>
+                        <input type="text" id="source-ip" placeholder="Auto-detect">
+                    </div>
+
+                    <div class="packet-form-group" id="source-port-field">
+                        <label><i class="fas fa-door-open"></i> Source Port:</label>
+                        <input type="number" id="source-port" placeholder="12345" value="12345" min="1" max="65535">
+                    </div>
+
+                    <div class="packet-form-group">
+                        <label><i class="fas fa-file-code"></i> Payload:</label>
+                        <div class="preset-payloads">
+                            <button class="preset-btn" data-payload="Hello World!">Hello World</button>
+                            <button class="preset-btn" data-payload="EICAR">EICAR Test</button>
+                            <button class="preset-btn" data-payload="48656c6c6f20576f726c6421">Hex: Hello World</button>
+                            <button class="preset-btn" data-payload="3c7363726970743e616c65727428274861636b656427293c2f7363726970743e">XSS Payload</button>
+                        </div>
+                        <textarea id="payload" placeholder="Enter your payload here...&#10;For RAW mode: Enter hex bytes (e.g., 48656c6c6f)"></textarea>
+                        <div class="payload-stats" id="payload-stats">
+                            Length: 0 bytes
+                        </div>
+                    </div>
+                </div>
+
+                <div class="packet-action-buttons">
+                    <button class="packet-btn craft" id="craft-btn">
+                        <i class="fas fa-rocket"></i> Craft & Send
+                    </button>
+                    <button class="packet-btn eicar" id="eicar-btn">
+                        <i class="fas fa-virus"></i> Send EICAR
+                    </button>
+                    <button class="packet-btn raw" id="raw-btn" style="display: none;">
+                        <i class="fas fa-code"></i> Send Raw
+                    </button>
+                    <button class="packet-btn clear" id="clear-btn">
+                        <i class="fas fa-eraser"></i> Clear All
+                    </button>
+                </div>
+            </div>
+
+            <div class="visual-panel">
+                <h3><i class="fas fa-eye"></i> Visual Feedback</h3>
+                
+                <div class="network-visualization">
+                    <div class="packet-animation" id="packet-animation"></div>
+                    <div class="packet-flow">
+                        <div class="node">
+                            <i class="fas fa-laptop"></i>
+                            <div>Attacker</div>
+                            <small id="source-display">192.168.1.10</small>
+                        </div>
+                        <div class="flow-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                        <div class="node">
+                            <i class="fas fa-server"></i>
+                            <div>Target</div>
+                            <small id="target-display">192.168.1.100:80</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="led-status-section">
+                    <h4><i class="fas fa-lightbulb"></i> LED Status</h4>
+                    <div class="led-status-grid" id="led-grid">
+                        <div class="led-indicator" data-pin="17">1</div>
+                        <div class="led-indicator" data-pin="27">2</div>
+                        <div class="led-indicator" data-pin="22">3</div>
+                        <div class="led-indicator" data-pin="10">4</div>
+                        <div class="led-indicator" data-pin="9">5</div>
+                        <div class="led-indicator" data-pin="5">6</div>
+                        <div class="led-indicator" data-pin="6">7</div>
+                    </div>
+                </div>
+
+                <div class="interaction-panel">
+                    <h4><i class="fas fa-terminal"></i> Response & Log</h4>
+                    <div class="response-panel" id="response-log">
+                        <div class="response-header">[READY] Malicious Packet Builder initialized</div>
+                        <div>Ready to craft and send custom packets...</div>
+                    </div>
+                    <button id="clear-log" class="clear-btn" style="margin-top: 10px;">
+                        <i class="fas fa-trash"></i> Clear Log
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='malicious_packet.js') }}"></script>
+    <script>
+        // Hamburger menu functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const hamburgerMenu = document.getElementById('hamburger-menu');
+            const navMenu = document.getElementById('nav-menu');
+            
+            hamburgerMenu.addEventListener('click', function() {
+                navMenu.classList.toggle('active');
+            });
+            
+            // Close menu when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!hamburgerMenu.contains(event.target) && !navMenu.contains(event.target)) {
+                    navMenu.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
