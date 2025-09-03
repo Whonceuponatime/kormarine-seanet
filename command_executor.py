@@ -269,6 +269,7 @@ class CommandExecutor:
             self.gpio._off_all()
             
             # LED animation for packet crafting (no pause)
+            print(f"DEBUG: Turning ON RED LED (PIN_R={PIN_R}) for crafting")
             self.gpio._set(PIN_R, R_ACTIVE_LOW, True)  # Red LED for crafting
             
             if protocol == 'tcp':
@@ -280,10 +281,13 @@ class CommandExecutor:
             
             # Success animation
             if result["ok"]:
-                # Green LED for success (using PIN_Y)
+                # Yellow LED for success (using PIN_Y)
+                print(f"DEBUG: Turning OFF RED LED (PIN_R={PIN_R})")
                 self.gpio._set(PIN_R, R_ACTIVE_LOW, False)
+                print(f"DEBUG: Turning ON YELLOW LED (PIN_Y={PIN_Y}) for success")
                 self.gpio._set(PIN_Y, Y_ACTIVE_LOW, True)
                 time.sleep(0.5)  # Slower timing for success indication
+                print(f"DEBUG: Turning OFF YELLOW LED (PIN_Y={PIN_Y})")
                 self.gpio._set(PIN_Y, Y_ACTIVE_LOW, False)
                 # Start wave animation
                 threading.Thread(target=self.gpio.wave_once, kwargs={"step_period": 0.16}, daemon=True).start()
