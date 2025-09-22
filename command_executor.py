@@ -251,6 +251,7 @@ class CommandExecutor:
     
     def craft_and_send_packet(self, packet_data):
         """Craft and send a custom packet with specified parameters"""
+        print(f"DEBUG CRAFT: Starting craft_and_send_packet with data: {packet_data}")
         try:
             # Extract packet parameters
             target_ip = packet_data.get('target_ip', '').strip()

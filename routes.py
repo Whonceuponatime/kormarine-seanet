@@ -181,13 +181,13 @@ class Routes:
         def craft_packet():
             try:
                 data = request.get_json()
-                print(f"Received packet craft request: {data}")  # Debug logging
+                print(f"DEBUG ROUTE: Received packet craft request: {data}")  # Debug logging
                 
                 if not data:
                     return jsonify({"ok": False, "error": "No packet data provided"}), 400
                 
                 result = self.cmd.craft_and_send_packet(data)
-                print(f"Packet craft result: {result}")  # Debug logging
+                print(f"DEBUG ROUTE: Packet craft result: {result}")  # Debug logging
                 
                 # Return result with appropriate status code
                 if result["ok"]:
