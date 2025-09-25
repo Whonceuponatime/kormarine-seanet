@@ -52,7 +52,7 @@ class Routes:
         @self.app.get("/wave/forward")
         def wave_forward():
             try:
-                hz = float(request.args.get("hz", str(100)))
+                hz = float(request.args.get("hz", str(DEFAULT_WAVE_SPEED)))
                 step_period = 1.0 / max(0.1, hz)
             except:
                 hz = DEFAULT_WAVE_SPEED
