@@ -29,11 +29,12 @@
                 <p class="section-description">Test individual GPIO pins to ensure proper LED functionality</p>
                 
                 <div class="gpio-grid">
+                    <!-- GPIO pins in order: [17, 27, 22, 10, 9, 5, 6, 26, 16, 14, 18, 23, 24, 25, 20] -->
                     <div class="gpio-item" data-pin="17">
                         <div class="gpio-info">
                             <div class="pin-header">
                                 <span class="pin-number">GPIO 17</span>
-                                <span class="pin-description">LED 1 (Red RGB - Active HIGH)</span>
+                                <span class="pin-description">LED 1 (Active HIGH)</span>
                             </div>
                             <div class="pin-status">
                                 <div class="status-indicator" id="status-17">OFF</div>
@@ -171,6 +172,174 @@
                                 <i class="fas fa-lightbulb"></i> Turn ON
                             </button>
                             <button class="gpio-btn off-btn" onclick="testGPIO(6, 'off')">
+                                <i class="fas fa-power-off"></i> Turn OFF
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="gpio-item" data-pin="26">
+                        <div class="gpio-info">
+                            <div class="pin-header">
+                                <span class="pin-number">GPIO 26</span>
+                                <span class="pin-description">LED 8 (Active HIGH)</span>
+                            </div>
+                            <div class="pin-status">
+                                <div class="status-indicator" id="status-26">OFF</div>
+                                <div class="led-visual" id="led-visual-26"></div>
+                            </div>
+                        </div>
+                        <div class="gpio-controls">
+                            <button class="gpio-btn on-btn" onclick="testGPIO(26, 'on')">
+                                <i class="fas fa-lightbulb"></i> Turn ON
+                            </button>
+                            <button class="gpio-btn off-btn" onclick="testGPIO(26, 'off')">
+                                <i class="fas fa-power-off"></i> Turn OFF
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="gpio-item" data-pin="16">
+                        <div class="gpio-info">
+                            <div class="pin-header">
+                                <span class="pin-number">GPIO 16</span>
+                                <span class="pin-description">LED 9 (Active HIGH)</span>
+                            </div>
+                            <div class="pin-status">
+                                <div class="status-indicator" id="status-16">OFF</div>
+                                <div class="led-visual" id="led-visual-16"></div>
+                            </div>
+                        </div>
+                        <div class="gpio-controls">
+                            <button class="gpio-btn on-btn" onclick="testGPIO(16, 'on')">
+                                <i class="fas fa-lightbulb"></i> Turn ON
+                            </button>
+                            <button class="gpio-btn off-btn" onclick="testGPIO(16, 'off')">
+                                <i class="fas fa-power-off"></i> Turn OFF
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="gpio-item" data-pin="14">
+                        <div class="gpio-info">
+                            <div class="pin-header">
+                                <span class="pin-number">GPIO 14</span>
+                                <span class="pin-description">LED 10 (Active HIGH)</span>
+                            </div>
+                            <div class="pin-status">
+                                <div class="status-indicator" id="status-14">OFF</div>
+                                <div class="led-visual" id="led-visual-14"></div>
+                            </div>
+                        </div>
+                        <div class="gpio-controls">
+                            <button class="gpio-btn on-btn" onclick="testGPIO(14, 'on')">
+                                <i class="fas fa-lightbulb"></i> Turn ON
+                            </button>
+                            <button class="gpio-btn off-btn" onclick="testGPIO(14, 'off')">
+                                <i class="fas fa-power-off"></i> Turn OFF
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="gpio-item" data-pin="18">
+                        <div class="gpio-info">
+                            <div class="pin-header">
+                                <span class="pin-number">GPIO 18</span>
+                                <span class="pin-description">LED 11 (Active HIGH)</span>
+                            </div>
+                            <div class="pin-status">
+                                <div class="status-indicator" id="status-18">OFF</div>
+                                <div class="led-visual" id="led-visual-18"></div>
+                            </div>
+                        </div>
+                        <div class="gpio-controls">
+                            <button class="gpio-btn on-btn" onclick="testGPIO(18, 'on')">
+                                <i class="fas fa-lightbulb"></i> Turn ON
+                            </button>
+                            <button class="gpio-btn off-btn" onclick="testGPIO(18, 'off')">
+                                <i class="fas fa-power-off"></i> Turn OFF
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="gpio-item" data-pin="23">
+                        <div class="gpio-info">
+                            <div class="pin-header">
+                                <span class="pin-number">GPIO 23</span>
+                                <span class="pin-description">LED 12 (Active HIGH)</span>
+                            </div>
+                            <div class="pin-status">
+                                <div class="status-indicator" id="status-23">OFF</div>
+                                <div class="led-visual" id="led-visual-23"></div>
+                            </div>
+                        </div>
+                        <div class="gpio-controls">
+                            <button class="gpio-btn on-btn" onclick="testGPIO(23, 'on')">
+                                <i class="fas fa-lightbulb"></i> Turn ON
+                            </button>
+                            <button class="gpio-btn off-btn" onclick="testGPIO(23, 'off')">
+                                <i class="fas fa-power-off"></i> Turn OFF
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="gpio-item" data-pin="24">
+                        <div class="gpio-info">
+                            <div class="pin-header">
+                                <span class="pin-number">GPIO 24</span>
+                                <span class="pin-description">LED 13 (Active HIGH)</span>
+                            </div>
+                            <div class="pin-status">
+                                <div class="status-indicator" id="status-24">OFF</div>
+                                <div class="led-visual" id="led-visual-24"></div>
+                            </div>
+                        </div>
+                        <div class="gpio-controls">
+                            <button class="gpio-btn on-btn" onclick="testGPIO(24, 'on')">
+                                <i class="fas fa-lightbulb"></i> Turn ON
+                            </button>
+                            <button class="gpio-btn off-btn" onclick="testGPIO(24, 'off')">
+                                <i class="fas fa-power-off"></i> Turn OFF
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="gpio-item" data-pin="25">
+                        <div class="gpio-info">
+                            <div class="pin-header">
+                                <span class="pin-number">GPIO 25</span>
+                                <span class="pin-description">LED 14 (Active HIGH)</span>
+                            </div>
+                            <div class="pin-status">
+                                <div class="status-indicator" id="status-25">OFF</div>
+                                <div class="led-visual" id="led-visual-25"></div>
+                            </div>
+                        </div>
+                        <div class="gpio-controls">
+                            <button class="gpio-btn on-btn" onclick="testGPIO(25, 'on')">
+                                <i class="fas fa-lightbulb"></i> Turn ON
+                            </button>
+                            <button class="gpio-btn off-btn" onclick="testGPIO(25, 'off')">
+                                <i class="fas fa-power-off"></i> Turn OFF
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="gpio-item" data-pin="20">
+                        <div class="gpio-info">
+                            <div class="pin-header">
+                                <span class="pin-number">GPIO 20</span>
+                                <span class="pin-description">LED 15 (Active HIGH)</span>
+                            </div>
+                            <div class="pin-status">
+                                <div class="status-indicator" id="status-20">OFF</div>
+                                <div class="led-visual" id="led-visual-20"></div>
+                            </div>
+                        </div>
+                        <div class="gpio-controls">
+                            <button class="gpio-btn on-btn" onclick="testGPIO(20, 'on')">
+                                <i class="fas fa-lightbulb"></i> Turn ON
+                            </button>
+                            <button class="gpio-btn off-btn" onclick="testGPIO(20, 'off')">
                                 <i class="fas fa-power-off"></i> Turn OFF
                             </button>
                         </div>
