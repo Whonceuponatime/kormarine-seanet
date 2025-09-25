@@ -77,21 +77,33 @@ class CommandExecutor:
         ok = (code == 0)
         
         if ok:
-            # Success animation - 1234567 pattern for port down
+            # Success animation - 1→15 pattern for port down
             def port_down_animation():
-                # Pattern: 1-2-3-4-5-6-7 (GPIO 17, 27, 22, 10, 9, 5, 6)
+                # Pattern: 1→2→3→4→5→6→7→8→9→10→11→12→13→14→15 (all GPIO pins)
                 seq = [
-                    (True,  False, False, False, False, False, False),  # 17 (1)
-                    (False, True,  False, False, False, False, False),  # 27 (2)
-                    (False, False, True,  False, False, False, False),  # 22 (3)
-                    (False, False, False, True,  False, False, False),  # 10 (4)
-                    (False, False, False, False, True,  False, False),  # 9  (5)
-                    (False, False, False, False, False, True,  False),  # 5  (6)
-                    (False, False, False, False, False, False, True),   # 6  (7)
+                    (True,  False, False, False, False, False, False, False, False, False, False, False, False, False, False),  # 17 (1)
+                    (False, True,  False, False, False, False, False, False, False, False, False, False, False, False, False),  # 27 (2)
+                    (False, False, True,  False, False, False, False, False, False, False, False, False, False, False, False),  # 22 (3)
+                    (False, False, False, True,  False, False, False, False, False, False, False, False, False, False, False),  # 10 (4)
+                    (False, False, False, False, True,  False, False, False, False, False, False, False, False, False, False),  # 9  (5)
+                    (False, False, False, False, False, True,  False, False, False, False, False, False, False, False, False),  # 5  (6)
+                    (False, False, False, False, False, False, True,  False, False, False, False, False, False, False, False),  # 6  (7)
+                    (False, False, False, False, False, False, False, True,  False, False, False, False, False, False, False),  # 26 (8)
+                    (False, False, False, False, False, False, False, False, True,  False, False, False, False, False, False),  # 16 (9)
+                    (False, False, False, False, False, False, False, False, False, True,  False, False, False, False, False),  # 14 (10)
+                    (False, False, False, False, False, False, False, False, False, False, True,  False, False, False, False),  # 18 (11)
+                    (False, False, False, False, False, False, False, False, False, False, False, True,  False, False, False),  # 23 (12)
+                    (False, False, False, False, False, False, False, False, False, False, False, False, True,  False, False),  # 24 (13)
+                    (False, False, False, False, False, False, False, False, False, False, False, False, False, True,  False),  # 25 (14)
+                    (False, False, False, False, False, False, False, False, False, False, False, False, False, False, True),   # 20 (15)
                 ]
-                for st in seq:
+                for i, st in enumerate(seq):
                     self.gpio._apply_states(*st)
-                    time.sleep(0.15)
+                    time.sleep(0.12)  # Slightly faster for better flow
+                    # Send SNMP command when last LED lights up
+                    if i == len(seq) - 1:
+                        time.sleep(0.1)  # Brief pause to show last LED
+                        # The SNMP command was already sent before this animation
                 self.gpio._off_all()
             
             threading.Thread(target=port_down_animation, daemon=True).start()
@@ -131,21 +143,33 @@ class CommandExecutor:
         ok = (code == 0)
         
         if ok:
-            # Success animation - 7654321 pattern for port up
+            # Success animation - 15→1 pattern for port up
             def port_up_animation():
-                # Pattern: 7-6-5-4-3-2-1 (GPIO 6, 5, 9, 10, 22, 27, 17)
+                # Pattern: 15→14→13→12→11→10→9→8→7→6→5→4→3→2→1 (reverse order)
                 seq = [
-                    (False, False, False, False, False, False, True),   # 6  (7)
-                    (False, False, False, False, False, True,  False),  # 5  (6)
-                    (False, False, False, False, True,  False, False),  # 9  (5)
-                    (False, False, False, True,  False, False, False),  # 10 (4)
-                    (False, False, True,  False, False, False, False),  # 22 (3)
-                    (False, True,  False, False, False, False, False),  # 27 (2)
-                    (True,  False, False, False, False, False, False),  # 17 (1)
+                    (False, False, False, False, False, False, False, False, False, False, False, False, False, False, True),   # 20 (15)
+                    (False, False, False, False, False, False, False, False, False, False, False, False, False, True,  False),  # 25 (14)
+                    (False, False, False, False, False, False, False, False, False, False, False, False, True,  False, False),  # 24 (13)
+                    (False, False, False, False, False, False, False, False, False, False, False, True,  False, False, False),  # 23 (12)
+                    (False, False, False, False, False, False, False, False, False, False, True,  False, False, False, False),  # 18 (11)
+                    (False, False, False, False, False, False, False, False, False, True,  False, False, False, False, False),  # 14 (10)
+                    (False, False, False, False, False, False, False, False, True,  False, False, False, False, False, False),  # 16 (9)
+                    (False, False, False, False, False, False, False, True,  False, False, False, False, False, False, False),  # 26 (8)
+                    (False, False, False, False, False, False, True,  False, False, False, False, False, False, False, False),  # 6  (7)
+                    (False, False, False, False, False, True,  False, False, False, False, False, False, False, False, False),  # 5  (6)
+                    (False, False, False, False, True,  False, False, False, False, False, False, False, False, False, False),  # 9  (5)
+                    (False, False, False, True,  False, False, False, False, False, False, False, False, False, False, False),  # 10 (4)
+                    (False, False, True,  False, False, False, False, False, False, False, False, False, False, False, False),  # 22 (3)
+                    (False, True,  False, False, False, False, False, False, False, False, False, False, False, False, False),  # 27 (2)
+                    (True,  False, False, False, False, False, False, False, False, False, False, False, False, False, False),  # 17 (1)
                 ]
-                for st in seq:
+                for i, st in enumerate(seq):
                     self.gpio._apply_states(*st)
-                    time.sleep(0.15)
+                    time.sleep(0.12)  # Slightly faster for better flow
+                    # Send SNMP command when last LED lights up
+                    if i == len(seq) - 1:
+                        time.sleep(0.1)  # Brief pause to show last LED
+                        # The SNMP command was already sent before this animation
                 self.gpio._off_all()
             
             threading.Thread(target=port_up_animation, daemon=True).start()
