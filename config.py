@@ -6,7 +6,7 @@ Contains GPIO pin definitions and server settings
 """
 
 # ===================== GPIO CONFIG =====================
-PIN_R = 17   # RGB red (active-LOW)
+PIN_R = 17   # RGB red (active-HIGH)
 PIN_X = 27   # LED (active-HIGH)
 PIN_Y = 22   # LED (active-HIGH)
 PIN_A = 10   # LED (active-HIGH)
@@ -15,7 +15,7 @@ PIN_C = 5    # LED (active-HIGH)
 PIN_D = 6    # LED (active-HIGH)
 
 # Active low/high configuration for each pin
-R_ACTIVE_LOW = True
+R_ACTIVE_LOW = False
 X_ACTIVE_LOW = False
 Y_ACTIVE_LOW = False
 A_ACTIVE_LOW = False
