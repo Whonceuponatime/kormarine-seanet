@@ -183,7 +183,7 @@ async function testGPIO(pin, action) {
 async function runTestSequence() {
     settingsController.addTestLog('Starting GPIO test sequence...', 'info');
     
-    const pins = [17, 27, 22, 10, 9, 5, 6];
+    const pins = [17, 27, 22, 10, 9, 5, 6, 26, 16, 14, 18, 23, 24, 25, 20];
     
     try {
         // Turn all off first
@@ -192,15 +192,15 @@ async function runTestSequence() {
         
         // Test each pin in sequence
         for (const pin of pins) {
-            settingsController.addTestLog(`Testing Pin ${pin}...`, 'info');
+            settingsController.addTestLog(`Testing GPIO ${pin}...`, 'info');
             
             // Turn on
             await fetch(`/on${pin}`);
-            await new Promise(resolve => setTimeout(resolve, 800));
+            await new Promise(resolve => setTimeout(resolve, 600));
             
             // Turn off
             await fetch('/off');
-            await new Promise(resolve => setTimeout(resolve, 300));
+            await new Promise(resolve => setTimeout(resolve, 200));
         }
         
         settingsController.addTestLog('GPIO test sequence completed successfully', 'success');
@@ -213,13 +213,13 @@ async function runTestSequence() {
 async function allGPIOOn() {
     settingsController.addTestLog('Turning all GPIOs ON...', 'info');
     
-    const pins = [17, 27, 22, 10, 9, 5, 6];
+    const pins = [17, 27, 22, 10, 9, 5, 6, 26, 16, 14, 18, 23, 24, 25, 20];
     
     try {
         // Turn on each pin
         for (const pin of pins) {
             await fetch(`/on${pin}`);
-            await new Promise(resolve => setTimeout(resolve, 100));
+            await new Promise(resolve => setTimeout(resolve, 50));
         }
         
         settingsController.addTestLog('All GPIOs turned ON', 'success');
@@ -249,15 +249,35 @@ async function allGPIOOff() {
 // Wave Animation Functions
 async function startWaveAnimation() {
     const speed = settingsController.currentWaveSpeed;
-    settingsController.addTestLog(`Starting wave animation at ${speed} Hz`, 'info');
+    const pattern = settingsController.currentPattern;
+    settingsController.addTestLog(`Starting ${pattern} wave animation at ${speed} Hz`, 'info');
     
     try {
-        const response = await fetch(`/start?hz=${speed}`);
+        let endpoint;
+        if (pattern === 'forward') {
+            endpoint = `/wave/forward?hz=${speed}`;
+        } else if (pattern === 'backward') {
+            // For backward, we'll use roundtrip but only show the return part
+            endpoint = `/wave/roundtrip?hz=${speed}`;
+        } else if (pattern === 'roundtrip') {
+            endpoint = `/wave/roundtrip?hz=${speed}`;
+        } else if (pattern === 'bounce') {
+            endpoint = `/wave/bounce?hz=${speed}`;
+        } else {
+            // Default to continuous chaser
+            endpoint = `/start?hz=${speed}`;
+        }
+        
+        const response = await fetch(endpoint);
         const data = await response.json();
         
         if (data.ok) {
-            settingsController.addTestLog(`Wave animation started at ${data.hz} Hz`, 'success');
-            settingsController.updateWaveStatus('Running');
+            settingsController.addTestLog(`${data.anim} started at ${data.hz} Hz`, 'success');
+            if (pattern === 'forward' || pattern === 'roundtrip' || pattern === 'bounce') {
+                settingsController.updateWaveStatus('Completed');
+            } else {
+                settingsController.updateWaveStatus('Running');
+            }
         } else {
             settingsController.addTestLog('Failed to start wave animation', 'error');
         }
@@ -285,14 +305,29 @@ async function stopWaveAnimation() {
 }
 
 async function singleWave() {
-    settingsController.addTestLog('Executing single wave animation...', 'info');
+    const pattern = settingsController.currentPattern;
+    settingsController.addTestLog(`Executing single ${pattern} wave animation...`, 'info');
     
     try {
-        const response = await fetch('/demo/packet', { method: 'POST' });
+        let endpoint;
+        if (pattern === 'forward') {
+            endpoint = `/wave/forward`;
+        } else if (pattern === 'backward') {
+            endpoint = `/wave/roundtrip`;
+        } else if (pattern === 'roundtrip') {
+            endpoint = `/wave/roundtrip`;
+        } else if (pattern === 'bounce') {
+            endpoint = `/wave/bounce`;
+        } else {
+            // Default to packet demo wave
+            endpoint = '/demo/packet';
+        }
+        
+        const response = await fetch(endpoint);
         const data = await response.json();
         
         if (data.ok) {
-            settingsController.addTestLog('Single wave animation executed', 'success');
+            settingsController.addTestLog(`Single ${pattern} wave animation executed`, 'success');
         } else {
             settingsController.addTestLog('Failed to execute single wave', 'error');
         }

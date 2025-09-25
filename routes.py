@@ -47,7 +47,44 @@ class Routes:
                 hz = DEFAULT_WAVE_SPEED
                 step_period = 1.0
             started = self.gpio.start_chaser(step_period)
-            return jsonify(ok=started, anim="7-step wave", hz=hz)
+            return jsonify(ok=started, anim="15-step chaser", hz=hz)
+        
+        @self.app.get("/wave/forward")
+        def wave_forward():
+            try:
+                hz = float(request.args.get("hz", str(DEFAULT_WAVE_SPEED)))
+                step_period = 1.0 / max(0.1, hz)
+            except:
+                hz = DEFAULT_WAVE_SPEED
+                step_period = 1.0
+            # Run single forward wave
+            self.gpio.wave_once(step_period)
+            return jsonify(ok=True, anim="forward wave", hz=hz)
+        
+        @self.app.get("/wave/roundtrip")
+        def wave_roundtrip():
+            try:
+                hz = float(request.args.get("hz", str(DEFAULT_WAVE_SPEED)))
+                step_period = 1.0 / max(0.1, hz)
+            except:
+                hz = DEFAULT_WAVE_SPEED
+                step_period = 1.0
+            # Run single roundtrip wave
+            self.gpio.roundtrip_wave(step_period)
+            return jsonify(ok=True, anim="roundtrip wave", hz=hz)
+        
+        @self.app.get("/wave/bounce")
+        def wave_bounce():
+            try:
+                hz = float(request.args.get("hz", str(DEFAULT_WAVE_SPEED)))
+                step_period = 1.0 / max(0.1, hz)
+            except:
+                hz = DEFAULT_WAVE_SPEED
+                step_period = 1.0
+            # Run multiple roundtrip waves for bounce effect
+            for _ in range(3):
+                self.gpio.roundtrip_wave(step_period)
+            return jsonify(ok=True, anim="bounce wave", hz=hz)
         
         @self.app.get("/stop")
         def stop():
