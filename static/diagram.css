@@ -74,16 +74,16 @@ body.admin-page {
 
 .network-topology .interaction-panel {
     flex-shrink: 0;
-    height: 180px;
+    height: 250px;
 }
 
-/* Header Styles - More space for logo and title */
+/* Header Styles - Compact for more space */
 .diagram-header {
     background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
     border: 2px solid #dc3545;
     border-radius: 8px;
-    padding: 15px 25px;
-    margin-bottom: 10px;
+    padding: 8px 15px;
+    margin-bottom: 6px;
     box-shadow: 0 4px 12px rgba(220, 53, 69, 0.15);
     position: relative;
     flex-shrink: 0;
@@ -98,17 +98,17 @@ body.admin-page {
 .logo-section {
     display: flex;
     align-items: center;
-    gap: 25px;
+    gap: 15px;
 }
 
 .header-logo {
-    height: 140px;
+    height: 80px;
     width: auto;
 }
 
 .header-content h1 {
     color: #dc3545;
-    font-size: 2.2rem;
+    font-size: 1.6rem;
     margin: 0;
     font-weight: 700;
 }
@@ -278,13 +278,13 @@ body.admin-page {
     color: white;
 }
 
-/* Control Panel - More space for diagram */
+/* Control Panel - Compact for more space */
 .control-panel {
     background: linear-gradient(135deg, rgba(52, 73, 93, 0.95) 0%, rgba(44, 62, 80, 0.95) 100%);
     border: 2px solid rgba(52, 152, 219, 0.3);
     border-radius: 12px;
-    padding: 18px;
-    margin-bottom: 10px;
+    padding: 12px;
+    margin-bottom: 6px;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
     flex-shrink: 0;
@@ -293,21 +293,21 @@ body.admin-page {
 .control-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 12px;
+    gap: 8px;
     align-items: start;
 }
 
-/* Control Group - Better proportions */
+/* Control Group - Compact proportions */
 .control-group {
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 10px;
-    padding: 14px;
+    border-radius: 8px;
+    padding: 10px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 6px;
     transition: all 0.3s ease;
-    min-height: 100px;
+    min-height: 80px;
     backdrop-filter: blur(5px);
 }
 
@@ -759,12 +759,12 @@ body.admin-page {
     height: 200px;
 }
 
-/* Unified Panel Styling - Minimal size for more diagram space */
+/* Unified Panel Styling - Optimized for command output */
 .attack-log {
     background: linear-gradient(135deg, rgba(52, 73, 93, 0.95) 0%, rgba(44, 62, 80, 0.95) 100%);
     border: 2px solid rgba(52, 152, 219, 0.3);
     border-radius: 10px;
-    padding: 10px;
+    padding: 8px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
     transition: all 0.3s ease;
@@ -782,17 +782,17 @@ body.admin-page {
 
 /* Manual LED control styles removed */
 
-/* Panel Headers - Minimal size */
+/* Panel Headers - Compact size */
 .attack-log h3 {
     color: #ecf0f1;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     font-weight: 700;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
     border-bottom: 1px solid rgba(52, 152, 219, 0.3);
-    padding-bottom: 6px;
+    padding-bottom: 4px;
     position: relative;
     flex-shrink: 0;
 }
@@ -824,10 +824,10 @@ body.admin-page {
     flex: 1;
     overflow-y: auto;
     background: #2c3e50;
-    border-radius: 8px;
-    padding: 12px;
+    border-radius: 6px;
+    padding: 8px;
     font-family: 'Courier New', monospace;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     border: 1px solid #34495e;
     min-height: 0;
 }
@@ -869,14 +869,14 @@ body.admin-page {
 }
 
 .clear-btn {
-    margin-top: 6px;
-    padding: 4px 8px;
+    margin-top: 4px;
+    padding: 3px 6px;
     background: #e74c3c;
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     transition: all 0.3s ease;
     flex-shrink: 0;
 }
@@ -952,7 +952,7 @@ body.admin-page {
     
     .interaction-panel {
         grid-template-columns: 1fr;
-        height: 220px;
+        height: 280px;
     }
     
     .control-panel, .attack-log {
@@ -968,7 +968,7 @@ body.admin-page {
     
     .interaction-panel {
         grid-template-columns: 1fr;
-        height: 200px;
+        height: 250px;
     }
     
     .control-group {
@@ -979,16 +979,16 @@ body.admin-page {
 
 @media (max-width: 768px) {
     .diagram-header {
-        padding: 15px 20px;
-        margin-bottom: 15px;
+        padding: 8px 15px;
+        margin-bottom: 8px;
     }
     
     .header-content h1 {
-        font-size: 2rem;
+        font-size: 1.4rem;
     }
     
     .header-logo {
-        height: 100px;
+        height: 60px;
     }
     
     .control-panel, .attack-log {
