@@ -155,7 +155,7 @@
             </div>
         </header>
 
-        <div class="network-diagram" style="padding: 2px; width: 100%; height: 400px; min-height: 400px;">
+        <div class="network-diagram" style="padding: 2px; width: 100%; height: 350px; min-height: 350px;">
             <div class="diagram-overlay">
                 <div class="interaction-hint-overlay">
                     <i class="fas fa-info-circle"></i>
@@ -357,15 +357,15 @@
         </div>
 
         <div class="control-panel">
-            <div class="control-grid" style="grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+            <div class="control-grid" style="grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
                 <!-- Target Configuration -->
                 <div class="control-group">
                     <label><i class="fas fa-crosshairs"></i> Target Configuration:</label>
-                    <div style="margin-bottom: 8px;">
-                        <input type="text" id="target-ip" value="192.168.1.100" placeholder="Target IP" class="control-input" style="margin-bottom: 4px;">
+                    <div style="margin-bottom: 4px;">
+                        <input type="text" id="target-ip" value="192.168.1.100" placeholder="Target IP" class="control-input" style="margin-bottom: 2px;">
                         <div style="display: flex; gap: 2px; align-items: center;">
-                            <input type="text" id="target-mac" placeholder="Target MAC (XX:XX:XX:XX:XX:XX)" class="control-input" style="font-size: 10px; flex: 1;">
-                            <button id="fetch-target-mac-btn" style="background: #3498db; border: none; color: white; padding: 4px 6px; border-radius: 3px; cursor: pointer; font-size: 10px; min-width: 24px; height: 24px;" title="Auto-fetch Target MAC">
+                            <input type="text" id="target-mac" placeholder="Target MAC (XX:XX:XX:XX:XX:XX)" class="control-input" style="font-size: 9px; flex: 1;">
+                            <button id="fetch-target-mac-btn" style="background: #3498db; border: none; color: white; padding: 3px 5px; border-radius: 3px; cursor: pointer; font-size: 9px; min-width: 20px; height: 20px;" title="Auto-fetch Target MAC">
                                 🔍
                             </button>
                         </div>
@@ -376,11 +376,11 @@
                 <!-- Source Configuration -->
                 <div class="control-group">
                     <label><i class="fas fa-home"></i> Source Configuration:</label>
-                    <div style="margin-bottom: 8px;">
-                        <input type="text" id="source-ip" placeholder="Source IP (Auto)" class="control-input" style="margin-bottom: 4px;">
+                    <div style="margin-bottom: 4px;">
+                        <input type="text" id="source-ip" placeholder="Source IP (Auto)" class="control-input" style="margin-bottom: 2px;">
                         <div style="display: flex; gap: 2px; align-items: center;">
-                            <input type="text" id="source-mac" placeholder="Source MAC (XX:XX:XX:XX:XX:XX)" class="control-input" style="font-size: 10px; flex: 1;">
-                            <button id="fetch-source-mac-btn" style="background: #3498db; border: none; color: white; padding: 4px 6px; border-radius: 3px; cursor: pointer; font-size: 10px; min-width: 24px; height: 24px;" title="Auto-fetch Source MAC">
+                            <input type="text" id="source-mac" placeholder="Source MAC (XX:XX:XX:XX:XX:XX)" class="control-input" style="font-size: 9px; flex: 1;">
+                            <button id="fetch-source-mac-btn" style="background: #3498db; border: none; color: white; padding: 3px 5px; border-radius: 3px; cursor: pointer; font-size: 9px; min-width: 20px; height: 20px;" title="Auto-fetch Source MAC">
                                 🔍
                             </button>
                         </div>
@@ -391,27 +391,27 @@
                 <!-- Payload Configuration -->
                 <div class="control-group">
                     <label><i class="fas fa-file-code"></i> Payload Configuration:</label>
-                    <div class="preset-payloads" style="margin-bottom: 8px;">
+                    <div class="preset-payloads" style="margin-bottom: 4px;">
                         <button class="preset-btn" data-payload="Hello World!">Hello World</button>
                         <button class="preset-btn" data-payload="EICAR">EICAR Test</button>
                         <button class="preset-btn" data-payload="48656c6c6f20576f726c6421">Hex: Hello</button>
                         <button class="preset-btn" data-payload="3c7363726970743e616c65727428274861636b656427293c2f7363726970743e">XSS</button>
                     </div>
-                    <textarea id="payload" placeholder="Enter payload..." class="control-input" style="min-height: 60px; font-family: 'Courier New', monospace; font-size: 11px;"></textarea>
+                    <textarea id="payload" placeholder="Enter payload..." class="control-input" style="min-height: 50px; font-family: 'Courier New', monospace; font-size: 10px;"></textarea>
                 </div>
             </div>
             
             <!-- Action Buttons (Full Width) -->
-            <div class="control-group" style="margin-top: 15px;">
+            <div class="control-group" style="margin-top: 8px;">
                 <label><i class="fas fa-rocket"></i> Packet Actions:</label>
-                <div class="attack-buttons" style="display: flex; gap: 10px; justify-content: center;">
-                    <button id="craft-btn" class="control-btn port-down" style="flex: 1; padding: 12px 20px;">
+                <div class="attack-buttons" style="display: flex; gap: 6px; justify-content: center;">
+                    <button id="craft-btn" class="control-btn port-down" style="flex: 1; padding: 8px 16px;">
                         <i class="fas fa-hammer"></i> Craft & Send TCP Packet
                     </button>
-                    <button id="eicar-btn" class="control-btn port-up" style="flex: 1; padding: 12px 20px;">
+                    <button id="eicar-btn" class="control-btn port-up" style="flex: 1; padding: 8px 16px;">
                         <i class="fas fa-virus"></i> Send EICAR Test
                     </button>
-                    <button id="clear-btn" class="control-btn secondary" style="flex: 0.5; padding: 12px 20px;">
+                    <button id="clear-btn" class="control-btn secondary" style="flex: 0.5; padding: 8px 16px;">
                         <i class="fas fa-eraser"></i> Clear All
                     </button>
                 </div>
