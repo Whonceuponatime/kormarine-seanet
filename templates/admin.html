@@ -10,14 +10,37 @@
 <body class="admin-page">
     <div class="diagram-container">
         <header class="diagram-header">
+            <div class="nav-container">
+                <button class="hamburger-menu" id="hamburger-menu">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
+                <div class="nav-menu" id="nav-menu">
+                    <div class="attack-type-selector">
+                        <div class="attack-type-header">
+                            <i class="fas fa-bug"></i> Attack Types
+                        </div>
+                        <a href="/" class="attack-type-link">
+                            <i class="fas fa-network-wired"></i> SNMP Attack
+                        </a>
+                        <a href="/malicious-packet" class="attack-type-link">
+                            <i class="fas fa-hammer"></i> Packet Crafting
+                        </a>
+                        <div class="divider"></div>
+                        <a href="/settings" class="nav-link">
+                            <i class="fas fa-cogs"></i> Settings & Testing
+                        </a>
+                        <a href="/admin" class="nav-link active">
+                            <i class="fas fa-tools"></i> Admin Panel
+                        </a>
+                    </div>
+                </div>
+            </div>
             <div class="header-content">
-                <h1><i class="fas fa-user-shield"></i> Admin Panel</h1>
-                <p class="subtitle">Customize Network Components and Display Settings</p>
-                <div class="nav-links">
-                    <a href="/" class="nav-link">Network Topology</a>
-                    <a href="/settings" class="nav-link">Settings & Testing</a>
-                    <a href="/malicious-packet" class="nav-link">Malicious Packets</a>
-                    <a href="/admin" class="nav-link active">Admin Panel</a>
+                <div class="logo-section">
+                    <img src="/static/images/seacure-logo.png" alt="SEACURE Logo" class="header-logo">
+                    <h1>Admin Panel</h1>
                 </div>
             </div>
         </header>
@@ -493,5 +516,27 @@
     </div>
 
     <script src="{{ url_for('static', filename='admin.js') }}"></script>
+    <script>
+        // Hamburger menu functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const hamburgerMenu = document.getElementById('hamburger-menu');
+            const navMenu = document.getElementById('nav-menu');
+            
+            if (hamburgerMenu && navMenu) {
+                hamburgerMenu.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    navMenu.classList.toggle('active');
+                });
+                
+                // Close menu when clicking outside
+                document.addEventListener('click', function(event) {
+                    if (!hamburgerMenu.contains(event.target) && !navMenu.contains(event.target)) {
+                        navMenu.classList.remove('active');
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>

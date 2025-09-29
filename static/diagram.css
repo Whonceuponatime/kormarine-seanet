@@ -204,6 +204,53 @@ body.admin-page {
     font-weight: 600;
 }
 
+/* Attack Type Selector */
+.attack-type-selector {
+    padding: 0;
+}
+
+.attack-type-header {
+    padding: 12px 20px;
+    background: #007bff;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-radius: 6px 6px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.attack-type-link {
+    display: block;
+    padding: 12px 20px;
+    color: #495057;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+}
+
+.attack-type-link:hover {
+    background: #e3f2fd;
+    color: #007bff;
+    border-left-color: #007bff;
+}
+
+.attack-type-link.active {
+    background: #dc3545;
+    color: #ffffff;
+    border-left-color: #dc3545;
+    font-weight: 600;
+}
+
+.divider {
+    height: 1px;
+    background: #dee2e6;
+    margin: 8px 0;
+}
+
 .led-row {
     display: flex;
     gap: 8px;
@@ -1243,6 +1290,7 @@ body.admin-page {
     background: #34495e;
     outline: none;
     -webkit-appearance: none;
+    appearance: none;
 }
 
 .config-item input[type="range"]::-webkit-slider-thumb {
