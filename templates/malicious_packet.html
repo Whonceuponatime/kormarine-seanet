@@ -137,6 +137,9 @@
                         <a href="/malicious-packet" class="attack-type-link active">
                             <i class="fas fa-hammer"></i> Packet Crafting
                         </a>
+                        <a href="/dos-attack" class="attack-type-link">
+                            <i class="fas fa-bomb"></i> DOS Attack
+                        </a>
                         <div class="divider"></div>
                         <a href="/settings" class="nav-link">
                             <i class="fas fa-cogs"></i> Settings & Testing
@@ -362,7 +365,7 @@
                 <div class="control-group">
                     <label><i class="fas fa-crosshairs"></i> Target Configuration:</label>
                     <div style="margin-bottom: 4px;">
-                        <input type="text" id="target-ip" value="192.168.1.100" placeholder="Target IP" class="control-input" style="margin-bottom: 2px;">
+                        <input type="text" id="target-ip" value="192.168.127.98" placeholder="Target IP" class="control-input" style="margin-bottom: 2px;">
                         <div style="display: flex; gap: 2px; align-items: center;">
                             <input type="text" id="target-mac" placeholder="Target MAC (XX:XX:XX:XX:XX:XX)" class="control-input" style="font-size: 9px; flex: 1;">
                             <button id="fetch-target-mac-btn" style="background: #3498db; border: none; color: white; padding: 3px 5px; border-radius: 3px; cursor: pointer; font-size: 9px; min-width: 20px; height: 20px;" title="Auto-fetch Target MAC">

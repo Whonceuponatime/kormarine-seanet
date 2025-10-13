@@ -1,7 +1,7 @@
 // Interactive Network Diagram JavaScript
 class NetworkDiagram {
     constructor() {
-        this.targetIP = '192.168.1.100';
+        this.targetIP = '192.168.127.254';
         this.interfaces = [];
         this.eventSource = null;
         this.isAttacking = false;

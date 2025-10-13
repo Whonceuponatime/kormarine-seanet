@@ -274,6 +274,42 @@ class Routes:
                 print(error_msg)  # Debug logging
                 return jsonify({"ok": False, "error": str(e)}), 500
         
+        # DOS attack routes
+        @self.app.post("/dos/start-flood")
+        def start_udp_flood():
+            try:
+                data = request.get_json()
+                if not data:
+                    return jsonify({"ok": False, "error": "No flood data provided"}), 400
+                
+                result = self.cmd.start_udp_flood(data)
+                
+                if result["ok"]:
+                    return jsonify(**result), 200
+                else:
+                    return jsonify(**result), 200  # Return 200 so frontend can handle error
+                    
+            except Exception as e:
+                return jsonify({"ok": False, "error": str(e)}), 500
+        
+        @self.app.post("/dos/stop-flood")
+        def stop_udp_flood():
+            try:
+                result = self.cmd.stop_udp_flood()
+                return jsonify(**result), 200
+                
+            except Exception as e:
+                return jsonify({"ok": False, "error": str(e)}), 500
+        
+        @self.app.get("/dos/flood-status")
+        def get_flood_status():
+            try:
+                result = self.cmd.get_flood_status()
+                return jsonify(**result), 200
+                
+            except Exception as e:
+                return jsonify({"ok": False, "error": str(e)}), 500
+        
         # MAC address lookup routes
         @self.app.post("/packet/get-target-mac")
         def get_target_mac():
@@ -341,6 +377,11 @@ class Routes:
         @self.app.get("/malicious-packet")
         def malicious_packet():
             return render_template('malicious_packet.html')
+        
+        # DOS attack page route
+        @self.app.get("/dos-attack")
+        def dos_attack():
+            return render_template('dos_attack.html')
         
         # Image upload route
         @self.app.post("/upload-image")

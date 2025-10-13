@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOS Attack Simulator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='diagram.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .attack-type-selector {
+            padding: 10px 0;
+        }
+        
+        .attack-type-header {
+            font-weight: bold;
+            color: #e74c3c;
+            padding: 8px 15px;
+            border-bottom: 1px solid #34495e;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .attack-type-link {
+            display: block;
+            padding: 10px 15px;
+            color: #ecf0f1;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .attack-type-link:hover {
+            background: rgba(52, 152, 219, 0.2);
+            border-left-color: #3498db;
+        }
+        
+        .attack-type-link.active {
+            background: rgba(231, 76, 60, 0.2);
+            border-left-color: #e74c3c;
+            color: #e74c3c;
+        }
+        
+        .divider {
+            height: 1px;
+            background: #34495e;
+            margin: 10px 0;
+        }
+        
+        .bandwidth-display {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        
+        .bandwidth-display.active {
+            background: #e74c3c;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .flood-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .flood-status {
+            background: #34495e;
+            color: #ecf0f1;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 11px;
+            margin-top: 10px;
+        }
+        
+        .flood-status.active {
+            background: #e74c3c;
+        }
+    </style>
+</head>
+<body class="network-topology">
+    <div class="diagram-container">
+        <header class="diagram-header">
+            <div class="nav-container">
+                <button class="hamburger-menu" id="hamburger-menu">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
+                <div class="nav-menu" id="nav-menu">
+                    <div class="attack-type-selector">
+                        <div class="attack-type-header">
+                            <i class="fas fa-bug"></i> Attack Types
+                        </div>
+                        <a href="/" class="attack-type-link">
+                            <i class="fas fa-network-wired"></i> SNMP Attack
+                        </a>
+                        <a href="/malicious-packet" class="attack-type-link">
+                            <i class="fas fa-hammer"></i> Packet Crafting
+                        </a>
+                        <a href="/dos-attack" class="attack-type-link active">
+                            <i class="fas fa-bomb"></i> DOS Attack
+                        </a>
+                        <div class="divider"></div>
+                        <a href="/settings" class="nav-link">
+                            <i class="fas fa-cogs"></i> Settings & Testing
+                        </a>
+                        <a href="/admin" class="nav-link">
+                            <i class="fas fa-tools"></i> Admin Panel
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="header-content">
+                <div class="logo-section">
+                    <img src="/static/images/seacure-logo.png" alt="SEACURE Logo" class="header-logo">
+                    <h1>DOS Attack Simulator</h1>
+                </div>
+            </div>
+        </header>
+
+        <div class="network-diagram" style="padding: 2px; width: 100%; height: 60vh; min-height: 400px;">
+            <div class="diagram-overlay">
+                <div class="interaction-hint-overlay">
+                    <i class="fas fa-info-circle"></i>
+                    <span>UDP Flood Attack Simulator • Target: 192.168.127.98 • ~80Mbps Bandwidth</span>
+                </div>
+            </div>
+            <svg id="network-svg" viewBox="0 0 1400 300" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;">
+                <defs>
+                    <!-- Gradients for modern styling -->
+                    <linearGradient id="attackerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#e74c3c;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#c0392b;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="switchGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#3498db;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#2980b9;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="deviceGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#27ae60;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#229954;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="rpGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#9b59b6;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#8e44ad;stop-opacity:1" />
+                    </linearGradient>
+                    
+                    <!-- Animation definitions -->
+                    <marker id="arrowhead" markerWidth="10" markerHeight="7" 
+                            refX="0" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#e74c3c" />
+                    </marker>
+
+                    <!-- Packet animation -->
+                    <circle id="packet-template" r="6" fill="#f39c12" opacity="0">
+                        <animate attributeName="opacity" values="0;1;1;0" dur="2s" repeatCount="indefinite"/>
+                    </circle>
+                </defs>
+
+                <!-- Background -->
+                <rect width="100%" height="100%" fill="#ffffff"/>
+                
+                <!-- Raspberry Pi (Attacker) -->
+                <g id="raspberry-pi" class="device clickable" transform="translate(50, 250)">
+                    <!-- Main device image -->
+                    <image id="rpi-main-image" x="0" y="0" width="120" height="80" href="/static/images/bd463120-b910-447d-82a5-571217c5db0e.jpg" 
+                           preserveAspectRatio="xMidYMid meet" style="border-radius: 10px;"/>
+                    
+                    <!-- Fallback colored box -->
+                    <rect x="0" y="0" width="120" height="80" rx="10" fill="url(#rpGradient)" stroke="#7d3c98" stroke-width="2" 
+                          style="display: none;" id="rpi-fallback-box"/>
+                    
+                    <!-- Resize handle -->
+                    <circle class="resize-handle" cx="115" cy="5" r="5" data-device="rpi"/>
+                    
+                    <!-- Text positioned below the image -->
+                    <text x="60" y="95" text-anchor="middle" class="device-text-below" id="rpi-device-name">DOS Attacker</text>
+                    <text x="60" y="108" text-anchor="middle" class="device-subtext-below" id="rpi-device-desc">UDP Flood Source</text>
+                </g>
+
+                <!-- Network Switch -->
+                <g id="network-switch" class="device" transform="translate(500, 200)">
+                    <!-- Main device image -->
+                    <image id="switch-main-image" x="0" y="0" width="200" height="120" href="/static/images/moxa-edr-8010-series-datasheet-v1.jpg" 
+                           preserveAspectRatio="xMidYMid meet" style="border-radius: 8px;"/>
+                    
+                    <!-- Fallback colored box -->
+                    <rect x="0" y="0" width="200" height="120" rx="8" fill="url(#switchGradient)" stroke="#2980b9" stroke-width="3" 
+                          style="display: none;" id="switch-fallback-box"/>
+                    
+                    <!-- Resize handle -->
+                    <circle class="resize-handle" cx="195" cy="5" r="5" data-device="switch"/>
+                    
+                    <!-- Text positioned below the image -->
+                    <text x="100" y="140" text-anchor="middle" class="device-text-below" id="switch-device-name">Network Switch</text>
+                    <text x="100" y="153" text-anchor="middle" class="device-subtext-below" id="switch-device-desc">Network Infrastructure</text>
+                </g>
+
+                <!-- Target Device (DOS Target) -->
+                <g id="target-device" class="device" transform="translate(900, 200)">
+                    <!-- Main device image -->
+                    <image id="target-main-image" x="0" y="0" width="120" height="80" href="/static/images/workstation-default.svg" 
+                           preserveAspectRatio="xMidYMid meet" style="border-radius: 5px;"/>
+                    
+                    <!-- Fallback colored box -->
+                    <rect x="0" y="0" width="120" height="80" rx="5" fill="url(#deviceGradient)" stroke="#229954" stroke-width="2" 
+                          style="display: none;" id="target-fallback-box"/>
+                    
+                    <!-- Status indicator -->
+                    <circle cx="105" cy="10" r="6" fill="#27ae60" class="connection-status" id="target-status"/>
+                    
+                    <!-- Resize handle -->
+                    <circle class="resize-handle" cx="115" cy="5" r="5" data-device="target"/>
+                    
+                    <!-- Text positioned below the image -->
+                    <text x="60" y="100" text-anchor="middle" class="device-text-below" id="target-device-name">DOS Target</text>
+                    <text x="60" y="113" text-anchor="middle" class="device-subtext-below" id="target-device-desc">192.168.127.98</text>
+                </g>
+
+                <!-- Network Connections -->
+                <g class="connections">
+                    <!-- Attacker to Switch -->
+                    <line id="connection-attacker" x1="170" y1="290" x2="500" y2="260" 
+                          stroke="#e74c3c" stroke-width="3" stroke-dasharray="5,5" opacity="0.7"/>
+                    
+                    <!-- Switch to Target -->
+                    <line id="connection-target" x1="700" y1="260" x2="900" y2="240" 
+                          stroke="#27ae60" stroke-width="3" class="target-connection"/>
+                </g>
+
+                <!-- Packet Animation Layer -->
+                <g id="packet-layer">
+                    <!-- Animated packets will be added here dynamically -->
+                </g>
+
+                <!-- Attack Indicators -->
+                <g id="attack-indicators" opacity="0">
+                    <circle cx="600" cy="260" r="50" fill="none" stroke="#e74c3c" stroke-width="3" opacity="0.8">
+                        <animate attributeName="r" values="30;80;30" dur="1s" repeatCount="indefinite"/>
+                        <animate attributeName="opacity" values="0.8;0.2;0.8" dur="1s" repeatCount="indefinite"/>
+                    </circle>
+                    <text x="600" y="265" text-anchor="middle" class="attack-text">UDP FLOOD</text>
+                </g>
+            </svg>
+        </div>
+
+        <div class="control-panel">
+            <div class="control-grid" style="grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px;">
+                <!-- Target Configuration -->
+                <div class="control-group">
+                    <label><i class="fas fa-crosshairs"></i> Target Configuration:</label>
+                    <input type="text" id="target-ip" value="192.168.127.98" placeholder="Target IP" class="control-input">
+                    <input type="number" id="target-port" min="1" max="65535" placeholder="Target Port" value="53" class="control-input">
+                </div>
+                
+                <!-- Attack Parameters -->
+                <div class="control-group">
+                    <label><i class="fas fa-cogs"></i> Attack Parameters:</label>
+                    <input type="number" id="packet-size" min="64" max="65507" placeholder="Packet Size (bytes)" value="1024" class="control-input">
+                    <input type="number" id="duration" min="0" max="3600" placeholder="Duration (0=continuous)" value="0" class="control-input">
+                </div>
+                
+                <!-- Flood Controls -->
+                <div class="control-group">
+                    <label><i class="fas fa-bomb"></i> Flood Control:</label>
+                    <div class="flood-controls">
+                        <button id="start-flood-btn" class="control-btn port-down">
+                            <i class="fas fa-play"></i> Start Flood
+                        </button>
+                        <button id="stop-flood-btn" class="control-btn port-up" disabled>
+                            <i class="fas fa-stop"></i> Stop Flood
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Bandwidth Monitor -->
+                <div class="control-group">
+                    <label><i class="fas fa-tachometer-alt"></i> Bandwidth Monitor:</label>
+                    <div class="bandwidth-display" id="bandwidth-display">
+                        Target: 80 Mbps<br>
+                        Current: 0 Mbps<br>
+                        Packets: 0
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Flood Status -->
+            <div class="flood-status" id="flood-status">
+                <strong>Status:</strong> Ready to attack • <strong>Target:</strong> 192.168.127.98:53 • <strong>Mode:</strong> UDP Flood
+            </div>
+        </div>
+
+        <div class="interaction-panel">
+            <div class="attack-log">
+                <h3><i class="fas fa-terminal"></i> DOS Attack Log & Statistics</h3>
+                <div class="log-container" id="log-container">
+                    <div class="log-entry info">
+                        <span class="timestamp">[Ready]</span>
+                        <span class="message">DOS Attack Simulator initialized - Target: 192.168.127.98</span>
+                    </div>
+                </div>
+                <button id="clear-log" class="clear-btn">
+                    <i class="fas fa-trash"></i> Clear Log
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='diagram.js') }}"></script>
+    <script src="{{ url_for('static', filename='dos_attack.js') }}"></script>
+    <script>
+        // Initialize everything when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing DOS attack page...');
+            
+            // Hamburger menu functionality
+            const hamburgerMenu = document.getElementById('hamburger-menu');
+            const navMenu = document.getElementById('nav-menu');
+            
+            if (hamburgerMenu && navMenu) {
+                hamburgerMenu.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    navMenu.classList.toggle('active');
+                });
+                
+                // Close menu when clicking outside
+                document.addEventListener('click', function(event) {
+                    if (!hamburgerMenu.contains(event.target) && !navMenu.contains(event.target)) {
+                        navMenu.classList.remove('active');
+                    }
+                });
+            }
+            
+            // Initialize DOS attack controller
+            if (typeof DOSAttackController !== 'undefined') {
+                console.log('Initializing DOSAttackController...');
+                window.dosController = new DOSAttackController();
+            }
+            
+            // Initialize network diagram with DOS-specific settings
+            setTimeout(() => {
+                if (typeof NetworkDiagram !== 'undefined') {
+                    console.log('Initializing NetworkDiagram for DOS attack...');
+                    window.networkDiagram = new NetworkDiagram();
+                    // Disable SNMP-specific features for DOS attack page
+                    if (window.networkDiagram) {
+                        window.networkDiagram.executeSnmpWalk = function() { console.log('SNMP disabled on DOS page'); };
+                        window.networkDiagram.executePortDown = function() { console.log('Port control disabled on DOS page'); };
+                        window.networkDiagram.executePortUp = function() { console.log('Port control disabled on DOS page'); };
+                        window.networkDiagram.checkPortStatus = function() { console.log('Port status disabled on DOS page'); };
+                    }
+                }
+            }, 100);
+        });
+    </script>
+</body>
+</html>

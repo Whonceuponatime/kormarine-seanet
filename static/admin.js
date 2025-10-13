@@ -14,7 +14,7 @@ class AdminController {
                 description: 'SNMP v1/v2c Enabled',
                 imageUrl: '/static/images/moxa-edr-8010-series-datasheet-v1.jpg',
                 model: 'MOXA EDR-8010',
-                defaultIP: '192.168.1.100'
+                defaultIP: '192.168.127.254'
             },
             device1: {
                 name: 'Workstation',
