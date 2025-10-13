@@ -12,6 +12,7 @@ class MaliciousPacketBuilder {
     init() {
         this.setupEventListeners();
         this.updateTargetDisplay();
+        this.autoResolveSourceConfiguration();
     }
 
     setupEventListeners() {
@@ -350,6 +351,32 @@ class MaliciousPacketBuilder {
                 <span class="message">Malicious Packet Builder initialized</span>
             </div>
         `;
+    }
+
+    async autoResolveSourceConfiguration() {
+        this.log('Auto-resolving source configuration...', 'info');
+        
+        // Auto-fetch source MAC address
+        try {
+            const response = await fetch('/packet/get-source-mac');
+            const result = await response.json();
+            
+            if (result.ok && result.mac) {
+                document.getElementById('source-mac').value = result.masked_mac || result.mac;
+                this.log(`Source MAC resolved: ${result.masked_mac || result.mac}`, 'success');
+            } else {
+                this.log('Could not auto-resolve source MAC', 'warning');
+            }
+        } catch (error) {
+            this.log(`Source MAC resolution failed: ${error.message}`, 'error');
+        }
+
+        // Set source IP to "Auto" by default (it's already set in HTML)
+        const sourceIpField = document.getElementById('source-ip');
+        if (!sourceIpField.value) {
+            sourceIpField.placeholder = 'Source IP (Auto-detected)';
+            this.log('Source IP set to auto-detect', 'info');
+        }
     }
 
     log(message, type = 'info') {
