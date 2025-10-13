@@ -93,30 +93,35 @@
                 <div class="logo-section">
                     <img src="/static/images/seacure-logo.png" alt="SEACURE Logo" class="header-logo">
                     <h1>DOS Attack Simulator</h1>
-                </div>
+                        </div>
+                <nav class="main-navigation">
+                    <div class="nav-group">
+                        <a href="/" class="nav-btn">
+                            <i class="fas fa-network-wired"></i>
+                            <span>SNMP Attack</span>
+                        </a>
+                        <a href="/malicious-packet" class="nav-btn">
+                            <i class="fas fa-hammer"></i>
+                            <span>Packet Crafting</span>
+                        </a>
+                        <a href="/dos-attack" class="nav-btn active">
+                            <i class="fas fa-bomb"></i>
+                            <span>DOS Attack</span>
+                        </a>
+                    </div>
+                    <div class="nav-divider"></div>
+                    <div class="nav-group">
+                        <a href="/settings" class="nav-btn">
+                            <i class="fas fa-cogs"></i>
+                            <span>Settings</span>
+                        </a>
+                        <a href="/admin" class="nav-btn">
+                            <i class="fas fa-tools"></i>
+                            <span>Admin</span>
+                        </a>
+                    </div>
+                </nav>
             </div>
-            <nav class="main-navigation">
-                <div class="nav-section">
-                    <span class="nav-section-title"><i class="fas fa-bug"></i> Attack Types</span>
-                    <a href="/" class="nav-btn">
-                        <i class="fas fa-network-wired"></i> SNMP Attack
-                    </a>
-                    <a href="/malicious-packet" class="nav-btn">
-                        <i class="fas fa-hammer"></i> Packet Crafting
-                    </a>
-                    <a href="/dos-attack" class="nav-btn active">
-                        <i class="fas fa-bomb"></i> DOS Attack
-                    </a>
-                </div>
-                <div class="nav-section">
-                    <a href="/settings" class="nav-btn">
-                        <i class="fas fa-cogs"></i> Settings
-                    </a>
-                    <a href="/admin" class="nav-btn">
-                        <i class="fas fa-tools"></i> Admin
-                    </a>
-                </div>
-            </nav>
         </header>
 
         <div class="network-diagram" style="padding: 2px; width: 100%;">
@@ -161,7 +166,7 @@
 
                 <!-- Background -->
                 <rect width="100%" height="100%" fill="#ffffff"/>
-                
+
 
                 <!-- Raspberry Pi (Attacker) -->
                 <g id="raspberry-pi" class="device clickable" transform="translate(50, 250)">
@@ -355,7 +360,7 @@
                         Target: 80 Mbps<br>
                         Current: 0 Mbps<br>
                         Packets: 0
-                    </div>
+                </div>
                 </div>
             </div>
             
@@ -364,7 +369,7 @@
                 <label><i class="fas fa-terminal"></i> Attack Log:</label>
                 <div class="simple-log" id="simple-log" style="background: #2c3e50; color: #ecf0f1; padding: 8px; border-radius: 5px; font-family: 'Courier New', monospace; font-size: 11px; height: 80px; overflow-y: auto; border: 1px solid #34495e;">
                     [Ready] DOS Attack Simulator initialized - Target: 192.168.127.98
-                </div>
+                    </div>
                 <div style="display: flex; gap: 10px; margin-top: 5px; justify-content: space-between;">
                     <div class="flood-status" id="flood-status" style="flex: 1;">
                         <strong>Status:</strong> Ready to attack • <strong>Target:</strong> 192.168.127.98:53 • <strong>Mode:</strong> UDP Flood
@@ -375,7 +380,7 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Hidden dummy elements for NetworkDiagram compatibility -->
         <div style="display: none;">
             <button id="discover-btn"></button>
