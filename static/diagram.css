@@ -102,8 +102,10 @@ body.admin-page {
 }
 
 .header-logo {
-    height: 80px;
-    width: auto;
+    height: 160px !important;
+    width: auto !important;
+    max-height: none !important;
+    max-width: none !important;
 }
 
 /* Header Content Layout */
