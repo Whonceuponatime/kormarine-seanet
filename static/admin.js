@@ -51,6 +51,12 @@ class AdminController {
                 showIPAddresses: true,
                 showPortNumbers: true,
                 compactMode: false
+            },
+            deviceVisibility: {
+                device1: true,
+                device2: false,
+                device3: false,
+                device4: false
             }
         };
         
@@ -247,7 +253,7 @@ class AdminController {
         } else {
             this.currentConfig = { ...this.defaultConfig };
             this.populateForm();
-            this.addAdminLog('Using default configuration', 'info');
+            this.addAdminLog('Using default configuration - Device 1 only visible', 'info');
         }
     }
     
