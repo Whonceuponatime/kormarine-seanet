@@ -127,11 +127,11 @@
             </div>
         </header>
 
-        <div class="network-diagram" style="padding: 2px; width: 100%; height: 60vh; min-height: 400px;">
+        <div class="network-diagram" style="padding: 2px; width: 100%;">
             <div class="diagram-overlay">
                 <div class="interaction-hint-overlay">
                     <i class="fas fa-info-circle"></i>
-                    <span>UDP Flood Attack Simulator • Target: 192.168.127.98 • ~80Mbps Bandwidth</span>
+                    <span>Drag components to reposition • UDP Flood Attack Simulator • Target: 192.168.127.98</span>
                 </div>
             </div>
             <svg id="network-svg" viewBox="0 0 1400 300" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;">
@@ -154,6 +154,7 @@
                         <stop offset="100%" style="stop-color:#8e44ad;stop-opacity:1" />
                     </linearGradient>
                     
+
                     <!-- Animation definitions -->
                     <marker id="arrowhead" markerWidth="10" markerHeight="7" 
                             refX="0" refY="3.5" orient="auto">
@@ -169,13 +170,14 @@
                 <!-- Background -->
                 <rect width="100%" height="100%" fill="#ffffff"/>
                 
+
                 <!-- Raspberry Pi (Attacker) -->
                 <g id="raspberry-pi" class="device clickable" transform="translate(50, 250)">
-                    <!-- Main device image -->
+                    <!-- Main device image (replaces the colored box) -->
                     <image id="rpi-main-image" x="0" y="0" width="120" height="80" href="/static/images/bd463120-b910-447d-82a5-571217c5db0e.jpg" 
                            preserveAspectRatio="xMidYMid meet" style="border-radius: 10px;"/>
                     
-                    <!-- Fallback colored box -->
+                    <!-- Fallback colored box (shown if image fails to load) -->
                     <rect x="0" y="0" width="120" height="80" rx="10" fill="url(#rpGradient)" stroke="#7d3c98" stroke-width="2" 
                           style="display: none;" id="rpi-fallback-box"/>
                     
@@ -187,15 +189,24 @@
                     <text x="60" y="108" text-anchor="middle" class="device-subtext-below" id="rpi-device-desc">UDP Flood Source</text>
                 </g>
 
-                <!-- Network Switch -->
+                <!-- Network Switch (Target) -->
                 <g id="network-switch" class="device" transform="translate(500, 200)">
-                    <!-- Main device image -->
+                    <!-- Main device image (replaces the colored box) -->
                     <image id="switch-main-image" x="0" y="0" width="200" height="120" href="/static/images/moxa-edr-8010-series-datasheet-v1.jpg" 
                            preserveAspectRatio="xMidYMid meet" style="border-radius: 8px;"/>
                     
-                    <!-- Fallback colored box -->
+                    <!-- Fallback colored box (shown if image fails to load) -->
                     <rect x="0" y="0" width="200" height="120" rx="8" fill="url(#switchGradient)" stroke="#2980b9" stroke-width="3" 
                           style="display: none;" id="switch-fallback-box"/>
+                    
+                    <!-- Switch Ports -->
+                    <g class="switch-ports">
+                        <!-- Port labels on the switch (relative to switch position) -->
+                        <text x="190" y="20" text-anchor="middle" class="port-label" id="switch-port-1">Port 1</text>
+                        <text x="190" y="50" text-anchor="middle" class="port-label" id="switch-port-2">Port 2</text>
+                        <text x="190" y="80" text-anchor="middle" class="port-label" id="switch-port-3">Port 3</text>
+                        <text x="190" y="110" text-anchor="middle" class="port-label" id="switch-port-4">Port 4</text>
+                    </g>
                     
                     <!-- Resize handle -->
                     <circle class="resize-handle" cx="195" cy="5" r="5" data-device="switch"/>
@@ -205,25 +216,81 @@
                     <text x="100" y="153" text-anchor="middle" class="device-subtext-below" id="switch-device-desc">Network Infrastructure</text>
                 </g>
 
-                <!-- Target Device (DOS Target) -->
-                <g id="target-device" class="device" transform="translate(900, 200)">
-                    <!-- Main device image -->
-                    <image id="target-main-image" x="0" y="0" width="120" height="80" href="/static/images/workstation-default.svg" 
+                <!-- Target Devices -->
+                <g id="device-1" class="device" transform="translate(900, 150)">
+                    <!-- Main device image (replaces the colored box) -->
+                    <image id="device1-main-image" x="0" y="0" width="100" height="70" href="/static/images/workstation-default.svg" 
                            preserveAspectRatio="xMidYMid meet" style="border-radius: 5px;"/>
                     
                     <!-- Fallback colored box -->
-                    <rect x="0" y="0" width="120" height="80" rx="5" fill="url(#deviceGradient)" stroke="#229954" stroke-width="2" 
-                          style="display: none;" id="target-fallback-box"/>
+                    <rect x="0" y="0" width="100" height="70" rx="5" fill="url(#deviceGradient)" stroke="#229954" stroke-width="2" 
+                          style="display: none;" id="device1-fallback-box"/>
                     
-                    <!-- Status indicator -->
-                    <circle cx="105" cy="10" r="6" fill="#27ae60" class="connection-status" id="target-status"/>
+                    <!-- Status indicator on image -->
+                    <circle cx="85" cy="10" r="4" fill="#27ae60" class="connection-status" id="device-1-status"/>
                     
                     <!-- Resize handle -->
-                    <circle class="resize-handle" cx="115" cy="5" r="5" data-device="target"/>
+                    <circle class="resize-handle" cx="95" cy="5" r="4" data-device="device1"/>
                     
                     <!-- Text positioned below the image -->
-                    <text x="60" y="100" text-anchor="middle" class="device-text-below" id="target-device-name">DOS Target</text>
-                    <text x="60" y="113" text-anchor="middle" class="device-subtext-below" id="target-device-desc">192.168.127.98</text>
+                    <text x="50" y="85" text-anchor="middle" class="device-text-below" id="device1-device-name">DOS Target</text>
+                </g>
+
+                <g id="device-2" class="device" transform="translate(900, 270)">
+                    <!-- Main device image (replaces the colored box) -->
+                    <image id="device2-main-image" x="0" y="0" width="100" height="70" href="/static/images/printer-default.svg" 
+                           preserveAspectRatio="xMidYMid meet" style="border-radius: 5px;"/>
+                    
+                    <!-- Fallback colored box -->
+                    <rect x="0" y="0" width="100" height="70" rx="5" fill="url(#deviceGradient)" stroke="#229954" stroke-width="2" 
+                          style="display: none;" id="device2-fallback-box"/>
+                    
+                    <!-- Status indicator on image -->
+                    <circle cx="85" cy="10" r="4" fill="#27ae60" class="connection-status" id="device-2-status"/>
+                    
+                    <!-- Resize handle -->
+                    <circle class="resize-handle" cx="95" cy="5" r="4" data-device="device2"/>
+                    
+                    <!-- Text positioned below the image -->
+                    <text x="50" y="85" text-anchor="middle" class="device-text-below" id="device2-device-name"></text>
+                </g>
+
+                <g id="device-3" class="device" transform="translate(900, 390)">
+                    <!-- Main device image (replaces the colored box) -->
+                    <image id="device3-main-image" x="0" y="0" width="100" height="70" href="/static/images/iot-default.svg" 
+                           preserveAspectRatio="xMidYMid meet" style="border-radius: 5px;"/>
+                    
+                    <!-- Fallback colored box -->
+                    <rect x="0" y="0" width="100" height="70" rx="5" fill="url(#deviceGradient)" stroke="#229954" stroke-width="2" 
+                          style="display: none;" id="device3-fallback-box"/>
+                    
+                    <!-- Status indicator on image -->
+                    <circle cx="85" cy="10" r="4" fill="#27ae60" class="connection-status" id="device-3-status"/>
+                    
+                    <!-- Resize handle -->
+                    <circle class="resize-handle" cx="95" cy="5" r="4" data-device="device3"/>
+                    
+                    <!-- Text positioned below the image -->
+                    <text x="50" y="85" text-anchor="middle" class="device-text-below" id="device3-device-name"></text>
+                </g>
+
+                <g id="device-4" class="device" transform="translate(900, 510)">
+                    <!-- Main device image (replaces the colored box) -->
+                    <image id="device4-main-image" x="0" y="0" width="100" height="70" href="/static/images/camera-default.svg" 
+                           preserveAspectRatio="xMidYMid meet" style="border-radius: 5px;"/>
+                    
+                    <!-- Fallback colored box -->
+                    <rect x="0" y="0" width="100" height="70" rx="5" fill="url(#deviceGradient)" stroke="#229954" stroke-width="2" 
+                          style="display: none;" id="device4-fallback-box"/>
+                    
+                    <!-- Status indicator on image -->
+                    <circle cx="85" cy="10" r="4" fill="#27ae60" class="connection-status" id="device-4-status"/>
+                    
+                    <!-- Resize handle -->
+                    <circle class="resize-handle" cx="95" cy="5" r="4" data-device="device4"/>
+                    
+                    <!-- Text positioned below the image -->
+                    <text x="50" y="85" text-anchor="middle" class="device-text-below" id="device4-device-name"></text>
                 </g>
 
                 <!-- Network Connections -->
@@ -232,9 +299,16 @@
                     <line id="connection-attacker" x1="170" y1="290" x2="500" y2="260" 
                           stroke="#e74c3c" stroke-width="3" stroke-dasharray="5,5" opacity="0.7"/>
                     
-                    <!-- Switch to Target -->
-                    <line id="connection-target" x1="700" y1="260" x2="900" y2="240" 
-                          stroke="#27ae60" stroke-width="3" class="target-connection"/>
+                    
+                    <!-- Switch to Devices -->
+                    <line id="connection-device-1" x1="700" y1="220" x2="900" y2="185" 
+                          stroke="#27ae60" stroke-width="3" class="device-connection" data-port="1"/>
+                    <line id="connection-device-2" x1="700" y1="250" x2="900" y2="305" 
+                          stroke="#27ae60" stroke-width="3" class="device-connection" data-port="2"/>
+                    <line id="connection-device-3" x1="700" y1="280" x2="900" y2="425" 
+                          stroke="#27ae60" stroke-width="3" class="device-connection" data-port="3"/>
+                    <line id="connection-device-4" x1="700" y1="310" x2="900" y2="545" 
+                          stroke="#27ae60" stroke-width="3" class="device-connection" data-port="4"/>
                 </g>
 
                 <!-- Packet Animation Layer -->
@@ -244,11 +318,11 @@
 
                 <!-- Attack Indicators -->
                 <g id="attack-indicators" opacity="0">
-                    <circle cx="600" cy="260" r="50" fill="none" stroke="#e74c3c" stroke-width="3" opacity="0.8">
-                        <animate attributeName="r" values="30;80;30" dur="1s" repeatCount="indefinite"/>
-                        <animate attributeName="opacity" values="0.8;0.2;0.8" dur="1s" repeatCount="indefinite"/>
+                    <circle cx="600" cy="360" r="50" fill="none" stroke="#e74c3c" stroke-width="3" opacity="0.8">
+                        <animate attributeName="r" values="30;60;30" dur="1.5s" repeatCount="indefinite"/>
+                        <animate attributeName="opacity" values="0.8;0.3;0.8" dur="1.5s" repeatCount="indefinite"/>
                     </circle>
-                    <text x="600" y="265" text-anchor="middle" class="attack-text">UDP FLOOD</text>
+                    <text x="600" y="365" text-anchor="middle" class="attack-text">UDP FLOOD</text>
                 </g>
             </svg>
         </div>
@@ -293,25 +367,30 @@
                 </div>
             </div>
             
-            <!-- Flood Status -->
-            <div class="flood-status" id="flood-status">
-                <strong>Status:</strong> Ready to attack • <strong>Target:</strong> 192.168.127.98:53 • <strong>Mode:</strong> UDP Flood
+            <!-- Simple Attack Log -->
+            <div class="control-group" style="grid-column: 1 / -1; margin-top: 10px;">
+                <label><i class="fas fa-terminal"></i> Attack Log:</label>
+                <div class="simple-log" id="simple-log" style="background: #2c3e50; color: #ecf0f1; padding: 8px; border-radius: 5px; font-family: 'Courier New', monospace; font-size: 11px; height: 80px; overflow-y: auto; border: 1px solid #34495e;">
+                    [Ready] DOS Attack Simulator initialized - Target: 192.168.127.98
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 5px; justify-content: space-between;">
+                    <div class="flood-status" id="flood-status" style="flex: 1;">
+                        <strong>Status:</strong> Ready to attack • <strong>Target:</strong> 192.168.127.98:53 • <strong>Mode:</strong> UDP Flood
+                    </div>
+                    <button id="clear-log" class="clear-btn" style="padding: 4px 8px; font-size: 10px;">
+                        <i class="fas fa-trash"></i> Clear
+                    </button>
+                </div>
             </div>
         </div>
-
-        <div class="interaction-panel">
-            <div class="attack-log">
-                <h3><i class="fas fa-terminal"></i> DOS Attack Log & Statistics</h3>
-                <div class="log-container" id="log-container">
-                    <div class="log-entry info">
-                        <span class="timestamp">[Ready]</span>
-                        <span class="message">DOS Attack Simulator initialized - Target: 192.168.127.98</span>
-                    </div>
-                </div>
-                <button id="clear-log" class="clear-btn">
-                    <i class="fas fa-trash"></i> Clear Log
-                </button>
-            </div>
+        
+        <!-- Hidden dummy elements for NetworkDiagram compatibility -->
+        <div style="display: none;">
+            <button id="discover-btn"></button>
+            <button id="port-down-btn"></button>
+            <button id="port-up-btn"></button>
+            <button id="check-status-btn"></button>
+            <div class="log-container" id="log-container"></div>
         </div>
     </div>
 

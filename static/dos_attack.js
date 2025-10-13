@@ -179,8 +179,8 @@ class DOSAttackController {
                     `;
                     bandwidthDisplay.classList.add('active');
                     
-                    // Update target status indicator
-                    const targetStatus = document.getElementById('target-status');
+                    // Update target status indicator (device-1 is the DOS target)
+                    const targetStatus = document.getElementById('device-1-status');
                     if (targetStatus) {
                         targetStatus.setAttribute('fill', '#e74c3c'); // Red when under attack
                     }
@@ -203,8 +203,8 @@ class DOSAttackController {
             this.statusInterval = null;
         }
         
-        // Reset target status indicator
-        const targetStatus = document.getElementById('target-status');
+        // Reset target status indicator (device-1 is the DOS target)
+        const targetStatus = document.getElementById('device-1-status');
         if (targetStatus) {
             targetStatus.setAttribute('fill', '#27ae60'); // Green when not under attack
         }
@@ -258,8 +258,8 @@ class DOSAttackController {
                 // Start from attacker position
                 const startX = 170;
                 const startY = 290;
-                const endX = 960; // Target device position
-                const endY = 240;
+                const endX = 950; // Device-1 position (DOS Target)
+                const endY = 185;
                 
                 packet.setAttribute('cx', startX);
                 packet.setAttribute('cy', startY);
@@ -321,10 +321,10 @@ class DOSAttackController {
         const targetIP = document.getElementById('target-ip').value.trim();
         const targetPort = document.getElementById('target-port').value;
         
-        // Update target device description
-        const targetDesc = document.getElementById('target-device-desc');
+        // Update target device description (device-1 is the DOS target)
+        const targetDesc = document.getElementById('device1-device-name');
         if (targetDesc) {
-            targetDesc.textContent = targetIP || '192.168.127.98';
+            targetDesc.textContent = `DOS Target (${targetIP || '192.168.127.98'})`;
         }
         
         // Update status display if not attacking
@@ -338,44 +338,28 @@ class DOSAttackController {
     }
     
     addLog(type, message) {
-        const logContainer = document.getElementById('log-container');
-        if (!logContainer) return;
+        const simpleLog = document.getElementById('simple-log');
+        if (!simpleLog) return;
         
         const timestamp = new Date().toLocaleTimeString();
-        const logEntry = document.createElement('div');
-        logEntry.className = `log-entry ${type}`;
+        const logLine = `[${timestamp}] ${message}\n`;
         
-        logEntry.innerHTML = `
-            <span class="timestamp">[${timestamp}]</span>
-            <span class="message">${message}</span>
-        `;
-        
-        logContainer.appendChild(logEntry);
-        logContainer.scrollTop = logContainer.scrollHeight;
+        simpleLog.textContent += logLine;
+        simpleLog.scrollTop = simpleLog.scrollHeight;
     }
     
     addInitialLog(message) {
-        const logContainer = document.getElementById('log-container');
-        if (!logContainer) return;
+        const simpleLog = document.getElementById('simple-log');
+        if (!simpleLog) return;
         
-        // Clear existing logs
-        logContainer.innerHTML = '';
-        
-        const logEntry = document.createElement('div');
-        logEntry.className = 'log-entry info';
-        
-        logEntry.innerHTML = `
-            <span class="timestamp">[Ready]</span>
-            <span class="message">${message}</span>
-        `;
-        
-        logContainer.appendChild(logEntry);
+        // Clear existing logs and add initial message
+        simpleLog.textContent = `[Ready] ${message}`;
     }
     
     clearLog() {
-        const logContainer = document.getElementById('log-container');
-        if (logContainer) {
-            logContainer.innerHTML = '';
+        const simpleLog = document.getElementById('simple-log');
+        if (simpleLog) {
+            simpleLog.textContent = '';
             this.addInitialLog('DOS Attack Simulator ready - Target: 192.168.127.98');
         }
     }
