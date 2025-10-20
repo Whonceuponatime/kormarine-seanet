@@ -43,13 +43,34 @@ class CommandExecutor:
         cmd = f"snmpwalk -v2c -c {community} {target} 1.3.6.1.2.1.31.1.1.1.1"
         code, out, err = self._run(cmd, timeout=SNMP_TIMEOUT)
         
-        # Visual feedback - flash green LED for success
+        # Visual feedback - 100Hz rapid fire animation for success
         if code == 0:
-            self.gpio._set(PIN_Y, Y_ACTIVE_LOW, True)
-            time.sleep(0.2)
-            self.gpio._set(PIN_Y, Y_ACTIVE_LOW, False)
-            # Start wave animation
-            threading.Thread(target=self.gpio.wave_once, kwargs={"step_period": 0.16}, daemon=True).start()
+            def success_animation():
+                seq = [
+                    (True,  False, False, False, False, False, False, False, False, False, False, False, False, False, False, False),
+                    (False, True,  False, False, False, False, False, False, False, False, False, False, False, False, False, False),
+                    (False, False, True,  False, False, False, False, False, False, False, False, False, False, False, False, False),
+                    (False, False, False, True,  False, False, False, False, False, False, False, False, False, False, False, False),
+                    (False, False, False, False, True,  False, False, False, False, False, False, False, False, False, False, False),
+                    (False, False, False, False, False, True,  False, False, False, False, False, False, False, False, False, False),
+                    (False, False, False, False, False, False, True,  False, False, False, False, False, False, False, False, False),
+                    (False, False, False, False, False, False, False, True,  False, False, False, False, False, False, False, False),
+                    (False, False, False, False, False, False, False, False, True,  False, False, False, False, False, False, False),
+                    (False, False, False, False, False, False, False, False, False, True,  False, False, False, False, False, False),
+                    (False, False, False, False, False, False, False, False, False, False, True,  False, False, False, False, False),
+                    (False, False, False, False, False, False, False, False, False, False, False, True,  False, False, False, False),
+                    (False, False, False, False, False, False, False, False, False, False, False, False, True,  False, False, False),
+                    (False, False, False, False, False, False, False, False, False, False, False, False, False, True,  False, False),
+                    (False, False, False, False, False, False, False, False, False, False, False, False, False, False, True,  False),
+                    (False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, True),
+                ]
+                # Run once at 100Hz
+                for st in seq:
+                    self.gpio._apply_states(*st)
+                    time.sleep(0.01)
+                self.gpio._off_all()
+            
+            threading.Thread(target=success_animation, daemon=True).start()
         else:
             # Flash red LED for error
             self.gpio.strobe_error()
@@ -77,7 +98,7 @@ class CommandExecutor:
         ok = (code == 0)
         
         if ok:
-            # Success animation - 1→16 pattern for port down
+            # Success animation - 1→16 pattern for port down at 100Hz, 5 times
             def port_down_animation():
                 # Pattern: 1→2→3→4→5→6→7→8→9→10→11→12→13→14→15→16 (all GPIO pins)
                 seq = [
@@ -98,13 +119,11 @@ class CommandExecutor:
                     (False, False, False, False, False, False, False, False, False, False, False, False, False, False, True,  False),  # 20 (15)
                     (False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, True),   # 21 (16)
                 ]
-                for i, st in enumerate(seq):
-                    self.gpio._apply_states(*st)
-                    time.sleep(0.12)  # Slightly faster for better flow
-                    # Send SNMP command when last LED lights up
-                    if i == len(seq) - 1:
-                        time.sleep(0.1)  # Brief pause to show last LED
-                        # The SNMP command was already sent before this animation
+                # Run animation 5 times at 100Hz
+                for _ in range(5):
+                    for st in seq:
+                        self.gpio._apply_states(*st)
+                        time.sleep(0.01)  # 100Hz = 0.01s per step
                 self.gpio._off_all()
             
             threading.Thread(target=port_down_animation, daemon=True).start()
@@ -144,7 +163,7 @@ class CommandExecutor:
         ok = (code == 0)
         
         if ok:
-            # Success animation - 16→1 pattern for port up
+            # Success animation - 16→1 pattern for port up at 100Hz, 5 times
             def port_up_animation():
                 # Pattern: 16→15→14→13→12→11→10→9→8→7→6→5→4→3→2→1 (reverse order)
                 seq = [
@@ -165,13 +184,11 @@ class CommandExecutor:
                     (False, True,  False, False, False, False, False, False, False, False, False, False, False, False, False, False),  # 27 (2)
                     (True,  False, False, False, False, False, False, False, False, False, False, False, False, False, False, False),  # 17 (1)
                 ]
-                for i, st in enumerate(seq):
-                    self.gpio._apply_states(*st)
-                    time.sleep(0.12)  # Slightly faster for better flow
-                    # Send SNMP command when last LED lights up
-                    if i == len(seq) - 1:
-                        time.sleep(0.1)  # Brief pause to show last LED
-                        # The SNMP command was already sent before this animation
+                # Run animation 5 times at 100Hz
+                for _ in range(5):
+                    for st in seq:
+                        self.gpio._apply_states(*st)
+                        time.sleep(0.01)  # 100Hz = 0.01s per step
                 self.gpio._off_all()
             
             threading.Thread(target=port_up_animation, daemon=True).start()
@@ -251,10 +268,33 @@ class CommandExecutor:
         ok = (name_code == 0 and admin_code == 0 and oper_code == 0)
         
         if ok:
-            # Visual feedback - flash blue LED
-            self.gpio._set(PIN_A, A_ACTIVE_LOW, True)
-            time.sleep(0.2)
-            self.gpio._set(PIN_A, A_ACTIVE_LOW, False)
+            # Visual feedback - 100Hz rapid fire animation
+            def success_animation():
+                seq = [
+                    (True,  False, False, False, False, False, False, False, False, False, False, False, False, False, False, False),
+                    (False, True,  False, False, False, False, False, False, False, False, False, False, False, False, False, False),
+                    (False, False, True,  False, False, False, False, False, False, False, False, False, False, False, False, False),
+                    (False, False, False, True,  False, False, False, False, False, False, False, False, False, False, False, False),
+                    (False, False, False, False, True,  False, False, False, False, False, False, False, False, False, False, False),
+                    (False, False, False, False, False, True,  False, False, False, False, False, False, False, False, False, False),
+                    (False, False, False, False, False, False, True,  False, False, False, False, False, False, False, False, False),
+                    (False, False, False, False, False, False, False, True,  False, False, False, False, False, False, False, False),
+                    (False, False, False, False, False, False, False, False, True,  False, False, False, False, False, False, False),
+                    (False, False, False, False, False, False, False, False, False, True,  False, False, False, False, False, False),
+                    (False, False, False, False, False, False, False, False, False, False, True,  False, False, False, False, False),
+                    (False, False, False, False, False, False, False, False, False, False, False, True,  False, False, False, False),
+                    (False, False, False, False, False, False, False, False, False, False, False, False, True,  False, False, False),
+                    (False, False, False, False, False, False, False, False, False, False, False, False, False, True,  False, False),
+                    (False, False, False, False, False, False, False, False, False, False, False, False, False, False, True,  False),
+                    (False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, True),
+                ]
+                # Run once at 100Hz
+                for st in seq:
+                    self.gpio._apply_states(*st)
+                    time.sleep(0.01)
+                self.gpio._off_all()
+            
+            threading.Thread(target=success_animation, daemon=True).start()
         
         return {
             "ok": ok,
@@ -295,10 +335,6 @@ class CommandExecutor:
             self.gpio.stop_anim()
             self.gpio._off_all()
             
-            # LED animation for packet crafting (no pause)
-            print(f"DEBUG: Turning ON RED LED (PIN_R={PIN_R}) for crafting")
-            self.gpio._set(PIN_R, R_ACTIVE_LOW, True)  # Red LED for crafting
-            
             if protocol == 'tcp':
                 result = self._send_tcp_packet(source_ip, source_port, target_ip, target_port, payload, source_mac, target_mac)
             elif protocol == 'udp':
@@ -306,21 +342,36 @@ class CommandExecutor:
             else:
                 return {"ok": False, "error": f"Unsupported protocol: {protocol}"}
             
-            # Success animation
+            # Success animation - 100Hz rapid fire
             if result["ok"]:
-                # Yellow LED for success (using PIN_Y)
-                print(f"DEBUG: Turning OFF RED LED (PIN_R={PIN_R})")
-                self.gpio._set(PIN_R, R_ACTIVE_LOW, False)
-                print(f"DEBUG: Turning ON YELLOW LED (PIN_Y={PIN_Y}) for success")
-                self.gpio._set(PIN_Y, Y_ACTIVE_LOW, True)
-                time.sleep(0.5)  # Slower timing for success indication
-                print(f"DEBUG: Turning OFF YELLOW LED (PIN_Y={PIN_Y})")
-                self.gpio._set(PIN_Y, Y_ACTIVE_LOW, False)
-                # Start wave animation
-                threading.Thread(target=self.gpio.wave_once, kwargs={"step_period": 0.16}, daemon=True).start()
+                def success_animation():
+                    seq = [
+                        (True,  False, False, False, False, False, False, False, False, False, False, False, False, False, False, False),
+                        (False, True,  False, False, False, False, False, False, False, False, False, False, False, False, False, False),
+                        (False, False, True,  False, False, False, False, False, False, False, False, False, False, False, False, False),
+                        (False, False, False, True,  False, False, False, False, False, False, False, False, False, False, False, False),
+                        (False, False, False, False, True,  False, False, False, False, False, False, False, False, False, False, False),
+                        (False, False, False, False, False, True,  False, False, False, False, False, False, False, False, False, False),
+                        (False, False, False, False, False, False, True,  False, False, False, False, False, False, False, False, False),
+                        (False, False, False, False, False, False, False, True,  False, False, False, False, False, False, False, False),
+                        (False, False, False, False, False, False, False, False, True,  False, False, False, False, False, False, False),
+                        (False, False, False, False, False, False, False, False, False, True,  False, False, False, False, False, False),
+                        (False, False, False, False, False, False, False, False, False, False, True,  False, False, False, False, False),
+                        (False, False, False, False, False, False, False, False, False, False, False, True,  False, False, False, False),
+                        (False, False, False, False, False, False, False, False, False, False, False, False, True,  False, False, False),
+                        (False, False, False, False, False, False, False, False, False, False, False, False, False, True,  False, False),
+                        (False, False, False, False, False, False, False, False, False, False, False, False, False, False, True,  False),
+                        (False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, True),
+                    ]
+                    # Run once at 100Hz
+                    for st in seq:
+                        self.gpio._apply_states(*st)
+                        time.sleep(0.01)
+                    self.gpio._off_all()
+                
+                threading.Thread(target=success_animation, daemon=True).start()
             else:
                 # Error animation
-                self.gpio._set(PIN_R, R_ACTIVE_LOW, False)
                 self.gpio.strobe_error()
             
             return result
@@ -492,21 +543,38 @@ class CommandExecutor:
             self.gpio.stop_anim()
             self.gpio._off_all()
             
-            # LED animation for raw packet
-            self.gpio._set(PIN_B, B_ACTIVE_LOW, True)  # Blue LED for raw packet
-            time.sleep(0.3)  # Slower timing for malicious packet builder
-            
             # Send raw packet via UDP
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             sock.sendto(raw_bytes, (target_ip, target_port))
             sock.close()
             
-            # Success animation
-            self.gpio._set(PIN_B, B_ACTIVE_LOW, False)
-            self.gpio._set(PIN_Y, Y_ACTIVE_LOW, True)
-            time.sleep(0.5)  # Slower timing for success indication
-            self.gpio._set(PIN_Y, Y_ACTIVE_LOW, False)
-            threading.Thread(target=self.gpio.wave_once, kwargs={"step_period": 0.16}, daemon=True).start()
+            # Success animation - 100Hz rapid fire
+            def success_animation():
+                seq = [
+                    (True,  False, False, False, False, False, False, False, False, False, False, False, False, False, False, False),
+                    (False, True,  False, False, False, False, False, False, False, False, False, False, False, False, False, False),
+                    (False, False, True,  False, False, False, False, False, False, False, False, False, False, False, False, False),
+                    (False, False, False, True,  False, False, False, False, False, False, False, False, False, False, False, False),
+                    (False, False, False, False, True,  False, False, False, False, False, False, False, False, False, False, False),
+                    (False, False, False, False, False, True,  False, False, False, False, False, False, False, False, False, False),
+                    (False, False, False, False, False, False, True,  False, False, False, False, False, False, False, False, False),
+                    (False, False, False, False, False, False, False, True,  False, False, False, False, False, False, False, False),
+                    (False, False, False, False, False, False, False, False, True,  False, False, False, False, False, False, False),
+                    (False, False, False, False, False, False, False, False, False, True,  False, False, False, False, False, False),
+                    (False, False, False, False, False, False, False, False, False, False, True,  False, False, False, False, False),
+                    (False, False, False, False, False, False, False, False, False, False, False, True,  False, False, False, False),
+                    (False, False, False, False, False, False, False, False, False, False, False, False, True,  False, False, False),
+                    (False, False, False, False, False, False, False, False, False, False, False, False, False, True,  False, False),
+                    (False, False, False, False, False, False, False, False, False, False, False, False, False, False, True,  False),
+                    (False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, True),
+                ]
+                # Run once at 100Hz
+                for st in seq:
+                    self.gpio._apply_states(*st)
+                    time.sleep(0.01)
+                self.gpio._off_all()
+            
+            threading.Thread(target=success_animation, daemon=True).start()
             
             return {
                 "ok": True,
@@ -535,29 +603,23 @@ class CommandExecutor:
             self.gpio.stop_anim()
             self.gpio._off_all()
             
-            # LED animation for EICAR test
-            self.gpio._set(PIN_Y, Y_ACTIVE_LOW, True)  # Yellow LED for EICAR
-            time.sleep(0.3)  # Slower timing for malicious packet builder
-            
             if protocol == 'tcp':
                 result = self._send_tcp_packet('', 12345, target_ip, target_port, eicar_string)
             else:
                 result = self._send_udp_packet('', 12345, target_ip, target_port, eicar_string)
             
-            # Success animation with special EICAR pattern
+            # Success animation with special EICAR pattern - 100Hz rapid fire
             if result["ok"]:
-                self.gpio._set(PIN_Y, Y_ACTIVE_LOW, False)
-                # Special EICAR LED pattern (all 16 LEDs flash twice)
+                # Special EICAR LED pattern (all 16 LEDs flash 3 times at 100Hz)
                 def eicar_animation():
-                    for _ in range(2):
+                    for _ in range(3):
                         self.gpio._apply_states(True, True, True, True, True, True, True, True, True, True, True, True, True, True, True, True)
-                        time.sleep(0.3)  # Slower flash timing
+                        time.sleep(0.01)  # 100Hz
                         self.gpio._off_all()
-                        time.sleep(0.3)  # Slower flash timing
+                        time.sleep(0.01)  # 100Hz
                 
                 threading.Thread(target=eicar_animation, daemon=True).start()
             else:
-                self.gpio._set(PIN_Y, Y_ACTIVE_LOW, False)
                 self.gpio.strobe_error()
             
             result["eicar_payload"] = eicar_string
@@ -618,9 +680,6 @@ class CommandExecutor:
                 additional_data = ''.join(random.choices(string.ascii_letters + string.digits + ' .,', k=packet_size - len(payload)))
                 payload += additional_data.encode()
             
-            # LED animation for flood start
-            self.gpio._set(PIN_R, R_ACTIVE_LOW, True)  # Red LED for attack
-            
             # Store flood state
             self.flood_active = True
             self.flood_stats = {
@@ -630,6 +689,39 @@ class CommandExecutor:
                 'target_ip': target_ip,
                 'target_port': target_port
             }
+            
+            # LED animation for flood - 100Hz rapid fire
+            def led_animation_worker():
+                """Worker function for 100Hz LED animation during flood"""
+                seq = [
+                    (True,  False, False, False, False, False, False, False, False, False, False, False, False, False, False, False),  # 17 (1)
+                    (False, True,  False, False, False, False, False, False, False, False, False, False, False, False, False, False),  # 27 (2)
+                    (False, False, True,  False, False, False, False, False, False, False, False, False, False, False, False, False),  # 22 (3)
+                    (False, False, False, True,  False, False, False, False, False, False, False, False, False, False, False, False),  # 10 (4)
+                    (False, False, False, False, True,  False, False, False, False, False, False, False, False, False, False, False),  # 9  (5)
+                    (False, False, False, False, False, True,  False, False, False, False, False, False, False, False, False, False),  # 5  (6)
+                    (False, False, False, False, False, False, True,  False, False, False, False, False, False, False, False, False),  # 6  (7)
+                    (False, False, False, False, False, False, False, True,  False, False, False, False, False, False, False, False),  # 26 (8)
+                    (False, False, False, False, False, False, False, False, True,  False, False, False, False, False, False, False),  # 16 (9)
+                    (False, False, False, False, False, False, False, False, False, True,  False, False, False, False, False, False),  # 14 (10)
+                    (False, False, False, False, False, False, False, False, False, False, True,  False, False, False, False, False),  # 18 (11)
+                    (False, False, False, False, False, False, False, False, False, False, False, True,  False, False, False, False),  # 23 (12)
+                    (False, False, False, False, False, False, False, False, False, False, False, False, True,  False, False, False),  # 24 (13)
+                    (False, False, False, False, False, False, False, False, False, False, False, False, False, True,  False, False),  # 25 (14)
+                    (False, False, False, False, False, False, False, False, False, False, False, False, False, False, True,  False),  # 20 (15)
+                    (False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, True),   # 21 (16)
+                ]
+                try:
+                    while self.flood_active:
+                        for st in seq:
+                            if not self.flood_active:
+                                break
+                            self.gpio._apply_states(*st)
+                            time.sleep(0.01)  # 100Hz
+                except Exception as e:
+                    print(f"LED animation error: {e}")
+                finally:
+                    self.gpio._off_all()
             
             def flood_worker():
                 """Worker function to send UDP packets"""
@@ -686,20 +778,14 @@ class CommandExecutor:
                             continue
                     
                     sock.close()
-                    
-                    # Stop animation when flood ends
-                    self.gpio._set(PIN_R, R_ACTIVE_LOW, False)
-                    # Flash completion pattern
-                    for _ in range(3):
-                        self.gpio._set(PIN_Y, Y_ACTIVE_LOW, True)
-                        time.sleep(0.2)
-                        self.gpio._set(PIN_Y, Y_ACTIVE_LOW, False)
-                        time.sleep(0.2)
                         
                 except Exception as e:
                     print(f"Flood worker error: {e}")
                     self.flood_active = False
-                    self.gpio.strobe_error()
+            
+            # Start LED animation in background thread
+            self.led_animation_thread = threading.Thread(target=led_animation_worker, daemon=True)
+            self.led_animation_thread.start()
             
             # Start flood in background thread
             self.flood_thread = threading.Thread(target=flood_worker, daemon=True)
@@ -724,6 +810,10 @@ class CommandExecutor:
             if hasattr(self, 'flood_active'):
                 self.flood_active = False
                 
+            # Wait for LED animation thread to finish
+            if hasattr(self, 'led_animation_thread') and self.led_animation_thread.is_alive():
+                self.led_animation_thread.join(timeout=1.0)
+                
             # Calculate final stats
             if hasattr(self, 'flood_stats'):
                 duration = time.time() - self.flood_stats['start_time']
@@ -740,8 +830,7 @@ class CommandExecutor:
             else:
                 stats = {"ok": True, "message": "No active flood to stop"}
             
-            # Stop LED animation
-            self.gpio._set(PIN_R, R_ACTIVE_LOW, False)
+            # Ensure LEDs are off
             self.gpio._off_all()
             
             return stats
