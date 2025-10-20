@@ -1,7 +1,12 @@
 #!/bin/bash
 # Startup script for Raspberry Pi LED Server
 
+# Get the directory where this script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
+
 echo "Starting Raspberry Pi LED Server..."
+echo "Project directory: $SCRIPT_DIR"
 
 # Check if pigpiod is installed
 if ! command -v pigpiod &> /dev/null; then
@@ -12,13 +17,16 @@ if ! command -v pigpiod &> /dev/null; then
     sudo apt install -y gcc make python3-dev unzip wget
     
     # Download and build pigpio
+    ORIG_DIR="$PWD"
     cd /tmp
     wget https://github.com/joan2937/pigpio/archive/master.zip -O pigpio.zip
     unzip -o pigpio.zip
     cd pigpio-master
     make
     sudo make install
-    cd -
+    
+    # Return to original directory
+    cd "$ORIG_DIR"
     
     # Clean up
     rm -rf /tmp/pigpio.zip /tmp/pigpio-master
