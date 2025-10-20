@@ -77,25 +77,26 @@ class CommandExecutor:
         ok = (code == 0)
         
         if ok:
-            # Success animation - 1→15 pattern for port down
+            # Success animation - 1→16 pattern for port down
             def port_down_animation():
-                # Pattern: 1→2→3→4→5→6→7→8→9→10→11→12→13→14→15 (all GPIO pins)
+                # Pattern: 1→2→3→4→5→6→7→8→9→10→11→12→13→14→15→16 (all GPIO pins)
                 seq = [
-                    (True,  False, False, False, False, False, False, False, False, False, False, False, False, False, False),  # 17 (1)
-                    (False, True,  False, False, False, False, False, False, False, False, False, False, False, False, False),  # 27 (2)
-                    (False, False, True,  False, False, False, False, False, False, False, False, False, False, False, False),  # 22 (3)
-                    (False, False, False, True,  False, False, False, False, False, False, False, False, False, False, False),  # 10 (4)
-                    (False, False, False, False, True,  False, False, False, False, False, False, False, False, False, False),  # 9  (5)
-                    (False, False, False, False, False, True,  False, False, False, False, False, False, False, False, False),  # 5  (6)
-                    (False, False, False, False, False, False, True,  False, False, False, False, False, False, False, False),  # 6  (7)
-                    (False, False, False, False, False, False, False, True,  False, False, False, False, False, False, False),  # 26 (8)
-                    (False, False, False, False, False, False, False, False, True,  False, False, False, False, False, False),  # 16 (9)
-                    (False, False, False, False, False, False, False, False, False, True,  False, False, False, False, False),  # 14 (10)
-                    (False, False, False, False, False, False, False, False, False, False, True,  False, False, False, False),  # 18 (11)
-                    (False, False, False, False, False, False, False, False, False, False, False, True,  False, False, False),  # 23 (12)
-                    (False, False, False, False, False, False, False, False, False, False, False, False, True,  False, False),  # 24 (13)
-                    (False, False, False, False, False, False, False, False, False, False, False, False, False, True,  False),  # 25 (14)
-                    (False, False, False, False, False, False, False, False, False, False, False, False, False, False, True),   # 20 (15)
+                    (True,  False, False, False, False, False, False, False, False, False, False, False, False, False, False, False),  # 17 (1)
+                    (False, True,  False, False, False, False, False, False, False, False, False, False, False, False, False, False),  # 27 (2)
+                    (False, False, True,  False, False, False, False, False, False, False, False, False, False, False, False, False),  # 22 (3)
+                    (False, False, False, True,  False, False, False, False, False, False, False, False, False, False, False, False),  # 10 (4)
+                    (False, False, False, False, True,  False, False, False, False, False, False, False, False, False, False, False),  # 9  (5)
+                    (False, False, False, False, False, True,  False, False, False, False, False, False, False, False, False, False),  # 5  (6)
+                    (False, False, False, False, False, False, True,  False, False, False, False, False, False, False, False, False),  # 6  (7)
+                    (False, False, False, False, False, False, False, True,  False, False, False, False, False, False, False, False),  # 26 (8)
+                    (False, False, False, False, False, False, False, False, True,  False, False, False, False, False, False, False),  # 16 (9)
+                    (False, False, False, False, False, False, False, False, False, True,  False, False, False, False, False, False),  # 14 (10)
+                    (False, False, False, False, False, False, False, False, False, False, True,  False, False, False, False, False),  # 18 (11)
+                    (False, False, False, False, False, False, False, False, False, False, False, True,  False, False, False, False),  # 23 (12)
+                    (False, False, False, False, False, False, False, False, False, False, False, False, True,  False, False, False),  # 24 (13)
+                    (False, False, False, False, False, False, False, False, False, False, False, False, False, True,  False, False),  # 25 (14)
+                    (False, False, False, False, False, False, False, False, False, False, False, False, False, False, True,  False),  # 20 (15)
+                    (False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, True),   # 21 (16)
                 ]
                 for i, st in enumerate(seq):
                     self.gpio._apply_states(*st)
@@ -143,25 +144,26 @@ class CommandExecutor:
         ok = (code == 0)
         
         if ok:
-            # Success animation - 15→1 pattern for port up
+            # Success animation - 16→1 pattern for port up
             def port_up_animation():
-                # Pattern: 15→14→13→12→11→10→9→8→7→6→5→4→3→2→1 (reverse order)
+                # Pattern: 16→15→14→13→12→11→10→9→8→7→6→5→4→3→2→1 (reverse order)
                 seq = [
-                    (False, False, False, False, False, False, False, False, False, False, False, False, False, False, True),   # 20 (15)
-                    (False, False, False, False, False, False, False, False, False, False, False, False, False, True,  False),  # 25 (14)
-                    (False, False, False, False, False, False, False, False, False, False, False, False, True,  False, False),  # 24 (13)
-                    (False, False, False, False, False, False, False, False, False, False, False, True,  False, False, False),  # 23 (12)
-                    (False, False, False, False, False, False, False, False, False, False, True,  False, False, False, False),  # 18 (11)
-                    (False, False, False, False, False, False, False, False, False, True,  False, False, False, False, False),  # 14 (10)
-                    (False, False, False, False, False, False, False, False, True,  False, False, False, False, False, False),  # 16 (9)
-                    (False, False, False, False, False, False, False, True,  False, False, False, False, False, False, False),  # 26 (8)
-                    (False, False, False, False, False, False, True,  False, False, False, False, False, False, False, False),  # 6  (7)
-                    (False, False, False, False, False, True,  False, False, False, False, False, False, False, False, False),  # 5  (6)
-                    (False, False, False, False, True,  False, False, False, False, False, False, False, False, False, False),  # 9  (5)
-                    (False, False, False, True,  False, False, False, False, False, False, False, False, False, False, False),  # 10 (4)
-                    (False, False, True,  False, False, False, False, False, False, False, False, False, False, False, False),  # 22 (3)
-                    (False, True,  False, False, False, False, False, False, False, False, False, False, False, False, False),  # 27 (2)
-                    (True,  False, False, False, False, False, False, False, False, False, False, False, False, False, False),  # 17 (1)
+                    (False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, True),   # 21 (16)
+                    (False, False, False, False, False, False, False, False, False, False, False, False, False, False, True,  False),  # 20 (15)
+                    (False, False, False, False, False, False, False, False, False, False, False, False, False, True,  False, False),  # 25 (14)
+                    (False, False, False, False, False, False, False, False, False, False, False, False, True,  False, False, False),  # 24 (13)
+                    (False, False, False, False, False, False, False, False, False, False, False, True,  False, False, False, False),  # 23 (12)
+                    (False, False, False, False, False, False, False, False, False, False, True,  False, False, False, False, False),  # 18 (11)
+                    (False, False, False, False, False, False, False, False, False, True,  False, False, False, False, False, False),  # 14 (10)
+                    (False, False, False, False, False, False, False, False, True,  False, False, False, False, False, False, False),  # 16 (9)
+                    (False, False, False, False, False, False, False, True,  False, False, False, False, False, False, False, False),  # 26 (8)
+                    (False, False, False, False, False, False, True,  False, False, False, False, False, False, False, False, False),  # 6  (7)
+                    (False, False, False, False, False, True,  False, False, False, False, False, False, False, False, False, False),  # 5  (6)
+                    (False, False, False, False, True,  False, False, False, False, False, False, False, False, False, False, False),  # 9  (5)
+                    (False, False, False, True,  False, False, False, False, False, False, False, False, False, False, False, False),  # 10 (4)
+                    (False, False, True,  False, False, False, False, False, False, False, False, False, False, False, False, False),  # 22 (3)
+                    (False, True,  False, False, False, False, False, False, False, False, False, False, False, False, False, False),  # 27 (2)
+                    (True,  False, False, False, False, False, False, False, False, False, False, False, False, False, False, False),  # 17 (1)
                 ]
                 for i, st in enumerate(seq):
                     self.gpio._apply_states(*st)
@@ -545,10 +547,10 @@ class CommandExecutor:
             # Success animation with special EICAR pattern
             if result["ok"]:
                 self.gpio._set(PIN_Y, Y_ACTIVE_LOW, False)
-                # Special EICAR LED pattern (all LEDs flash twice)
+                # Special EICAR LED pattern (all 16 LEDs flash twice)
                 def eicar_animation():
                     for _ in range(2):
-                        self.gpio._apply_states(True, True, True, True, True, True, True)
+                        self.gpio._apply_states(True, True, True, True, True, True, True, True, True, True, True, True, True, True, True, True)
                         time.sleep(0.3)  # Slower flash timing
                         self.gpio._off_all()
                         time.sleep(0.3)  # Slower flash timing

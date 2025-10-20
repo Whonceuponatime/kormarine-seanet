@@ -47,7 +47,7 @@ class Routes:
                 hz = DEFAULT_WAVE_SPEED
                 step_period = 1.0
             started = self.gpio.start_chaser(step_period)
-            return jsonify(ok=started, anim="15-step chaser", hz=hz)
+            return jsonify(ok=started, anim="16-step chaser", hz=hz)
         
         @self.app.get("/wave/forward")
         def wave_forward():
@@ -131,6 +131,51 @@ class Routes:
         @self.app.get("/on6")
         def on6():
             success = self.gpio.turn_on_pin('6')
+            return jsonify(ok=success)
+        
+        @self.app.get("/on26")
+        def on26():
+            success = self.gpio.turn_on_pin('26')
+            return jsonify(ok=success)
+        
+        @self.app.get("/on16")
+        def on16():
+            success = self.gpio.turn_on_pin('16')
+            return jsonify(ok=success)
+        
+        @self.app.get("/on14")
+        def on14():
+            success = self.gpio.turn_on_pin('14')
+            return jsonify(ok=success)
+        
+        @self.app.get("/on18")
+        def on18():
+            success = self.gpio.turn_on_pin('18')
+            return jsonify(ok=success)
+        
+        @self.app.get("/on23")
+        def on23():
+            success = self.gpio.turn_on_pin('23')
+            return jsonify(ok=success)
+        
+        @self.app.get("/on24")
+        def on24():
+            success = self.gpio.turn_on_pin('24')
+            return jsonify(ok=success)
+        
+        @self.app.get("/on25")
+        def on25():
+            success = self.gpio.turn_on_pin('25')
+            return jsonify(ok=success)
+        
+        @self.app.get("/on20")
+        def on20():
+            success = self.gpio.turn_on_pin('20')
+            return jsonify(ok=success)
+        
+        @self.app.get("/on21")
+        def on21():
+            success = self.gpio.turn_on_pin('21')
             return jsonify(ok=success)
         
         # Status routes
