@@ -5,9 +5,23 @@ echo "Starting Raspberry Pi LED Server..."
 
 # Check if pigpiod is installed
 if ! command -v pigpiod &> /dev/null; then
-    echo "pigpiod not found. Installing..."
+    echo "pigpiod not found. Installing from source..."
+    
+    # Install dependencies
     sudo apt update
-    sudo apt install -y pigpio
+    sudo apt install -y gcc make python3-dev unzip wget
+    
+    # Download and build pigpio
+    cd /tmp
+    wget https://github.com/joan2937/pigpio/archive/master.zip -O pigpio.zip
+    unzip -o pigpio.zip
+    cd pigpio-master
+    make
+    sudo make install
+    cd -
+    
+    # Clean up
+    rm -rf /tmp/pigpio.zip /tmp/pigpio-master
     
     # Verify installation
     if ! command -v pigpiod &> /dev/null; then
