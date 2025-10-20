@@ -340,7 +340,7 @@ class CommandExecutor:
             else:
                 return {"ok": False, "error": f"Unsupported protocol: {protocol}"}
             
-            # Success animation - 15Hz
+            # Success animation - Same as SNMP port down (1→16 at 15Hz, once)
             if result["ok"]:
                 def success_animation():
                     seq = [
@@ -361,10 +361,10 @@ class CommandExecutor:
                         (False, False, False, False, False, False, False, False, False, False, False, False, False, False, True,  False),
                         (False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, True),
                     ]
-                    # Run once at 15Hz
+                    # Single pass at 15Hz
                     for st in seq:
                         self.gpio._apply_states(*st)
-                        time.sleep(0.067)  # 15Hz = 0.067s per step
+                        time.sleep(0.067)  # 15Hz
                     self.gpio._off_all()
                 
                 threading.Thread(target=success_animation, daemon=True).start()
@@ -546,7 +546,7 @@ class CommandExecutor:
             sock.sendto(raw_bytes, (target_ip, target_port))
             sock.close()
             
-            # Success animation - 15Hz
+            # Success animation - Same as SNMP port down (1→16 at 15Hz, once)
             def success_animation():
                 seq = [
                     (True,  False, False, False, False, False, False, False, False, False, False, False, False, False, False, False),
@@ -566,10 +566,10 @@ class CommandExecutor:
                     (False, False, False, False, False, False, False, False, False, False, False, False, False, False, True,  False),
                     (False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, True),
                 ]
-                # Run once at 15Hz
+                # Single pass at 15Hz
                 for st in seq:
                     self.gpio._apply_states(*st)
-                    time.sleep(0.067)  # 15Hz = 0.067s per step
+                    time.sleep(0.067)  # 15Hz
                 self.gpio._off_all()
             
             threading.Thread(target=success_animation, daemon=True).start()
@@ -606,15 +606,32 @@ class CommandExecutor:
             else:
                 result = self._send_udp_packet('', 12345, target_ip, target_port, eicar_string)
             
-            # Success animation with special EICAR pattern - 15Hz
+            # Success animation - Same as SNMP port down (1→16 at 15Hz, once)
             if result["ok"]:
-                # Special EICAR LED pattern (all 16 LEDs flash 3 times at 15Hz)
                 def eicar_animation():
-                    for _ in range(3):
-                        self.gpio._apply_states(True, True, True, True, True, True, True, True, True, True, True, True, True, True, True, True)
+                    seq = [
+                        (True,  False, False, False, False, False, False, False, False, False, False, False, False, False, False, False),
+                        (False, True,  False, False, False, False, False, False, False, False, False, False, False, False, False, False),
+                        (False, False, True,  False, False, False, False, False, False, False, False, False, False, False, False, False),
+                        (False, False, False, True,  False, False, False, False, False, False, False, False, False, False, False, False),
+                        (False, False, False, False, True,  False, False, False, False, False, False, False, False, False, False, False),
+                        (False, False, False, False, False, True,  False, False, False, False, False, False, False, False, False, False),
+                        (False, False, False, False, False, False, True,  False, False, False, False, False, False, False, False, False),
+                        (False, False, False, False, False, False, False, True,  False, False, False, False, False, False, False, False),
+                        (False, False, False, False, False, False, False, False, True,  False, False, False, False, False, False, False),
+                        (False, False, False, False, False, False, False, False, False, True,  False, False, False, False, False, False),
+                        (False, False, False, False, False, False, False, False, False, False, True,  False, False, False, False, False),
+                        (False, False, False, False, False, False, False, False, False, False, False, True,  False, False, False, False),
+                        (False, False, False, False, False, False, False, False, False, False, False, False, True,  False, False, False),
+                        (False, False, False, False, False, False, False, False, False, False, False, False, False, True,  False, False),
+                        (False, False, False, False, False, False, False, False, False, False, False, False, False, False, True,  False),
+                        (False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, True),
+                    ]
+                    # Single pass at 15Hz
+                    for st in seq:
+                        self.gpio._apply_states(*st)
                         time.sleep(0.067)  # 15Hz
-                        self.gpio._off_all()
-                        time.sleep(0.067)  # 15Hz
+                    self.gpio._off_all()
                 
                 threading.Thread(target=eicar_animation, daemon=True).start()
             else:
