@@ -43,7 +43,7 @@ class CommandExecutor:
         cmd = f"snmpwalk -v2c -c {community} {target} 1.3.6.1.2.1.31.1.1.1.1"
         code, out, err = self._run(cmd, timeout=SNMP_TIMEOUT)
         
-        # Visual feedback - 100Hz rapid fire animation for success
+        # Visual feedback - 15Hz animation for success
         if code == 0:
             def success_animation():
                 seq = [
@@ -64,10 +64,10 @@ class CommandExecutor:
                     (False, False, False, False, False, False, False, False, False, False, False, False, False, False, True,  False),
                     (False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, True),
                 ]
-                # Run once at 100Hz
+                # Run once at 15Hz
                 for st in seq:
                     self.gpio._apply_states(*st)
-                    time.sleep(0.01)
+                    time.sleep(0.067)  # 15Hz = 0.067s per step
                 self.gpio._off_all()
             
             threading.Thread(target=success_animation, daemon=True).start()
@@ -98,7 +98,7 @@ class CommandExecutor:
         ok = (code == 0)
         
         if ok:
-            # Success animation - 1→16 pattern for port down at 100Hz, 5 times
+            # Success animation - 1→16 pattern for port down at 15Hz, once
             def port_down_animation():
                 # Pattern: 1→2→3→4→5→6→7→8→9→10→11→12→13→14→15→16 (all GPIO pins)
                 seq = [
@@ -119,11 +119,10 @@ class CommandExecutor:
                     (False, False, False, False, False, False, False, False, False, False, False, False, False, False, True,  False),  # 20 (15)
                     (False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, True),   # 21 (16)
                 ]
-                # Run animation 5 times at 100Hz
-                for _ in range(5):
-                    for st in seq:
-                        self.gpio._apply_states(*st)
-                        time.sleep(0.01)  # 100Hz = 0.01s per step
+                # Run animation once at 15Hz
+                for st in seq:
+                    self.gpio._apply_states(*st)
+                    time.sleep(0.067)  # 15Hz = 0.067s per step
                 self.gpio._off_all()
             
             threading.Thread(target=port_down_animation, daemon=True).start()
@@ -163,7 +162,7 @@ class CommandExecutor:
         ok = (code == 0)
         
         if ok:
-            # Success animation - 16→1 pattern for port up at 100Hz, 5 times
+            # Success animation - 16→1 pattern for port up at 15Hz, once
             def port_up_animation():
                 # Pattern: 16→15→14→13→12→11→10→9→8→7→6→5→4→3→2→1 (reverse order)
                 seq = [
@@ -184,11 +183,10 @@ class CommandExecutor:
                     (False, True,  False, False, False, False, False, False, False, False, False, False, False, False, False, False),  # 27 (2)
                     (True,  False, False, False, False, False, False, False, False, False, False, False, False, False, False, False),  # 17 (1)
                 ]
-                # Run animation 5 times at 100Hz
-                for _ in range(5):
-                    for st in seq:
-                        self.gpio._apply_states(*st)
-                        time.sleep(0.01)  # 100Hz = 0.01s per step
+                # Run animation once at 15Hz
+                for st in seq:
+                    self.gpio._apply_states(*st)
+                    time.sleep(0.067)  # 15Hz = 0.067s per step
                 self.gpio._off_all()
             
             threading.Thread(target=port_up_animation, daemon=True).start()
@@ -268,7 +266,7 @@ class CommandExecutor:
         ok = (name_code == 0 and admin_code == 0 and oper_code == 0)
         
         if ok:
-            # Visual feedback - 100Hz rapid fire animation
+            # Visual feedback - 15Hz animation
             def success_animation():
                 seq = [
                     (True,  False, False, False, False, False, False, False, False, False, False, False, False, False, False, False),
@@ -288,10 +286,10 @@ class CommandExecutor:
                     (False, False, False, False, False, False, False, False, False, False, False, False, False, False, True,  False),
                     (False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, True),
                 ]
-                # Run once at 100Hz
+                # Run once at 15Hz
                 for st in seq:
                     self.gpio._apply_states(*st)
-                    time.sleep(0.01)
+                    time.sleep(0.067)  # 15Hz = 0.067s per step
                 self.gpio._off_all()
             
             threading.Thread(target=success_animation, daemon=True).start()
@@ -342,7 +340,7 @@ class CommandExecutor:
             else:
                 return {"ok": False, "error": f"Unsupported protocol: {protocol}"}
             
-            # Success animation - 100Hz rapid fire
+            # Success animation - 15Hz
             if result["ok"]:
                 def success_animation():
                     seq = [
@@ -363,10 +361,10 @@ class CommandExecutor:
                         (False, False, False, False, False, False, False, False, False, False, False, False, False, False, True,  False),
                         (False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, True),
                     ]
-                    # Run once at 100Hz
+                    # Run once at 15Hz
                     for st in seq:
                         self.gpio._apply_states(*st)
-                        time.sleep(0.01)
+                        time.sleep(0.067)  # 15Hz = 0.067s per step
                     self.gpio._off_all()
                 
                 threading.Thread(target=success_animation, daemon=True).start()
@@ -548,7 +546,7 @@ class CommandExecutor:
             sock.sendto(raw_bytes, (target_ip, target_port))
             sock.close()
             
-            # Success animation - 100Hz rapid fire
+            # Success animation - 15Hz
             def success_animation():
                 seq = [
                     (True,  False, False, False, False, False, False, False, False, False, False, False, False, False, False, False),
@@ -568,10 +566,10 @@ class CommandExecutor:
                     (False, False, False, False, False, False, False, False, False, False, False, False, False, False, True,  False),
                     (False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, True),
                 ]
-                # Run once at 100Hz
+                # Run once at 15Hz
                 for st in seq:
                     self.gpio._apply_states(*st)
-                    time.sleep(0.01)
+                    time.sleep(0.067)  # 15Hz = 0.067s per step
                 self.gpio._off_all()
             
             threading.Thread(target=success_animation, daemon=True).start()
@@ -608,15 +606,15 @@ class CommandExecutor:
             else:
                 result = self._send_udp_packet('', 12345, target_ip, target_port, eicar_string)
             
-            # Success animation with special EICAR pattern - 100Hz rapid fire
+            # Success animation with special EICAR pattern - 15Hz
             if result["ok"]:
-                # Special EICAR LED pattern (all 16 LEDs flash 3 times at 100Hz)
+                # Special EICAR LED pattern (all 16 LEDs flash 3 times at 15Hz)
                 def eicar_animation():
                     for _ in range(3):
                         self.gpio._apply_states(True, True, True, True, True, True, True, True, True, True, True, True, True, True, True, True)
-                        time.sleep(0.01)  # 100Hz
+                        time.sleep(0.067)  # 15Hz
                         self.gpio._off_all()
-                        time.sleep(0.01)  # 100Hz
+                        time.sleep(0.067)  # 15Hz
                 
                 threading.Thread(target=eicar_animation, daemon=True).start()
             else:
