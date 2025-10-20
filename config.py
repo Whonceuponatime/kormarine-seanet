@@ -6,7 +6,7 @@ Contains GPIO pin definitions and server settings
 """
 
 # ===================== GPIO CONFIG =====================
-# GPIO pins in order: [17, 27, 22, 10, 9, 5, 6, 26, 16, 14, 18, 23, 24, 25, 20]
+# GPIO pins in order: [17, 27, 22, 10, 9, 5, 6, 26, 16, 14, 18, 23, 24, 25, 20, 21]
 PIN_1 = 17   # LED 1 (active-HIGH)
 PIN_2 = 27   # LED 2 (active-HIGH)
 PIN_3 = 22   # LED 3 (active-HIGH)
@@ -22,6 +22,7 @@ PIN_12 = 23  # LED 12 (active-HIGH)
 PIN_13 = 24  # LED 13 (active-HIGH)
 PIN_14 = 25  # LED 14 (active-HIGH)
 PIN_15 = 20  # LED 15 (active-HIGH)
+PIN_16 = 21  # LED 16 (active-HIGH)
 
 # Active low/high configuration for each pin
 PIN_1_ACTIVE_LOW = False
@@ -39,6 +40,7 @@ PIN_12_ACTIVE_LOW = False
 PIN_13_ACTIVE_LOW = False
 PIN_14_ACTIVE_LOW = False
 PIN_15_ACTIVE_LOW = False
+PIN_16_ACTIVE_LOW = False
 
 # Legacy aliases for backward compatibility
 PIN_R = PIN_1   # RGB red (active-HIGH)

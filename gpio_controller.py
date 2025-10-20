@@ -27,7 +27,7 @@ class GPIOController:
     
     def _setup_pins(self):
         """Set up GPIO pins as outputs, handling reserved pins gracefully"""
-        pins = [PIN_1, PIN_2, PIN_3, PIN_4, PIN_5, PIN_6, PIN_7, PIN_8, PIN_9, PIN_10, PIN_11, PIN_12, PIN_13, PIN_14, PIN_15]
+        pins = [PIN_1, PIN_2, PIN_3, PIN_4, PIN_5, PIN_6, PIN_7, PIN_8, PIN_9, PIN_10, PIN_11, PIN_12, PIN_13, PIN_14, PIN_15, PIN_16]
         for pin in pins:
             try:
                 self.pi.set_mode(pin, pigpio.OUTPUT)
@@ -57,8 +57,9 @@ class GPIOController:
         self._set(PIN_13, PIN_13_ACTIVE_LOW, False)
         self._set(PIN_14, PIN_14_ACTIVE_LOW, False)
         self._set(PIN_15, PIN_15_ACTIVE_LOW, False)
+        self._set(PIN_16, PIN_16_ACTIVE_LOW, False)
     
-    def _apply_states(self, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15):
+    def _apply_states(self, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16):
         """Apply states to all LEDs at once"""
         self._set(PIN_1, PIN_1_ACTIVE_LOW, p1)
         self._set(PIN_2, PIN_2_ACTIVE_LOW, p2)
@@ -75,26 +76,28 @@ class GPIOController:
         self._set(PIN_13, PIN_13_ACTIVE_LOW, p13)
         self._set(PIN_14, PIN_14_ACTIVE_LOW, p14)
         self._set(PIN_15, PIN_15_ACTIVE_LOW, p15)
+        self._set(PIN_16, PIN_16_ACTIVE_LOW, p16)
     
     def wave_once(self, step_period=DEFAULT_STEP_PERIOD):
         """Execute a single left-to-right wave animation"""
-        # Left-to-right one pass: 17→27→22→10→9→5→6→26→16→14→18→23→24→25→20
+        # Left-to-right one pass: 17→27→22→10→9→5→6→26→16→14→18→23→24→25→20→21
         seq = [
-            (True,  False, False, False, False, False, False, False, False, False, False, False, False, False, False),  # 17
-            (False, True,  False, False, False, False, False, False, False, False, False, False, False, False, False),  # 27
-            (False, False, True,  False, False, False, False, False, False, False, False, False, False, False, False),  # 22
-            (False, False, False, True,  False, False, False, False, False, False, False, False, False, False, False),  # 10
-            (False, False, False, False, True,  False, False, False, False, False, False, False, False, False, False),  # 9
-            (False, False, False, False, False, True,  False, False, False, False, False, False, False, False, False),  # 5
-            (False, False, False, False, False, False, True,  False, False, False, False, False, False, False, False),  # 6
-            (False, False, False, False, False, False, False, True,  False, False, False, False, False, False, False),  # 26
-            (False, False, False, False, False, False, False, False, True,  False, False, False, False, False, False),  # 16
-            (False, False, False, False, False, False, False, False, False, True,  False, False, False, False, False),  # 14
-            (False, False, False, False, False, False, False, False, False, False, True,  False, False, False, False),  # 18
-            (False, False, False, False, False, False, False, False, False, False, False, True,  False, False, False),  # 23
-            (False, False, False, False, False, False, False, False, False, False, False, False, True,  False, False),  # 24
-            (False, False, False, False, False, False, False, False, False, False, False, False, False, True,  False),  # 25
-            (False, False, False, False, False, False, False, False, False, False, False, False, False, False, True),   # 20
+            (True,  False, False, False, False, False, False, False, False, False, False, False, False, False, False, False),  # 17
+            (False, True,  False, False, False, False, False, False, False, False, False, False, False, False, False, False),  # 27
+            (False, False, True,  False, False, False, False, False, False, False, False, False, False, False, False, False),  # 22
+            (False, False, False, True,  False, False, False, False, False, False, False, False, False, False, False, False),  # 10
+            (False, False, False, False, True,  False, False, False, False, False, False, False, False, False, False, False),  # 9
+            (False, False, False, False, False, True,  False, False, False, False, False, False, False, False, False, False),  # 5
+            (False, False, False, False, False, False, True,  False, False, False, False, False, False, False, False, False),  # 6
+            (False, False, False, False, False, False, False, True,  False, False, False, False, False, False, False, False),  # 26
+            (False, False, False, False, False, False, False, False, True,  False, False, False, False, False, False, False),  # 16
+            (False, False, False, False, False, False, False, False, False, True,  False, False, False, False, False, False),  # 14
+            (False, False, False, False, False, False, False, False, False, False, True,  False, False, False, False, False),  # 18
+            (False, False, False, False, False, False, False, False, False, False, False, True,  False, False, False, False),  # 23
+            (False, False, False, False, False, False, False, False, False, False, False, False, True,  False, False, False),  # 24
+            (False, False, False, False, False, False, False, False, False, False, False, False, False, True,  False, False),  # 25
+            (False, False, False, False, False, False, False, False, False, False, False, False, False, False, True,  False),  # 20
+            (False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, True),   # 21
         ]
         for st in seq:
             self._apply_states(*st)
@@ -104,43 +107,45 @@ class GPIOController:
     def roundtrip_wave(self, step_period=DEFAULT_ROUNDTRIP_PERIOD):
         """Execute a roundtrip wave animation (forward then backward)"""
         fwd = [
-            (True,  False, False, False, False, False, False, False, False, False, False, False, False, False, False),
-            (False, True,  False, False, False, False, False, False, False, False, False, False, False, False, False),
-            (False, False, True,  False, False, False, False, False, False, False, False, False, False, False, False),
-            (False, False, False, True,  False, False, False, False, False, False, False, False, False, False, False),
-            (False, False, False, False, True,  False, False, False, False, False, False, False, False, False, False),
-            (False, False, False, False, False, True,  False, False, False, False, False, False, False, False, False),
-            (False, False, False, False, False, False, True,  False, False, False, False, False, False, False, False),
-            (False, False, False, False, False, False, False, True,  False, False, False, False, False, False, False),
-            (False, False, False, False, False, False, False, False, True,  False, False, False, False, False, False),
-            (False, False, False, False, False, False, False, False, False, True,  False, False, False, False, False),
-            (False, False, False, False, False, False, False, False, False, False, True,  False, False, False, False),
-            (False, False, False, False, False, False, False, False, False, False, False, True,  False, False, False),
-            (False, False, False, False, False, False, False, False, False, False, False, False, True,  False, False),
-            (False, False, False, False, False, False, False, False, False, False, False, False, False, True,  False),
-            (False, False, False, False, False, False, False, False, False, False, False, False, False, False, True),
+            (True,  False, False, False, False, False, False, False, False, False, False, False, False, False, False, False),
+            (False, True,  False, False, False, False, False, False, False, False, False, False, False, False, False, False),
+            (False, False, True,  False, False, False, False, False, False, False, False, False, False, False, False, False),
+            (False, False, False, True,  False, False, False, False, False, False, False, False, False, False, False, False),
+            (False, False, False, False, True,  False, False, False, False, False, False, False, False, False, False, False),
+            (False, False, False, False, False, True,  False, False, False, False, False, False, False, False, False, False),
+            (False, False, False, False, False, False, True,  False, False, False, False, False, False, False, False, False),
+            (False, False, False, False, False, False, False, True,  False, False, False, False, False, False, False, False),
+            (False, False, False, False, False, False, False, False, True,  False, False, False, False, False, False, False),
+            (False, False, False, False, False, False, False, False, False, True,  False, False, False, False, False, False),
+            (False, False, False, False, False, False, False, False, False, False, True,  False, False, False, False, False),
+            (False, False, False, False, False, False, False, False, False, False, False, True,  False, False, False, False),
+            (False, False, False, False, False, False, False, False, False, False, False, False, True,  False, False, False),
+            (False, False, False, False, False, False, False, False, False, False, False, False, False, True,  False, False),
+            (False, False, False, False, False, False, False, False, False, False, False, False, False, False, True,  False),
+            (False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, True),
         ]
         back = [
-            (False, False, False, False, False, False, False, False, False, False, False, False, False, True,  False),
-            (False, False, False, False, False, False, False, False, False, False, False, False, True,  False, False),
-            (False, False, False, False, False, False, False, False, False, False, False, True,  False, False, False),
-            (False, False, False, False, False, False, False, False, False, False, True,  False, False, False, False),
-            (False, False, False, False, False, False, False, False, False, True,  False, False, False, False, False),
-            (False, False, False, False, False, False, False, False, True,  False, False, False, False, False, False),
-            (False, False, False, False, False, False, False, True,  False, False, False, False, False, False, False),
-            (False, False, False, False, False, False, True,  False, False, False, False, False, False, False, False),
-            (False, False, False, False, False, True,  False, False, False, False, False, False, False, False, False),
-            (False, False, False, False, True,  False, False, False, False, False, False, False, False, False, False),
-            (False, False, False, True,  False, False, False, False, False, False, False, False, False, False, False),
-            (False, False, True,  False, False, False, False, False, False, False, False, False, False, False, False),
-            (False, True,  False, False, False, False, False, False, False, False, False, False, False, False, False),
-            (True,  False, False, False, False, False, False, False, False, False, False, False, False, False, False),
+            (False, False, False, False, False, False, False, False, False, False, False, False, False, False, True,  False),
+            (False, False, False, False, False, False, False, False, False, False, False, False, False, True,  False, False),
+            (False, False, False, False, False, False, False, False, False, False, False, False, True,  False, False, False),
+            (False, False, False, False, False, False, False, False, False, False, False, True,  False, False, False, False),
+            (False, False, False, False, False, False, False, False, False, False, True,  False, False, False, False, False),
+            (False, False, False, False, False, False, False, False, False, True,  False, False, False, False, False, False),
+            (False, False, False, False, False, False, False, False, True,  False, False, False, False, False, False, False),
+            (False, False, False, False, False, False, False, True,  False, False, False, False, False, False, False, False),
+            (False, False, False, False, False, False, True,  False, False, False, False, False, False, False, False, False),
+            (False, False, False, False, False, True,  False, False, False, False, False, False, False, False, False, False),
+            (False, False, False, False, True,  False, False, False, False, False, False, False, False, False, False, False),
+            (False, False, False, True,  False, False, False, False, False, False, False, False, False, False, False, False),
+            (False, False, True,  False, False, False, False, False, False, False, False, False, False, False, False, False),
+            (False, True,  False, False, False, False, False, False, False, False, False, False, False, False, False, False),
+            (True,  False, False, False, False, False, False, False, False, False, False, False, False, False, False, False),
         ]
         for st in fwd:
             self._apply_states(*st)
             time.sleep(step_period)
-        self._apply_states(False, False, False, False, False, False, False, False, False, False, False, False, False, False, True)
-        time.sleep(step_period)  # hold @15
+        self._apply_states(False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, True)
+        time.sleep(step_period)  # hold @16
         for st in back:
             self._apply_states(*st)
             time.sleep(step_period)
@@ -157,21 +162,22 @@ class GPIOController:
     def chaser(self, step_period=0.5):
         """Continuous chaser animation"""
         order = [
-            (True,  False, False, False, False, False, False, False, False, False, False, False, False, False, False),
-            (False, True,  False, False, False, False, False, False, False, False, False, False, False, False, False),
-            (False, False, True,  False, False, False, False, False, False, False, False, False, False, False, False),
-            (False, False, False, True,  False, False, False, False, False, False, False, False, False, False, False),
-            (False, False, False, False, True,  False, False, False, False, False, False, False, False, False, False),
-            (False, False, False, False, False, True,  False, False, False, False, False, False, False, False, False),
-            (False, False, False, False, False, False, True,  False, False, False, False, False, False, False, False),
-            (False, False, False, False, False, False, False, True,  False, False, False, False, False, False, False),
-            (False, False, False, False, False, False, False, False, True,  False, False, False, False, False, False),
-            (False, False, False, False, False, False, False, False, False, True,  False, False, False, False, False),
-            (False, False, False, False, False, False, False, False, False, False, True,  False, False, False, False),
-            (False, False, False, False, False, False, False, False, False, False, False, True,  False, False, False),
-            (False, False, False, False, False, False, False, False, False, False, False, False, True,  False, False),
-            (False, False, False, False, False, False, False, False, False, False, False, False, False, True,  False),
-            (False, False, False, False, False, False, False, False, False, False, False, False, False, False, True),
+            (True,  False, False, False, False, False, False, False, False, False, False, False, False, False, False, False),
+            (False, True,  False, False, False, False, False, False, False, False, False, False, False, False, False, False),
+            (False, False, True,  False, False, False, False, False, False, False, False, False, False, False, False, False),
+            (False, False, False, True,  False, False, False, False, False, False, False, False, False, False, False, False),
+            (False, False, False, False, True,  False, False, False, False, False, False, False, False, False, False, False),
+            (False, False, False, False, False, True,  False, False, False, False, False, False, False, False, False, False),
+            (False, False, False, False, False, False, True,  False, False, False, False, False, False, False, False, False),
+            (False, False, False, False, False, False, False, True,  False, False, False, False, False, False, False, False),
+            (False, False, False, False, False, False, False, False, True,  False, False, False, False, False, False, False),
+            (False, False, False, False, False, False, False, False, False, True,  False, False, False, False, False, False),
+            (False, False, False, False, False, False, False, False, False, False, True,  False, False, False, False, False),
+            (False, False, False, False, False, False, False, False, False, False, False, True,  False, False, False, False),
+            (False, False, False, False, False, False, False, False, False, False, False, False, True,  False, False, False),
+            (False, False, False, False, False, False, False, False, False, False, False, False, False, True,  False, False),
+            (False, False, False, False, False, False, False, False, False, False, False, False, False, False, True,  False),
+            (False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, True),
         ]
         idx = 0
         while not self.anim_stop.is_set():
@@ -216,6 +222,7 @@ class GPIOController:
             '24': (PIN_13, PIN_13_ACTIVE_LOW),
             '25': (PIN_14, PIN_14_ACTIVE_LOW),
             '20': (PIN_15, PIN_15_ACTIVE_LOW),
+            '21': (PIN_16, PIN_16_ACTIVE_LOW),
         }
         
         if pin_name in pin_map:
@@ -245,6 +252,7 @@ class GPIOController:
                 "24": self.pi.read(PIN_13),
                 "25": self.pi.read(PIN_14),
                 "20": self.pi.read(PIN_15),
+                "21": self.pi.read(PIN_16),
             }
         }
     

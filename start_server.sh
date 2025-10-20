@@ -80,7 +80,7 @@ source venv/bin/activate
 # Check if dependencies are installed in venv
 if ! python -c "import flask, pigpio, psutil, netifaces" 2>/dev/null; then
     echo "Installing Python dependencies in virtual environment..."
-    pip install -r requirements.txt
+    pip install --force-reinstall -r requirements.txt
 fi
 
 # Start the server with virtual environment
