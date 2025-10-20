@@ -3,11 +3,46 @@
 
 echo "Starting Raspberry Pi LED Server..."
 
+# Check if pigpiod is installed
+if ! command -v pigpiod &> /dev/null; then
+    echo "pigpiod not found. Installing..."
+    sudo apt update
+    sudo apt install -y pigpio
+    
+    # Verify installation
+    if ! command -v pigpiod &> /dev/null; then
+        echo "ERROR: Failed to install pigpiod"
+        exit 1
+    fi
+    
+    echo "pigpiod installed successfully"
+fi
+
 # Check if pigpiod is running
 if ! pgrep -x "pigpiod" > /dev/null; then
     echo "Starting pigpiod daemon..."
-    sudo systemctl start pigpiod
+    
+    # Try to start via systemd first
+    if systemctl list-unit-files | grep -q "pigpiod.service"; then
+        sudo systemctl start pigpiod
+    else
+        # If systemd service doesn't exist, start manually
+        sudo pigpiod
+    fi
+    
+    # Wait for daemon to start
     sleep 2
+    
+    # Verify it's running
+    if ! pgrep -x "pigpiod" > /dev/null; then
+        echo "ERROR: Failed to start pigpiod daemon"
+        echo "Try running manually: sudo pigpiod"
+        exit 1
+    fi
+    
+    echo "pigpiod daemon started successfully"
+else
+    echo "pigpiod daemon is already running"
 fi
 
 # Create virtual environment if it doesn't exist
